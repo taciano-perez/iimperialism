@@ -32,10 +32,23 @@ The challenge is to manage resources efficiently across six commodities:
 - **Orders for next turn**
   - `TT` = Timber transport  
   - `TC` = Cotton transport  
-  - `PL` = Produce Lumber (from Timber)  
-  - `PF` = Produce Furniture (from Lumber)  
-  - `PA` = Produce Fabric (from Cotton)  
-  - `PC` = Produce Clothes (from Fabric)  
+  - `PL` = Sawmill orders (2 Timber → 1 Lumber)
+  - `PF` = Furniture Factory orders (2 Lumber → 1 Furniture)
+  - `PG` = Textile Workshop orders (2 Cotton → 1 Fabric)  
+  - `PC` = Clothes Factory orders (2 Fabric → 1 Clothes)
+
+- **Transport capacity**
+  - `TCAP` = Maximum total transport orders allowed per turn (starts at 20)
+  - Transport orders (`TT` + `TC`) cannot exceed transport capacity
+  - Players can increase capacity through the Transport Orders menu
+
+- **Factory capacities**
+  - `SCAP` = Sawmill capacity (starts at 1)
+  - `FCAP` = Furniture Factory capacity (starts at 1)
+  - `WCAP` = Textile Workshop capacity (starts at 1)
+  - `CCAP` = Clothes Factory capacity (starts at 1)
+  - Each factory can only process up to its capacity per turn
+  - Players can increase individual factory capacities  
 
 - **Province supply (changes every turn)**
   - `ST` = Timber supply available in provinces this turn  
@@ -45,14 +58,15 @@ The challenge is to manage resources efficiently across six commodities:
 
 1. **Transport Phase**
    - Orders `TT` and `TC` are capped at available provincial supply `ST` and `SC`.
+   - Total transport orders (`TT` + `TC`) cannot exceed transport capacity `TCAP`.
    - Result is added to warehouse (`TI` and `CO`).
 
 2. **Production Phase**
-   - `PL`: Each order consumes **1 Timber → 1 Lumber**.
-   - `PF`: Each order consumes **2 Lumber → 1 Furniture**.
-   - `PA`: Each order consumes **1 Cotton → 1 Fabric**.
-   - `PC`: Each order consumes **2 Fabric → 1 Clothes**.
-   - Orders are reduced if insufficient resources are available.
+   - **Sawmill** (`PL`): Each order consumes **2 Timber → 1 Lumber** (capacity limited)
+   - **Furniture Factory** (`PF`): Each order consumes **2 Lumber → 1 Furniture** (capacity limited)
+   - **Textile Workshop** (`PG`): Each order consumes **2 Cotton → 1 Fabric** (capacity limited)
+   - **Clothes Factory** (`PC`): Each order consumes **2 Fabric → 1 Clothes** (capacity limited)
+   - Orders are reduced if insufficient resources or factory capacity available.
 
 3. **Date Advancement**
    - The date advances by 7 days each turn.
@@ -85,7 +99,17 @@ The challenge is to manage resources efficiently across six commodities:
    - Do I need more raw materials? (use **Transport**).
    - Do I want to manufacture goods? (use **Production**).
    - Or am I ready to move time forward? (use **Next turn**).
-3. Enter orders carefully—resources are limited by supply and by conversion costs.
-4. Press **N** to end the turn and see the results.
+3. **Transport Orders screen** (press **T**):
+   - View current transport capacity and orders
+   - **A** = Add transport capacity
+   - **T** = Change transport orders (validates against capacity)
+   - **C** = Cancel and return
+4. **Production Orders screen** (press **P**):
+   - View all four factories with individual capacities and orders
+   - **C** = Change production orders (validates against factory capacities)
+   - **A** = Add capacity to specific factories
+   - **R** = Return to main screen
+5. Enter orders carefully—resources are limited by supply, transport capacity, factory capacity, and conversion costs.
+6. Press **N** to end the turn and see the results.
 
 ---
