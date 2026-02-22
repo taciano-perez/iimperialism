@@ -49,12 +49,12 @@ void render_industry_screen(GameState *s) {
     print_int_right_aligned((BOX_X1+39), (BOX_Y1+2), state.production_clothes);
     print((BOX_X1+25), (BOX_Y1+3), "Tools: ");
     print_int_right_aligned((BOX_X1+39), (BOX_Y1+3), state.production_tools);
-    print((BOX_X1+25), (BOX_Y1+4), "Cannons: ");
-    print_int_right_aligned((BOX_X1+39), (BOX_Y1+4), state.production_cannons);
+    print((BOX_X1+25), (BOX_Y1+4), "Guns: ");
+    print_int_right_aligned((BOX_X1+39), (BOX_Y1+4), state.production_guns);
 
     /* ADVISOR */
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
     print(5, 20, "What are your orders, sir?");
     print(5, 21, "Change Transport, Production, ");
-    print(5, 22, "or End turn?");
+    print(5, 22, "Admiralty, or End turn?");
 }

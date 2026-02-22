@@ -28,7 +28,7 @@
  * ============================================================================
  */
 #define CAPACITY_PER_TRADER 3
-#define CANNONS_PER_FRIGATE 2
+#define GUNS_PER_FRIGATE 2
 
 /* ============================================================================
  * Game State Structure
@@ -50,7 +50,7 @@ typedef struct {
     unsigned int furniture;
     unsigned int clothes;
     unsigned int tools;
-    unsigned int cannons;
+    unsigned int guns;
 
     /* Provincial yields */
     unsigned int number_of_provinces;
@@ -73,7 +73,7 @@ typedef struct {
     unsigned int production_furniture;
     unsigned int production_clothes;
     unsigned int production_tools;
-    unsigned int production_cannons;
+    unsigned int production_guns;
     unsigned int available_workers;
 
     /* Navy */

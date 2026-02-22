@@ -32,7 +32,7 @@ void render_admiralty_screen(GameState *s) {
     print((BOX_X1+20), (BOX_Y1+1), "Frigates:");
     print_int_right_aligned((BOX_X1+36), (BOX_Y1+1), state.frigates);
     print((BOX_X1+20), (BOX_Y1+4), "Firepower:");
-    print_int_right_aligned((BOX_X1+36), (BOX_Y1+4), state.frigates * CANNONS_PER_FRIGATE);
+    print_int_right_aligned((BOX_X1+36), (BOX_Y1+4), state.frigates * GUNS_PER_FRIGATE);
 
     /* ADVISOR */
     draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);

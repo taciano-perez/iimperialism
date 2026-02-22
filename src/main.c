@@ -40,8 +40,8 @@ void render_warehouse_box() {
     print_int_right_aligned((BOX1_X1+39), (BOX1_Y1+2), state.clothes);
     print((BOX1_X1+25), (BOX1_Y1+3), "Tools: ");
     print_int_right_aligned((BOX1_X1+39), (BOX1_Y1+3), state.tools);
-    print((BOX1_X1+25), (BOX1_Y1+4), "Cannons: ");
-    print_int_right_aligned((BOX1_X1+39), (BOX1_Y1+4), state.cannons);
+    print((BOX1_X1+25), (BOX1_Y1+4), "Guns: ");
+    print_int_right_aligned((BOX1_X1+39), (BOX1_Y1+4), state.guns);
 }
 
 void change_resource_production_order(const char* resource_name, unsigned int* production_order, unsigned int max_production) {
@@ -74,7 +74,7 @@ void production_orders() {
     while (1) {
         clear_input_area();
         print (5, 20, "Orders for Lumber, Fabric, Steel, ");
-        print (5, 21, "fUrniture, Clothes, Tools, caNnons,");
+        print (5, 21, "fUrniture, Clothes, Tools, Guns,");
         print (5, 22, "or Return?");
         key = cgetc_at(16, 22);
         switch (key) {
@@ -108,10 +108,10 @@ void production_orders() {
                 change_resource_production_order("tools", &state.production_tools,
                     MIN(state.steel / 2, (state.production_tools + state.available_workers)));
                 return;
-            case 'n':
-            case 'N':
-                change_resource_production_order("cannons", &state.production_cannons,
-                    MIN(state.steel / 2, (state.production_cannons + state.available_workers)));
+            case 'g':
+            case 'G':
+                change_resource_production_order("guns", &state.production_guns,
+                    MIN(state.steel / 2, (state.production_guns + state.available_workers)));
                 return;
             case 'r':
             case 'R':
@@ -290,6 +290,10 @@ void handle_screen_input_industry(char key) {
         case 'p':
         case 'P':
             state.current_screen = SCREEN_PRODUCTION;
+            break;
+        case 'a':
+        case 'A':
+            state.current_screen = SCREEN_ADMIRALTY;
             break;
         case 'e':
         case 'E':

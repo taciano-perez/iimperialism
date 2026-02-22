@@ -17,7 +17,7 @@ void init_game() {
     state.furniture = 0;
     state.clothes = 0;
     state.tools = 0;
-    state.cannons = 0;
+    state.guns = 0;
 
     state.number_of_provinces = 4;
     state.timber_yield_per_province = 2;
@@ -38,7 +38,7 @@ void init_game() {
     state.production_furniture = 1;
     state.production_clothes = 1;
     state.production_tools = 0;
-    state.production_cannons = 0;
+    state.production_guns = 0;
 
     state.available_workers = 6;
 
@@ -48,7 +48,7 @@ void init_game() {
     state.turn_number = 1;
     snprintf(state.player_name, sizeof(state.player_name), "Taciano");
     snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
-    state.current_screen = SCREEN_ADMIRALTY;
+    state.current_screen = SCREEN_INDUSTRY;
 }
 
 void next_turn() {
@@ -72,8 +72,8 @@ void next_turn() {
     state.fabric -= 2 * state.production_clothes;
     state.tools += state.production_tools;
     state.steel -= 2 * state.production_tools;
-    state.cannons += state.production_cannons;
-    state.steel -= 2 * state.production_tools;
+    state.guns += state.production_guns;
+    state.steel -= 2 * state.production_guns;
 
     // cap production orders to available resources
     state.production_lumber = MIN(state.production_lumber, state.timber / 2);
@@ -82,7 +82,7 @@ void next_turn() {
     state.production_furniture = MIN(state.production_furniture, state.lumber / 2);
     state.production_clothes = MIN(state.production_clothes, state.fabric / 2);
     state.production_tools = MIN(state.production_tools, state.steel / 2);
-    state.production_cannons = MIN(state.production_cannons, state.steel / 2);
+    state.production_guns = MIN(state.production_guns, state.steel / 2);
 
     // update turn number
     state.turn_number++;

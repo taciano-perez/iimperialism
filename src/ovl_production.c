@@ -26,8 +26,8 @@ void render_production_screen(GameState *s) {
     print_int_right_aligned((BOX_X1+34), (BOX_Y1+2), state.production_clothes);
     print((BOX_X1+20), (BOX_Y1+3), "Tools: ");
     print_int_right_aligned((BOX_X1+34), (BOX_Y1+3), state.production_tools);
-    print((BOX_X1+20), (BOX_Y1+4), "Cannons: ");
-    print_int_right_aligned((BOX_X1+34), (BOX_Y1+4), state.production_cannons);
+    print((BOX_X1+20), (BOX_Y1+4), "Guns: ");
+    print_int_right_aligned((BOX_X1+34), (BOX_Y1+4), state.production_guns);
     print(1, 13, "Available workers:");
     print_int_right_aligned(24, 13, state.available_workers);
 
@@ -39,7 +39,7 @@ void render_production_screen(GameState *s) {
     print(18, 16, "Furniture: 2 lumber");
     print(18, 17, "Clothes:   2 fabric");
     print(18, 18, "Tools:     2 steel");
-    print(18, 19, "Cannon:    2 steel");
+    print(18, 19, "Guns:      2 steel");
 
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
     print(5, 20, "What are your orders, sir?");

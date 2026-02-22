@@ -124,48 +124,7 @@ This is an economic strategy game for the Apple II computer, inspired by the cla
 
 ### GameState Structure
 
-The `GameState` struct (defined in `game.h`) is the core data structure that holds all game state:
-
-```c
-typedef struct {
-    /* Raw materials (gathered from environment) */
-    unsigned int timber;
-    unsigned int cotton;
-    unsigned int iron;
-    unsigned int coal;
-
-    /* Processed materials (tier 1 production) */
-    unsigned int lumber;        // Produced from timber
-    unsigned int fabric;        // Produced from cotton
-    unsigned int steel;         // Produced from iron + coal
-
-    /* Finished goods (tier 2 production) */
-    unsigned int furniture;     // Produced from lumber
-    unsigned int clothes;       // Produced from fabric
-    unsigned int tools;         // Produced from steel
-    unsigned int cannons;       // Produced from steel
-
-    /* Transport orders (raw materials per turn) */
-    unsigned int transport_timber;
-    unsigned int transport_cotton;
-    unsigned int transport_iron;
-    unsigned int transport_coal;
-
-    /* Production orders (goods produced per turn) */
-    unsigned int production_lumber;
-    unsigned int production_fabric;
-    unsigned int production_steel;
-    unsigned int production_furniture;
-    unsigned int production_clothes;
-    unsigned int production_tools;
-    unsigned int production_cannons;
-
-    /* Game metadata */
-    unsigned int turn_number;
-    char player_name[20];
-    char nation_name[20];
-} GameState;
-```
+The `GameState` struct (defined in `game.h`) is the core data structure that holds all game state.
 
 **Global Instance**: `state` - Declared in `main.c`, externally visible via `game.h`
 
