@@ -1,115 +1,104 @@
-# iimperialism
-Apple II game inspired by Imperialism and Taipan!
+﻿# IImperialism - Apple II Strategy Game (cc65)
+
+An early-stage strategy game for the Apple II, written in C using the **cc65** compiler
+and its Tiny Graphics Interface (TGI) for Hi-Res Graphics (HGR) mode.
 
 ## Overview
 
-The game is turn-based. Each turn:
+The game uses a custom memory layout to fit within the Apple II's tight constraints:
+- Screen renderers are compiled as standalone 2KB **AUX RAM overlays** (ISCR, PSCR, TSCR)
+  loaded at startup and paged in on demand, freeing CODE space in MAIN RAM.
+- All UI primitives and game logic live in **LOWCODE** (`$0824-$1FFF`), below the HGR
+  screen, keeping the critical CODE segment small.
 
-1. **Provinces produce raw materials** (Timber and Cotton).
-2. The player’s **transport orders** bring some of those resources into the warehouse.
-3. The player’s **production orders** convert raw materials into finished goods.
-4. The warehouse shows updated stocks.
-5. The date advances by 7 days.
+See `docs/MEMORY.md` for the full memory map and overlay architecture.
 
-The challenge is to manage resources efficiently across six commodities:
-- **Timber → Lumber → Furniture**
-- **Cotton → Fabric → Clothes**
+## File Structure
 
----
+| File | Purpose |
+|------|---------|
+| `src/main.c` | Screen dispatch, input handlers, `render_warehouse_box` |
+| `src/ui.c` | All UI primitives: `print`, `box`, `clear_screen`, etc. (LOWCODE) |
+| `src/logic.c` | `init_game()`, `next_turn()` (LOWCODE) |
+| `src/gamestate.c` | Save / load game state via ProDOS file I/O (LOWCODE) |
+| `src/overlay.c` | `init_overlays()`, `run_overlay()` - overlay loading and dispatch (LOWCODE) |
+| `src/ovl_industry.c` | `render_industry_screen` - compiled to `iscr.bin` |
+| `src/ovl_production.c` | `render_production_screen` - compiled to `pscr.bin` |
+| `src/ovl_transport.c` | `render_transport_screen` - compiled to `tscr.bin` |
+| `asm/ovl_asm.s` | Assembly: `install_trampoline`, `main_to_aux` - AUX RAM copy routines (LOWCODE) |
+| `asm/jmptab.s` | 7-entry JMP table at `$080F` - fixed addresses called by overlay binaries |
+| `asm/werner.s` | Reserves the HGR segment |
+| `include/game.h` | `GameState` struct and all function declarations |
+| `include/overlay.h` | Overlay IDs, AUX addresses, trampoline ZP macros |
+| `config/apple2-hgr.cfg` | Linker config for the main binary (STARTUP/JMPTAB/LOWCODE/HGR/CODE layout) |
+| `config/apple2-ovl.cfg` | Linker config for overlay binaries (raw 2KB at `$8800`, symbols from jump table) |
+| `assets/startup.bas` | One-line Applesoft BASIC program: auto-BRUNs IIMPERIALISM at boot |
+| `assets/iimperialism.dsk` | ProDOS disk image |
+| `Makefile` | Build rules for main binary, overlay binaries, and disk image |
+| `build-run.sh` | Clean build + disk update + launch emulator in one step |
+| `tools/ac.jar` | AppleCommander - adds binaries to the ProDOS disk image |
 
-## Game Logic
+Documentation: `docs/MEMORY.md`, `docs/DESIGN.md`, `docs/FONT.md`, `docs/PICTURES.md`, `docs/STRUCTURE.md`
 
-### Data Structures
+## Prerequisites
 
-- **Warehouse stocks**
-  - `TI` = Timber  
-  - `LU` = Lumber  
-  - `FU` = Furniture  
-  - `CO` = Cotton  
-  - `FA` = Fabric  
-  - `CH` = Clothes  
+**cc65** cross-development package for 6502 systems, and **Java** (for AppleCommander).
 
-- **Orders for next turn**
-  - `TT` = Timber transport  
-  - `TC` = Cotton transport  
-  - `PL` = Sawmill orders (2 Timber → 1 Lumber)
-  - `PF` = Furniture Factory orders (2 Lumber → 1 Furniture)
-  - `PG` = Textile Workshop orders (2 Cotton → 1 Fabric)  
-  - `PC` = Clothes Factory orders (2 Fabric → 1 Clothes)
+### Windows
+1. Download the Windows Snapshot (zip) from the [cc65 GitHub releases](https://github.com/cc65/cc65/releases).
+2. Extract to a folder (e.g., `C:\cc65`) and add `C:\cc65\bin` to your PATH.
+3. Verify: `cl65 --version`
 
-- **Transport capacity**
-  - `TCAP` = Maximum total transport orders allowed per turn (starts at 20)
-  - Transport orders (`TT` + `TC`) cannot exceed transport capacity
-  - Players can increase capacity through the Transport Orders menu
+### macOS
+```bash
+brew install cc65
+```
 
-- **Factory capacities**
-  - `SCAP` = Sawmill capacity (starts at 1)
-  - `FCAP` = Furniture Factory capacity (starts at 1)
-  - `WCAP` = Textile Workshop capacity (starts at 1)
-  - `CCAP` = Clothes Factory capacity (starts at 1)
-  - Each factory can only process up to its capacity per turn
-  - Players can increase individual factory capacities  
+### Linux (Debian/Ubuntu)
+```bash
+sudo apt-get install cc65
+```
 
-- **Province supply (changes every turn)**
-  - `ST` = Timber supply available in provinces this turn  
-  - `SC` = Cotton supply available in provinces this turn  
+## Building
 
-### Turn Cycle
+```bash
+make disk
+```
 
-1. **Transport Phase**
-   - Orders `TT` and `TC` are capped at available provincial supply `ST` and `SC`.
-   - Total transport orders (`TT` + `TC`) cannot exceed transport capacity `TCAP`.
-   - Result is added to warehouse (`TI` and `CO`).
+This compiles the main binary and all three overlay binaries, then copies everything
+to `assets/iimperialism.dsk` using AppleCommander. The disk image is ready to run.
 
-2. **Production Phase**
-   - **Sawmill** (`PL`): Each order consumes **2 Timber → 1 Lumber** (capacity limited)
-   - **Furniture Factory** (`PF`): Each order consumes **2 Lumber → 1 Furniture** (capacity limited)
-   - **Textile Workshop** (`PG`): Each order consumes **2 Cotton → 1 Fabric** (capacity limited)
-   - **Clothes Factory** (`PC`): Each order consumes **2 Fabric → 1 Clothes** (capacity limited)
-   - Orders are reduced if insufficient resources or factory capacity available.
+To just build without updating the disk:
+```bash
+make
+```
 
-3. **Date Advancement**
-   - The date advances by 7 days each turn.
-   - Handles month changes and leap years.
+To clean all build artifacts:
+```bash
+make clean
+```
 
-4. **Reset Orders**
-   - After processing, all orders reset to zero.
+## Running on an Emulator
 
----
+`assets/iimperialism.dsk` is a **ProDOS** disk image. Load it in any Apple IIe emulator.
+The game launches automatically at boot via the `STARTUP` Applesoft program.
 
-## Code Structure
+If it doesn't auto-launch, at the ProDOS BASIC prompt type:
+```
+BRUN IIMPERIALISM
+```
 
-- **2000–2150**: Screen rendering (warehouse, orders, prompt).
-- **3000–3060**: Input handler (`T`, `P`, `N`).
-- **4000–4100**: Enter transport orders.
-- **4500–4610**: Enter production orders.
-- **5000–5010**: Reset orders to zero.
-- **6000–6030**: Generate random provincial supply each turn (5–20 units of each raw good).
-- **7000–7170**: Process transport and production logic.
-- **8000–8070**: Advance date by 7 days, including month/year rollover.
-- **8500–8520**: Month length calculation (handles leap years).
-- **9000–9010**: Print header line with date.
+### Recommended Emulators
+- **Cross-Platform:** [MicroM8](https://microm8.com/)
+- **Windows:** [AppleWin](https://github.com/AppleWin/AppleWin)
+- **macOS:** [Virtual II](https://www.virtualii.com/)
+- **Linux:** [LinApple](https://github.com/linappleii/linapple)
 
----
+## Development Workflow
 
-## How to Play
+```bash
+./build-run.sh      # clean build -> update disk -> launch emulator
+```
 
-1. **Start the program**: type `RUN`.
-2. Each turn, review warehouse stocks and decide:
-   - Do I need more raw materials? (use **Transport**).
-   - Do I want to manufacture goods? (use **Production**).
-   - Or am I ready to move time forward? (use **Next turn**).
-3. **Transport Orders screen** (press **T**):
-   - View current transport capacity and orders
-   - **A** = Add transport capacity
-   - **T** = Change transport orders (validates against capacity)
-   - **C** = Cancel and return
-4. **Production Orders screen** (press **P**):
-   - View all four factories with individual capacities and orders
-   - **C** = Change production orders (validates against factory capacities)
-   - **A** = Add capacity to specific factories
-   - **R** = Return to main screen
-5. Enter orders carefully—resources are limited by supply, transport capacity, factory capacity, and conversion costs.
-6. Press **N** to end the turn and see the results.
-
----
+When adding a new screen as an overlay, see the step-by-step instructions in `docs/MEMORY.md`
+under **"Adding a New Screen as an Overlay"**.
