@@ -11,15 +11,18 @@
  *   OVL_INDUSTRY   -> AUX $8800-$8FFF
  *   OVL_PRODUCTION -> AUX $9000-$97FF
  *   OVL_TRANSPORT  -> AUX $9800-$9FFF
+ *   OVL_ADMIRALTY  -> AUX $A000-$A7FF
  */
 #define OVL_INDUSTRY   0
 #define OVL_PRODUCTION 1
 #define OVL_TRANSPORT  2
+#define OVL_ADMIRALTY  3
 
 /* Disk file names for the overlay binaries (ProDOS, uppercase, no extension) */
 #define OVL_FILE_INDUSTRY   "ISCR"
 #define OVL_FILE_PRODUCTION "PSCR"
 #define OVL_FILE_TRANSPORT  "TSCR"
+#define OVL_FILE_ADMIRALTY  "ASCR"
 
 /* Zero-page trampoline parameters ($9A-$9E, outside cc65 ZP range $80-$99).
  * Set by run_overlay before calling the trampoline at $0100. */

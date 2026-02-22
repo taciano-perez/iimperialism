@@ -45,7 +45,7 @@ void init_game() {
     state.turn_number = 1;
     snprintf(state.player_name, sizeof(state.player_name), "Taciano");
     snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
-    state.current_screen = SCREEN_INDUSTRY;
+    state.current_screen = SCREEN_ADMIRALTY;
 }
 
 void next_turn() {

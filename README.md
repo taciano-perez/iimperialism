@@ -1,11 +1,13 @@
-﻿# IImperialism - Apple II Strategy Game (cc65)
+﻿# IImperialism - an Apple II Strategy Game
 
 An early-stage strategy game for the Apple II, written in C using the **cc65** compiler
 and its Tiny Graphics Interface (TGI) for Hi-Res Graphics (HGR) mode.
 
+This is an Apple II strategy game, inspired by Imperialism and Taipan!, written in C using the **cc65** compiler and its Tiny Graphics Interface (TGI) for Hi-Res Graphics (HGR) mode. It's a turn-based resource management game where players manage a supply chain from raw materials through production stages to finished goods and sell them abroad, improving its diplomatic relations towards global domination.
+
 ## Overview
 
-The game uses a custom memory layout to fit within the Apple II's tight constraints:
+The game requires at least 128KB of memory. It uses a custom memory layout to fit within the Apple II's tight constraints:
 - Screen renderers are compiled as standalone 2KB **AUX RAM overlays** (ISCR, PSCR, TSCR)
   loaded at startup and paged in on demand, freeing CODE space in MAIN RAM.
 - All UI primitives and game logic live in **LOWCODE** (`$0824-$1FFF`), below the HGR

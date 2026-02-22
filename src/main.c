@@ -312,6 +312,8 @@ int main(void) {
             run_overlay(OVL_TRANSPORT);
         } else if (state.current_screen == SCREEN_PRODUCTION) {
             run_overlay(OVL_PRODUCTION);
+        } else if (state.current_screen == SCREEN_ADMIRALTY) {
+            run_overlay(OVL_ADMIRALTY);
         }
 
         key = cgetc();
@@ -328,6 +330,8 @@ int main(void) {
                     handle_screen_input_transport(key);
                 } else if (state.current_screen == SCREEN_PRODUCTION) {
                     handle_screen_input_production(key);
+                } else if (state.current_screen == SCREEN_ADMIRALTY) {
+                    // TODO: input handling for Admiralty screen
                 }
                 break;
         }

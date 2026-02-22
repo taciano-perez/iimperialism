@@ -27,7 +27,8 @@ C_SOURCES  = \
 	$(SRC_DIR)/overlay.c \
 	$(SRC_DIR)/ovl_industry.c \
 	$(SRC_DIR)/ovl_production.c \
-	$(SRC_DIR)/ovl_transport.c
+	$(SRC_DIR)/ovl_transport.c \
+	$(SRC_DIR)/ovl_admiralty.c
 
 ASM_SOURCES = \
 	$(ASM_DIR)/werner.s \
@@ -47,7 +48,10 @@ MAIN_OBJECTS = \
 OVERLAY_OBJECTS = \
 	$(BUILD_DIR)/ovl_industry.o \
 	$(BUILD_DIR)/ovl_production.o \
-	$(BUILD_DIR)/ovl_transport.o
+	$(BUILD_DIR)/ovl_transport.o \
+	$(BUILD_DIR)/ovl_admiralty.o
+
+# Main compiler
 
 CC      = cl65
 CFLAGS  = -t apple2 -Oirs -I$(INCLUDE_DIR)
@@ -70,9 +74,10 @@ disk: iimperialism overlays
 	$(AC) -d $(DISK) ISCR           2>/dev/null; $(AC) -p   $(DISK) ISCR         BIN 0x8800 < $(BUILD_DIR)/iscr.bin
 	$(AC) -d $(DISK) PSCR           2>/dev/null; $(AC) -p   $(DISK) PSCR         BIN 0x9000 < $(BUILD_DIR)/pscr.bin
 	$(AC) -d $(DISK) TSCR           2>/dev/null; $(AC) -p   $(DISK) TSCR         BIN 0x9800 < $(BUILD_DIR)/tscr.bin
+	$(AC) -d $(DISK) ASCR           2>/dev/null; $(AC) -p   $(DISK) ASCR         BIN 0xA000 < $(BUILD_DIR)/ascr.bin
 	$(AC) -l $(DISK)
 
-overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin
+overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin
 
 iimperialism: $(MAIN_OBJECTS) | $(BUILD_DIR)
 	$(CC) $(LDFLAGS) -o $(BUILD_DIR)/iimperialism -m $(BUILD_DIR)/iimperialism.map $(MAIN_OBJECTS)
@@ -100,6 +105,9 @@ $(BUILD_DIR)/pscr.bin: $(BUILD_DIR)/ovl_production.o | $(BUILD_DIR)
 
 $(BUILD_DIR)/tscr.bin: $(BUILD_DIR)/ovl_transport.o | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ovl_transport.o
+
+$(BUILD_DIR)/ascr.bin: $(BUILD_DIR)/ovl_admiralty.o | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/ovl_admiralty.o
 
 clean:
 	$(CLEAN_CMD)

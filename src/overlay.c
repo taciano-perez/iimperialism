@@ -36,7 +36,7 @@ void init_overlays(void) {
     load_overlay_file(OVL_FILE_INDUSTRY,   0x8800u);
     load_overlay_file(OVL_FILE_PRODUCTION, 0x9000u);
     load_overlay_file(OVL_FILE_TRANSPORT,  0x9800u);
-}
+    load_overlay_file(OVL_FILE_ADMIRALTY,  0xA000u);}
 
 /* Copy overlay <id> from AUX RAM into OVERLAY_SLOT ($8800 in MAIN) and
  * execute it, passing &state as the GameState* argument. */

@@ -10,6 +10,7 @@
  */
 #define WISEMAN_PORTRAIT 0
 #define MILITARY_PORTRAIT 1
+#define ADMIRAL_PORTRAIT 2
 /* Add more picture indices here as you add pictures */
 
 /* ============================================================================
@@ -20,6 +21,7 @@
 #define SCREEN_INDUSTRY 1
 #define SCREEN_TRANSPORT 2
 #define SCREEN_PRODUCTION 3
+#define SCREEN_ADMIRALTY 4
 
 /* ============================================================================
  * Game State Structure
