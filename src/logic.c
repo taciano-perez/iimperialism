@@ -42,6 +42,9 @@ void init_game() {
 
     state.available_workers = 6;
 
+    state.traders = 2;
+    state.frigates = 1;
+
     state.turn_number = 1;
     snprintf(state.player_name, sizeof(state.player_name), "Taciano");
     snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");

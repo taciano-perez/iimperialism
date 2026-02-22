@@ -24,6 +24,13 @@
 #define SCREEN_ADMIRALTY 4
 
 /* ============================================================================
+ * Gameplay constants
+ * ============================================================================
+ */
+#define CAPACITY_PER_TRADER 3
+#define CANNONS_PER_FRIGATE 2
+
+/* ============================================================================
  * Game State Structure
  * ============================================================================
  */
@@ -68,6 +75,10 @@ typedef struct {
     unsigned int production_tools;
     unsigned int production_cannons;
     unsigned int available_workers;
+
+    /* Navy */
+    unsigned int traders;
+    unsigned int frigates;
 
     /* Game metadata */
     unsigned int turn_number;
