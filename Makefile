@@ -21,6 +21,9 @@ endif
 
 C_SOURCES  = \
 	$(SRC_DIR)/main.c \
+	$(SRC_DIR)/industry.c \
+	$(SRC_DIR)/transport.c \
+	$(SRC_DIR)/production.c \
 	$(SRC_DIR)/ui.c \
 	$(SRC_DIR)/gamestate.c \
 	$(SRC_DIR)/logic.c \
@@ -37,6 +40,9 @@ ASM_SOURCES = \
 
 MAIN_OBJECTS = \
 	$(BUILD_DIR)/main.o \
+	$(BUILD_DIR)/industry.o \
+	$(BUILD_DIR)/transport.o \
+	$(BUILD_DIR)/production.o \
 	$(BUILD_DIR)/ui.o \
 	$(BUILD_DIR)/werner.o \
 	$(BUILD_DIR)/gamestate.o \
