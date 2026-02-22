@@ -1,6 +1,7 @@
 #include <conio.h>
 #include <stdio.h>
 #include "game.h"
+#include "strings.h"
 
 static char buffer[42];
 
@@ -12,11 +13,11 @@ static void change_resource_transport_order(const char* resource_name, unsigned 
         clear_input_area();
         sprintf(buffer, "Transport how many units of %s", resource_name);
         print(5, 20, buffer);
-        sprintf(buffer, "per turn? (max %u)", max_transport);
+        sprintf(buffer, STR_PER_TURN_MAX_FMT, max_transport);
         print(5, 21, buffer);
         *transport_order = scan_uint(25, 21, 5);
         if (*transport_order > max_transport) {
-            print(5, 22, "Sir, we lack resources!");
+            print(5, 22, STR_SIR_WE_LACK_RESOURCES);
             cgetc();
             continue;
         } else {
@@ -57,7 +58,7 @@ static void transport_orders(void) {
                     MIN(state.coal_yield_per_province * state.number_of_provinces, state.transport_coal + state.available_wagons));
                 return;
             default:
-                print(5, 22, "Invalid answer!");
+                print(5, 22, STR_INVALID_ANSWER);
                 cgetc();
                 continue;
         }
@@ -71,7 +72,7 @@ static void build_wagons(void) {
     clear_input_area();
     max_wagons = MIN(state.lumber, state.steel);
     if (max_wagons == 0) {
-        print(5, 20, "Not enough resources!");
+        print(5, 20, STR_NOT_ENOUGH_RESOURCES);
         cgetc();
         return;
     } else {
@@ -80,7 +81,7 @@ static void build_wagons(void) {
             print (5, 20, buffer);
             wagons_to_build = scan_uint(5, 21, 5);
             if (wagons_to_build > max_wagons) {
-                print(5, 22, "Not enough resources!");
+                print(5, 22, STR_NOT_ENOUGH_RESOURCES);
                 cgetc();
                 clear_input_area();
                 continue;

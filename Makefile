@@ -25,6 +25,7 @@ C_SOURCES  = \
 	$(SRC_DIR)/transport.c \
 	$(SRC_DIR)/production.c \
 	$(SRC_DIR)/admiralty.c \
+	$(SRC_DIR)/strings.c \
 	$(SRC_DIR)/ui.c \
 	$(SRC_DIR)/gamestate.c \
 	$(SRC_DIR)/logic.c \
@@ -45,6 +46,7 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/transport.o \
 	$(BUILD_DIR)/production.o \
 	$(BUILD_DIR)/admiralty.o \
+	$(BUILD_DIR)/strings.o \
 	$(BUILD_DIR)/ui.o \
 	$(BUILD_DIR)/werner.o \
 	$(BUILD_DIR)/gamestate.o \

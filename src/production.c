@@ -1,6 +1,7 @@
 #include <conio.h>
 #include <stdio.h>
 #include "game.h"
+#include "strings.h"
 
 static char buffer[42];
 
@@ -13,11 +14,11 @@ static void change_resource_production_order(const char* resource_name, unsigned
         clear_input_area();
         sprintf(buffer, "Produce how many units of %s", resource_name);
         print(5, 20, buffer);
-        sprintf(buffer, "per turn? (max %u)", max_production);
+        sprintf(buffer, STR_PER_TURN_MAX_FMT, max_production);
         print(5, 21, buffer);
         new_production_order = scan_uint(25, 21, 5);
         if (new_production_order > max_production) {
-            print(5, 22, "Sir, we lack resources!");
+            print(5, 22, STR_SIR_WE_LACK_RESOURCES);
             cgetc();
             continue;
         } else {
@@ -77,7 +78,7 @@ static void production_orders(void) {
             case 'R':
                 return;
             default:
-                print(18, 22, "Invalid answer!");
+                print(18, 22, STR_INVALID_ANSWER);
                 cgetc();
                 continue;
         }
@@ -99,11 +100,11 @@ static void train_new_workers(void) {
         while (1) {
             print(5, 20, "Sir, A worker costs 1 furniture");
             print(5, 21, "and 1 clothes. Train how many?");
-            sprintf(buffer, "(max %u)", max_workers);
+            sprintf(buffer, STR_MAX_FMT, max_workers);
             print (5, 22, buffer);
             workers_to_train = scan_uint(12, 22, 5);
             if (workers_to_train > max_workers) {
-                print(19, 22, "Not enough resources!");
+                print(19, 22, STR_NOT_ENOUGH_RESOURCES);
                 cgetc();
                 clear_input_area();
                 continue;

@@ -104,3 +104,11 @@ BRUN IIMPERIALISM
 
 When adding a new screen as an overlay, see the step-by-step instructions in `docs/MEMORY.md`
 under **"Adding a New Screen as an Overlay"**.
+
+## TODO LIST
+- Add science screen
+- Add diplomacy screen
+- Add trade voyage screens
+- Add main menu
+- Add save/load/quit screen
+- Add retirement / end screen

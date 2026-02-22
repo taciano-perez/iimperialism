@@ -82,7 +82,6 @@ typedef struct {
 
     /* Game metadata */
     unsigned int turn_number;
-    char player_name[20];
     char nation_name[20];
     unsigned int current_screen;
 } GameState;
