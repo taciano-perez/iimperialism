@@ -10,6 +10,9 @@
 void render_production_screen(GameState *s) {
     clear_screen();
     print(0, 0, "Production Orders");
+    print(34, 0, "Turn:");
+    print_int_right_aligned(39, 0, state.turn_number);
+
     render_warehouse_box();
 
     box(BOX_X1, BOX_Y1, BOX_X2, BOX_Y2);
@@ -41,7 +44,7 @@ void render_production_screen(GameState *s) {
     print(18, 18, "Tools:     2 steel");
     print(18, 19, "Guns:      2 steel");
 
-    draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
+    draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
     print(5, 20, "What are your orders, sir?");
     print(5, 21, "Change Production per turn, Train");
     print(5, 22, "new workers or Return?");

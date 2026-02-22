@@ -15,8 +15,9 @@ char buffer[42];
 void render_admiralty_screen(GameState *s) {
     clear_screen();
 
-    print(0,  0, "Admiralty Office ");
-    print(28, 0, "12 FEB 2026");
+    print(0,  0, "Admiralty Office");
+    print(34, 0, "Turn:");
+    print_int_right_aligned(39, 0, state.turn_number);
 
     render_warehouse_box();
 
@@ -34,9 +35,12 @@ void render_admiralty_screen(GameState *s) {
     print((BOX_X1+20), (BOX_Y1+4), "Firepower:");
     print_int_right_aligned((BOX_X1+36), (BOX_Y1+4), state.frigates * GUNS_PER_FRIGATE);
 
+    print(1, 14, "Available workers:");
+    print_int_right_aligned(24, 14, state.available_workers);
+
     /* ADVISOR */
     draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
     print(5, 20, "Awaiting orders, sir.");
-    print(5, 21, "Build Merchant vessel, Warship,");
+    print(5, 21, "Build Trading vessel, Warship,");
     print(5, 22, "or Return?");
 }

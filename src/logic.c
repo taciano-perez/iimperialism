@@ -11,13 +11,13 @@ void init_game() {
     state.coal = 5;
 
     state.lumber = 2;
-    state.fabric = 0;
+    state.fabric = 2;
     state.steel = 2;
 
-    state.furniture = 0;
-    state.clothes = 0;
-    state.tools = 0;
-    state.guns = 0;
+    state.furniture = 2;
+    state.clothes = 2;
+    state.tools = 2;
+    state.guns = 2;
 
     state.number_of_provinces = 4;
     state.timber_yield_per_province = 2;

@@ -10,6 +10,8 @@
 void render_transport_screen(GameState *s) {
     clear_screen();
     print(0, 0, "Transport Orders");
+    print(34, 0, "Turn:");
+    print_int_right_aligned(39, 0, state.turn_number);
     render_warehouse_box();
 
     box(BOX_X1, BOX_Y1, BOX_X2, BOX_Y2);
@@ -35,7 +37,7 @@ void render_transport_screen(GameState *s) {
     print_int_right_aligned(20, 15, state.available_wagons);
     print(1, 16, "Cost of new wagon: 1 lumber + 1 steel");
 
-    draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
+    draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
     print(5, 20, "What are your orders, sir?");
     print(5, 21, "Change Transport per turn,");
     print(5, 22, "Build wagons or Return?");

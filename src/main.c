@@ -76,7 +76,7 @@ int main(void) {
                 } else if (state.current_screen == SCREEN_PRODUCTION) {
                     handle_screen_input_production(key);
                 } else if (state.current_screen == SCREEN_ADMIRALTY) {
-                    // TODO: input handling for Admiralty screen
+                    handle_screen_input_admiralty(key);
                 }
                 break;
         }

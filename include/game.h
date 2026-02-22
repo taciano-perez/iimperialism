@@ -9,7 +9,7 @@
  * Use these constants to reference pictures by name
  */
 #define WISEMAN_PORTRAIT 0
-#define MILITARY_PORTRAIT 1
+#define INDUSTRY_PORTRAIT 1
 #define ADMIRAL_PORTRAIT 2
 /* Add more picture indices here as you add pictures */
 

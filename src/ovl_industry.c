@@ -15,12 +15,9 @@ char buffer[42];
 void render_industry_screen(GameState *s) {
     clear_screen();
 
-    /* Header: "President <name> of <nation>  12 FEB 2026" */
-    print(0,  0, "President ");
-    print(10, 0, state.player_name);
-    print(18, 0, "of");
-    print(21, 0, state.nation_name);
-    print(28, 0, "12 FEB 2026");
+    print(0,  0, "Ministry of Industry");
+    print(34, 0, "Turn:");
+    print_int_right_aligned(39, 0, state.turn_number);
 
     render_warehouse_box();
 
@@ -53,7 +50,7 @@ void render_industry_screen(GameState *s) {
     print_int_right_aligned((BOX_X1+39), (BOX_Y1+4), state.production_guns);
 
     /* ADVISOR */
-    draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
+    draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
     print(5, 20, "What are your orders, sir?");
     print(5, 21, "Change Transport, Production, ");
     print(5, 22, "Admiralty, or End turn?");
