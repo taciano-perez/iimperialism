@@ -92,14 +92,16 @@ static void train_new_workers(void) {
     clear_input_area();
     max_workers = MIN(state.furniture, state.clothes);
     if (max_workers == 0) {
-        print(5, 20, "Sir, a worker costs 1 furniture");
-        print(5, 21, "and 1 clothes. We lack resources!");
+        print(5, 20, STR_SIR_TRAIN_WORKERS1);
+        print(5, 21, STR_SIR_TRAIN_WORKERS2);
+        print(20, 22, STR_NOT_ENOUGH_RESOURCES);
         cgetc();
         return;
     } else {
         while (1) {
-            print(5, 20, "Sir, A worker costs 1 furniture");
-            print(5, 21, "and 1 clothes. Train how many?");
+            print(5, 20, STR_SIR_TRAIN_WORKERS1);
+            print(5, 21, STR_SIR_TRAIN_WORKERS2);
+            print(20, 21, "Train how many?");
             sprintf(buffer, STR_MAX_FMT, max_workers);
             print (5, 22, buffer);
             workers_to_train = scan_uint(12, 22, 5);

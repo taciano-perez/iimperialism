@@ -9,5 +9,7 @@ extern const char STR_PER_TURN_MAX_FMT[];
 extern const char STR_TRADER_COST[];
 extern const char STR_WARSHIP_COST[];
 extern const char STR_WARSHIP_COST2[];
+extern const char STR_SIR_TRAIN_WORKERS1[];
+extern const char STR_SIR_TRAIN_WORKERS2[];
 
 #endif /* STRINGS_H */
