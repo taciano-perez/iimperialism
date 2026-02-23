@@ -7,12 +7,7 @@
 #define OVERLAY_PAGES    8       /* pages per overlay (1 page = 256 bytes) */
 #define OVERLAY_SIZE     2048    /* OVERLAY_PAGES * 256 */
 
-/* Overlay IDs — correspond to AUX RAM layout (8 pages = $0800 bytes apart):
- *   OVL_INDUSTRY   -> AUX $8800-$8FFF
- *   OVL_PRODUCTION -> AUX $9000-$97FF
- *   OVL_TRANSPORT  -> AUX $9800-$9FFF
- *   OVL_ADMIRALTY  -> AUX $A000-$A7FF
- */
+/* Overlay IDs used by run_overlay() to select a disk file. */
 #define OVL_INDUSTRY   0
 #define OVL_PRODUCTION 1
 #define OVL_TRANSPORT  2
@@ -30,13 +25,12 @@
 #define tramp_dst    ((unsigned char*)0x9C)   /* 2 bytes: MAIN dest  lo/hi */
 #define tramp_pages  (*(unsigned char*)0x9E)  /* page count */
 
-/* Load all overlay binaries from disk into AUX RAM, then install the
- * RAMRD trampoline in the hardware stack page ($0100). Call once at startup
- * before any run_overlay() call. */
+/* Install the RAMRD trampoline in the hardware stack page ($0100).
+ * Overlays are loaded on demand by run_overlay(). Call once at startup. */
 void init_overlays(void);
 
-/* Copy overlay <id> from AUX RAM to OVERLAY_SLOT ($8800) and execute it,
- * passing &state as the GameState* argument. */
+/* Load overlay <id> from disk into OVERLAY_SLOT ($8800), mirror it into
+ * AUX RAM at the same address, then execute it, passing &state. */
 void run_overlay(unsigned char id);
 
 #endif /* OVERLAY_H */

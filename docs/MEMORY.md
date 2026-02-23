@@ -23,10 +23,8 @@ $9600-$BEFF  ProDOS system area
 $BF00-$BFFF  ProDOS MLI
 
 AUX RAM (second 64KB bank, accessed via RAMRD/RAMWRT soft switches):
-$8800-$8FFF  OVL_INDUSTRY   (render_industry_screen,  2KB, loaded by init_overlays)
-$9000-$97FF  OVL_PRODUCTION (render_production_screen, 2KB, loaded by init_overlays)
-$9800-$9FFF  OVL_TRANSPORT  (render_transport_screen,  2KB, loaded by init_overlays)
-$A000-$BEFF  (room for 6 more overlays, 2KB each)
+$8800-$8FFF  OVERLAY_AUX_SLOT    (single 2KB overlay cache/execution source for trampoline copy)
+$9000-$BEFF  Available AUX RAM   (currently unused by overlay loader; room for future caching/expansion)
 ```
 
 ## Why the Binary Is Large
@@ -78,20 +76,24 @@ These symptoms indicate the binary end address has grown past a critical thresho
 
 ## Overlay Architecture
 
-The three screen renderers (`render_industry_screen`, `render_production_screen`,
-`render_transport_screen`) are compiled as standalone 2KB binaries stored on the
-ProDOS disk (ISCR, PSCR, TSCR) and loaded into AUX RAM at startup.
+The overlay screen renderers (currently industry, production, transport, and
+admiralty) are compiled as standalone 2KB binaries stored on the ProDOS disk
+(`ISCR`, `PSCR`, `TSCR`, `ASCR`) and loaded on demand.
 
 **Startup sequence (`init_overlays()` in overlay.c):**
 1. `install_trampoline()` — copies 18-byte trampoline code into $0100-$0117
-2. For each overlay: `fopen/fread` the .bin file into OVERLAY_SLOT (MAIN `$8800`)
-3. `main_to_aux()` (via RAMWRT) copies 8 pages from MAIN `$8800` to AUX destination
+2. No overlays are preloaded at startup
 
 **Screen switch (`run_overlay(id)` in overlay.c):**
-1. Compute AUX address: `$8800 + id * $0800`
-2. Set ZP trampoline params (`$9A-$9E`): AUX source, MAIN dest `$8800`, 8 pages
-3. Call trampoline at `$0100` (enables RAMRD, copies 8 pages AUX→MAIN, disables RAMRD)
-4. Call `((void(*)(GameState*))0x8800)(&state)`
+1. Map overlay ID to a ProDOS filename (`ISCR`, `PSCR`, `TSCR`, `ASCR`)
+2. `fopen/fread` the overlay file into OVERLAY_SLOT (MAIN `$8800`)
+3. `main_to_aux()` (via RAMWRT) copies 8 pages from MAIN `$8800` to AUX `$8800`
+4. Set ZP trampoline params (`$9A-$9E`): AUX source `$8800`, MAIN dest `$8800`, 8 pages
+5. Call trampoline at `$0100` (enables RAMRD, copies 8 pages AUX→MAIN, disables RAMRD)
+6. Call `((void(*)(GameState*))0x8800)(&state)`
+
+This preserves the existing trampoline execution path while scaling the number of
+overlays with disk space instead of fixed AUX slots.
 
 **Why the trampoline lives in the hardware stack page ($0100):**
 When RAMRD is on, instruction fetches from `$0200-$BFFF` come from AUX RAM. The
@@ -100,7 +102,7 @@ there always executes from MAIN regardless of RAMRD state.
 
 **Zero-page layout (`$9A-$9E`, outside cc65's ZP range of `$80-$99`):**
 ```
-$9A/$9B  tramp_src   — AUX source address (set by run_overlay)
+$9A/$9B  tramp_src   — AUX source address = $8800 (set by run_overlay)
 $9C/$9D  tramp_dst   — MAIN destination address = $8800 (set by run_overlay)
 $9E      tramp_pages — page count = 8 (set by run_overlay)
 ```
@@ -125,7 +127,7 @@ $0821  JMP _render_warehouse_box
 
 ## Adding a New Screen as an Overlay
 
-Example: adding a diplomacy screen with overlay ID 3, disk file DSCR.
+Example: adding a diplomacy screen with overlay ID 4, disk file DSCR.
 
 ### 1. Create `ovl_diplomacy.c`
 
@@ -145,23 +147,21 @@ via the jump table. No `#include "ui.h"` needed.
 ### 2. Add constants to `overlay.h`
 
 ```c
-#define OVL_DIPLOMACY        3
+#define OVL_DIPLOMACY        4
 #define OVL_FILE_DIPLOMACY   "DSCR"
 ```
 
-AUX address = `$8800 + 3 * $0800 = $A000`.
-
-### 3. Add loading to `overlay.c` → `init_overlays()`
+### 3. Add filename mapping to `overlay.c` → `overlay_filename()`
 
 ```c
-load_overlay_file(OVL_FILE_DIPLOMACY, 0xA000u);
+case OVL_DIPLOMACY: return OVL_FILE_DIPLOMACY;
 ```
 
 ### 4. Add build rules to `Makefile`
 
 Add to `overlays` target:
 ```makefile
-overlays: iscr.bin pscr.bin tscr.bin dscr.bin
+overlays: iscr.bin pscr.bin tscr.bin ascr.bin dscr.bin
 ```
 
 Add compile and link rules:
@@ -175,7 +175,7 @@ dscr.bin: ovl_diplomacy.o
 
 Add to `disk` target:
 ```makefile
-$(AC) -d $(DISK) DSCR 2>/dev/null; $(AC) -p $(DISK) DSCR BIN 0xA000 < dscr.bin
+$(AC) -d $(DISK) DSCR 2>/dev/null; $(AC) -p $(DISK) DSCR BIN 0x8800 < dscr.bin
 ```
 
 Add `dscr.bin` and `ovl_diplomacy.o` to the `clean` target.
@@ -215,7 +215,7 @@ verify with `iimperialism.map` after the next build.
 | Area | Address | Capacity | Notes |
 |------|---------|----------|-------|
 | LOWCODE | `$0824–$1FFF` | ~3.9KB free | Most effective — shrinks binary end address |
-| AUX overlays | `$A000–$BEFF` | 6 × 2KB slots | Each new screen costs 2KB in AUX, not CODE |
+| AUX RAM | `$9000–$BEFF` | ~12KB | Free now; can be used for overlay cache or other expansion |
 | Language Card | `$D400–$DFFF` | 3KB | Separate RAM bank, copied at startup |
 
 ## cc65 Configuration Reference
