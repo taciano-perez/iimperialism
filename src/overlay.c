@@ -14,6 +14,8 @@ static const char* overlay_filename(unsigned char id) {
         case OVL_PRODUCTION: return OVL_FILE_PRODUCTION;
         case OVL_TRANSPORT:  return OVL_FILE_TRANSPORT;
         case OVL_ADMIRALTY:  return OVL_FILE_ADMIRALTY;
+        case OVL_ADMIRALTY_TRADER:  return OVL_FILE_ADMIRALTY_TRADER;
+        case OVL_ADMIRALTY_WARSHIP: return OVL_FILE_ADMIRALTY_WARSHIP;
         default:             return 0;
     }
 }

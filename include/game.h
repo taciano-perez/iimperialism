@@ -100,6 +100,7 @@ void clear_input_area();
 void print (const int x, const int y, const char* text);
 void print_right_aligned(const int x, const int y, const char* text);
 void print_int_right_aligned(int x, int y, unsigned int value);
+void print_int(const int x, const int y, unsigned int value);
 void draw_picture_at(const unsigned char picture_index, const unsigned char x_byte, unsigned char y);
 void box (const int x1, const int y1, const int x2, const int y2);
 char cgetc_at(int x, int y);

@@ -9,6 +9,9 @@
 ;  $081B  JMP _draw_picture_at
 ;  $081E  JMP _box
 ;  $0821  JMP _render_warehouse_box
+;  $0824  JMP _cgetc
+;  $0827  JMP _scan_uint
+;  $082A  JMP _print_int
 
     .import _clear_screen
     .import _clear_input_area
@@ -17,6 +20,9 @@
     .import _draw_picture_at
     .import _box
     .import _render_warehouse_box
+    .import _cgetc
+    .import _scan_uint
+    .import _print_int
 
     .segment "JMPTAB"
 
@@ -27,3 +33,6 @@
     jmp _draw_picture_at            ; $081B
     jmp _box                        ; $081E
     jmp _render_warehouse_box       ; $0821
+    jmp _cgetc                      ; $0824
+    jmp _scan_uint                  ; $0827
+    jmp _print_int                  ; $082A

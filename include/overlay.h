@@ -12,12 +12,16 @@
 #define OVL_PRODUCTION 1
 #define OVL_TRANSPORT  2
 #define OVL_ADMIRALTY  3
+#define OVL_ADMIRALTY_TRADER  4
+#define OVL_ADMIRALTY_WARSHIP 5
 
 /* Disk file names for the overlay binaries (ProDOS, uppercase, no extension) */
 #define OVL_FILE_INDUSTRY   "ISCR"
 #define OVL_FILE_PRODUCTION "PSCR"
 #define OVL_FILE_TRANSPORT  "TSCR"
 #define OVL_FILE_ADMIRALTY  "ASCR"
+#define OVL_FILE_ADMIRALTY_TRADER  "ATRD"
+#define OVL_FILE_ADMIRALTY_WARSHIP "AWRS"
 
 /* Zero-page trampoline parameters ($9A-$9E, outside cc65 ZP range $80-$99).
  * Set by run_overlay before calling the trampoline at $0100. */
