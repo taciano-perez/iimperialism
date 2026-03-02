@@ -1,62 +1,78 @@
-﻿# IImperialism - an Apple II Strategy Game
+# IImperialism - an Apple II Strategy Game
 
 An early-stage strategy game for the Apple II, written in C using the **cc65** compiler
 and its Tiny Graphics Interface (TGI) for Hi-Res Graphics (HGR) mode.
 
-This is an Apple II strategy game, inspired by Imperialism and Taipan!, written in C using the **cc65** compiler and its Tiny Graphics Interface (TGI) for Hi-Res Graphics (HGR) mode. It's a turn-based resource management game where players manage a supply chain from raw materials through production stages to finished goods and sell them abroad, improving its diplomatic relations towards global domination.
+This project is inspired by Imperialism and Taipan!. It is a turn-based resource
+management game where players manage a supply chain from raw materials through
+production stages to finished goods.
 
 ## Overview
 
-The game requires at least 128KB of memory. It uses a custom memory layout to fit within the Apple II's tight constraints:
-- Screen renderers are compiled as standalone 2KB **AUX RAM overlays** (ISCR, PSCR, TSCR)
-  loaded at startup and paged in on demand, freeing CODE space in MAIN RAM.
-- All UI primitives and game logic live in **LOWCODE** (`$0824-$1FFF`), below the HGR
-  screen, keeping the critical CODE segment small.
+The game requires at least 128KB of memory. It uses a custom memory layout to fit
+within the Apple II's constraints:
 
-See `docs/MEMORY.md` for the full memory map and overlay architecture.
+- Screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`, `TSCR`,
+  `ASCR`, `ATRD`, `AWRS`) loaded on demand.
+- UI primitives and core game logic are kept in **LOWCODE** (`$0824-$1FFF`) below
+  the HGR screen to preserve resident code space.
+- Disk autoboot uses ProDOS `SYS` loader `IIMP.SYSTEM` to launch `IIMPERIALISM`
+  directly (no `BASIC.SYSTEM` dependency).
+
+See `docs/MEMORY.md` for memory and overlay details.
+See `docs/FLOPPY.md` for floppy contents and autoboot behavior.
 
 ## File Structure
 
 | File | Purpose |
 |------|---------|
-| `src/main.c` | Screen dispatch, input handlers, `render_warehouse_box` |
-| `src/ui.c` | All UI primitives: `print`, `box`, `clear_screen`, etc. (LOWCODE) |
-| `src/logic.c` | `init_game()`, `next_turn()` (LOWCODE) |
-| `src/gamestate.c` | Save / load game state via ProDOS file I/O (LOWCODE) |
-| `src/overlay.c` | `init_overlays()`, `run_overlay()` - overlay loading and dispatch (LOWCODE) |
-| `src/ovl_industry.c` | `render_industry_screen` - compiled to `iscr.bin` |
-| `src/ovl_production.c` | `render_production_screen` - compiled to `pscr.bin` |
-| `src/ovl_transport.c` | `render_transport_screen` - compiled to `tscr.bin` |
-| `asm/ovl_asm.s` | Assembly: `install_trampoline`, `main_to_aux` - AUX RAM copy routines (LOWCODE) |
-| `asm/jmptab.s` | 7-entry JMP table at `$080F` - fixed addresses called by overlay binaries |
-| `asm/werner.s` | Reserves the HGR segment |
-| `include/game.h` | `GameState` struct and all function declarations |
-| `include/overlay.h` | Overlay IDs, AUX addresses, trampoline ZP macros |
-| `config/apple2-hgr.cfg` | Linker config for the main binary (STARTUP/JMPTAB/LOWCODE/HGR/CODE layout) |
-| `config/apple2-ovl.cfg` | Linker config for overlay binaries (raw 2KB at `$8800`, symbols from jump table) |
-| `assets/startup.bas` | One-line Applesoft BASIC program: auto-BRUNs IIMPERIALISM at boot |
+| `src/main.c` | Main loop and screen dispatch |
+| `src/ui.c` | UI primitives (`print`, `box`, `clear_screen`, etc.) |
+| `src/logic.c` | `init_game()`, `next_turn()` |
+| `src/gamestate.c` | Save/load game state (`GAME.DATA`) |
+| `src/overlay.c` | `init_overlays()`, `run_overlay()` |
+| `src/ovl_industry.c` | Industry screen overlay (`iscr.bin`) |
+| `src/ovl_production.c` | Production screen overlay (`pscr.bin`) |
+| `src/ovl_transport.c` | Transport screen overlay (`tscr.bin`) |
+| `src/ovl_admiralty.c` | Admiralty screen overlay (`ascr.bin`) |
+| `src/ovl_admiralty_trader.c` | Admiralty trader flow overlay (`atrd.bin`) |
+| `src/ovl_admiralty_warship.c` | Admiralty warship flow overlay (`awrs.bin`) |
+| `asm/ovl_asm.s` | AUX RAM copy and trampoline helpers |
+| `asm/jmptab.s` | Resident jump table used by overlays |
+| `asm/werner.s` | Reserves HGR segment |
+| `asm/loader/loader.s` | Vendored cc65 loader source (patched for fixed target BIN) |
+| `asm/loader/loader.cfg` | Linker config for loader system file |
+| `include/game.h` | `GameState` and shared declarations |
+| `include/overlay.h` | Overlay IDs, filenames, trampoline ZP macros |
+| `config/apple2-hgr.cfg` | Main linker config |
+| `config/apple2-ovl.cfg` | Overlay linker config |
 | `assets/iimperialism.dsk` | ProDOS disk image |
-| `Makefile` | Build rules for main binary, overlay binaries, and disk image |
-| `build-run.sh` | Clean build + disk update + launch emulator in one step |
-| `tools/ac.jar` | AppleCommander - adds binaries to the ProDOS disk image |
+| `Makefile` | Build rules for main binary, overlays, loader, and disk |
+| `build-run.sh` | Build + disk update + emulator launch helper |
+| `tools/ac.jar` | AppleCommander utility |
 
-Documentation: `docs/MEMORY.md`, `docs/DESIGN.md`, `docs/FONT.md`, `docs/PICTURES.md`, `docs/STRUCTURE.md`
+Documentation: `docs/FLOPPY.md`, `docs/MEMORY.md`, `docs/DESIGN.md`,
+`docs/FONT.md`, `docs/PICTURES.md`, `docs/STRUCTURE.md`
 
 ## Prerequisites
 
-**cc65** cross-development package for 6502 systems, and **Java** (for AppleCommander).
+- **cc65** cross-development package
+- **Java** (for AppleCommander)
 
 ### Windows
-1. Download the Windows Snapshot (zip) from the [cc65 GitHub releases](https://github.com/cc65/cc65/releases).
-2. Extract to a folder (e.g., `C:\cc65`) and add `C:\cc65\bin` to your PATH.
+
+1. Download a Windows snapshot from [cc65 releases](https://github.com/cc65/cc65/releases).
+2. Extract it (for example `C:\cc65`) and add its `bin` folder to `PATH`.
 3. Verify: `cl65 --version`
 
 ### macOS
+
 ```bash
 brew install cc65
 ```
 
 ### Linux (Debian/Ubuntu)
+
 ```bash
 sudo apt-get install cc65
 ```
@@ -67,31 +83,45 @@ sudo apt-get install cc65
 make disk
 ```
 
-This compiles the main binary and all three overlay binaries, then copies everything
-to `assets/iimperialism.dsk` using AppleCommander. The disk image is ready to run.
+This builds the main binary, all overlays, and loader system file, then updates
+`assets/iimperialism.dsk`.
 
-To just build without updating the disk:
+On some Windows setups, use:
+
+```bash
+make SHELL=cmd disk
+```
+
+To build without updating the disk image:
+
 ```bash
 make
 ```
 
-To clean all build artifacts:
+To clean artifacts:
+
 ```bash
 make clean
 ```
 
 ## Running on an Emulator
 
-`assets/iimperialism.dsk` is a **ProDOS** disk image. Load it in any Apple IIe emulator.
-The game launches automatically at boot via the `STARTUP` Applesoft program.
+`assets/iimperialism.dsk` is a ProDOS disk image. Load it in an Apple IIe emulator.
 
-If it doesn't auto-launch, at the ProDOS BASIC prompt type:
-```
+Autoboot path:
+
+- ProDOS starts `IIMP.SYSTEM`
+- `IIMP.SYSTEM` loads and jumps to `IIMPERIALISM`
+
+If you need to launch manually from a ProDOS BASIC prompt:
+
+```text
 BRUN IIMPERIALISM
 ```
 
 ### Recommended Emulators
-- **Cross-Platform:** [MicroM8](https://microm8.com/)
+
+- **Cross-platform:** [MicroM8](https://microm8.com/)
 - **Windows:** [AppleWin](https://github.com/AppleWin/AppleWin)
 - **macOS:** [Virtual II](https://www.virtualii.com/)
 - **Linux:** [LinApple](https://github.com/linappleii/linapple)
@@ -99,16 +129,19 @@ BRUN IIMPERIALISM
 ## Development Workflow
 
 ```bash
-./build-run.sh      # clean build -> update disk -> launch emulator
+./build-run.sh
 ```
 
-When adding a new screen as an overlay, see the step-by-step instructions in `docs/MEMORY.md`
-under **"Adding a New Screen as an Overlay"**.
+This runs a build, updates the disk image, and launches the emulator.
 
-## TODO LIST
+When adding a new screen as an overlay, see `docs/MEMORY.md` under
+"Adding a New Screen as an Overlay".
+
+## TODO
+
 - Add science screen
 - Add diplomacy screen
 - Add trade voyage screens
 - Add main menu
 - Add save/load/quit screen
-- Add retirement / end screen
+- Add retirement/end screen
