@@ -8,6 +8,7 @@ CONFIG_DIR = $(ROOT_DIR)/config
 ASSETS_DIR = $(ROOT_DIR)/assets
 TOOLS_DIR  = $(ROOT_DIR)/tools
 BUILD_DIR  = $(ROOT_DIR)/build
+LOADER_DIR = $(ROOT_DIR)/asm/loader
 
 ifeq ($(OS),Windows_NT)
 MKDIR_P  = mkdir -p
@@ -78,19 +79,32 @@ OVL_LDFLAGS = -t apple2 -C $(CONFIG_DIR)/apple2-ovl.cfg -Oirs
 # Disk image tool (AppleCommander)
 AC = java -jar $(TOOLS_DIR)/ac.jar
 DISK = $(ASSETS_DIR)/iimperialism.dsk
+LOADER_SYSTEM = IIMP.SYSTEM
 
-all: $(BUILD_DIR) iimperialism overlays
+all: $(BUILD_DIR) iimperialism overlays $(BUILD_DIR)/loader.system
 
 # Update disk image with latest binaries (run after 'make all')
-disk: iimperialism overlays
-	$(AC) -d $(DISK) STARTUP        2>/dev/null; $(AC) -bas $(DISK) STARTUP      < $(ASSETS_DIR)/startup.bas
-	$(AC) -d $(DISK) IIMPERIALISM   2>/dev/null; $(AC) -p   $(DISK) IIMPERIALISM BIN 0x0803 < $(BUILD_DIR)/iimperialism
-	$(AC) -d $(DISK) ISCR           2>/dev/null; $(AC) -p   $(DISK) ISCR         BIN 0x8800 < $(BUILD_DIR)/iscr.bin
-	$(AC) -d $(DISK) PSCR           2>/dev/null; $(AC) -p   $(DISK) PSCR         BIN 0x9000 < $(BUILD_DIR)/pscr.bin
-	$(AC) -d $(DISK) TSCR           2>/dev/null; $(AC) -p   $(DISK) TSCR         BIN 0x9800 < $(BUILD_DIR)/tscr.bin
-	$(AC) -d $(DISK) ASCR           2>/dev/null; $(AC) -p   $(DISK) ASCR         BIN 0xA000 < $(BUILD_DIR)/ascr.bin
-	$(AC) -d $(DISK) ATRD           2>/dev/null; $(AC) -p   $(DISK) ATRD         BIN 0x8800 < $(BUILD_DIR)/atrd.bin
-	$(AC) -d $(DISK) AWRS           2>/dev/null; $(AC) -p   $(DISK) AWRS         BIN 0x8800 < $(BUILD_DIR)/awrs.bin
+disk: iimperialism overlays $(BUILD_DIR)/loader.system
+	-$(AC) -d $(DISK) STARTUP
+	-$(AC) -d $(DISK) BASIC.SYSTEM
+	-$(AC) -d $(DISK) IIMPERIALISM.SYSTEM
+	-$(AC) -d $(DISK) IIMPERIALISM.SY
+	-$(AC) -d $(DISK) $(LOADER_SYSTEM)
+	$(AC) -p $(DISK) $(LOADER_SYSTEM) SYS < $(BUILD_DIR)/loader.system
+	-$(AC) -d $(DISK) IIMPERIALISM
+	$(AC) -p $(DISK) IIMPERIALISM BIN 0x0803 < $(BUILD_DIR)/iimperialism
+	-$(AC) -d $(DISK) ISCR
+	$(AC) -p $(DISK) ISCR BIN 0x8800 < $(BUILD_DIR)/iscr.bin
+	-$(AC) -d $(DISK) PSCR
+	$(AC) -p $(DISK) PSCR BIN 0x9000 < $(BUILD_DIR)/pscr.bin
+	-$(AC) -d $(DISK) TSCR
+	$(AC) -p $(DISK) TSCR BIN 0x9800 < $(BUILD_DIR)/tscr.bin
+	-$(AC) -d $(DISK) ASCR
+	$(AC) -p $(DISK) ASCR BIN 0xA000 < $(BUILD_DIR)/ascr.bin
+	-$(AC) -d $(DISK) ATRD
+	$(AC) -p $(DISK) ATRD BIN 0x8800 < $(BUILD_DIR)/atrd.bin
+	-$(AC) -d $(DISK) AWRS
+	$(AC) -p $(DISK) AWRS BIN 0x8800 < $(BUILD_DIR)/awrs.bin
 	$(AC) -l $(DISK)
 
 overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/atrd.bin $(BUILD_DIR)/awrs.bin
@@ -130,6 +144,12 @@ $(BUILD_DIR)/atrd.bin: $(BUILD_DIR)/ovl_admiralty_trader.o | $(BUILD_DIR)
 
 $(BUILD_DIR)/awrs.bin: $(BUILD_DIR)/ovl_admiralty_warship.o | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/awrs.bin $(BUILD_DIR)/ovl_admiralty_warship.o
+
+$(BUILD_DIR)/loader.o: $(LOADER_DIR)/loader.s | $(BUILD_DIR)
+	ca65 $(LOADER_DIR)/loader.s -o $(BUILD_DIR)/loader.o
+
+$(BUILD_DIR)/loader.system: $(BUILD_DIR)/loader.o $(LOADER_DIR)/loader.cfg | $(BUILD_DIR)
+	ld65 -C $(LOADER_DIR)/loader.cfg -o $(BUILD_DIR)/loader.system $(BUILD_DIR)/loader.o
 
 clean:
 	$(CLEAN_CMD)
