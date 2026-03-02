@@ -153,3 +153,6 @@ $(BUILD_DIR)/loader.system: $(BUILD_DIR)/loader.o $(LOADER_DIR)/loader.cfg | $(B
 
 clean:
 	$(CLEAN_CMD)
+
+overlay-usage: overlays
+	powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(TOOLS_DIR)/overlay-usage.ps1" "$(BUILD_DIR)"

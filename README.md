@@ -104,6 +104,18 @@ To clean artifacts:
 make clean
 ```
 
+To inspect overlay occupancy (used bytes vs trailing padding):
+
+```bash
+make overlay-usage
+```
+
+In your setup (Git Bash on Windows), use:
+
+```bash
+make overlay-usage
+```
+
 ## Running on an Emulator
 
 `assets/iimperialism.dsk` is a ProDOS disk image. Load it in an Apple IIe emulator.
