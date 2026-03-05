@@ -47,7 +47,7 @@ void init_game() {
 
     state.turn_number = 1;
     snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
-    state.current_screen = SCREEN_INDUSTRY;
+    state.current_screen = SCREEN_DIPLOMACY;
 }
 
 void next_turn() {

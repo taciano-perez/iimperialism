@@ -22,6 +22,7 @@
 #define SCREEN_TRANSPORT 2
 #define SCREEN_PRODUCTION 3
 #define SCREEN_ADMIRALTY 4
+#define SCREEN_DIPLOMACY 5
 
 /* ============================================================================
  * Gameplay constants

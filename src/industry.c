@@ -14,6 +14,10 @@ void handle_screen_input_industry(char key) {
         case 'A':
             state.current_screen = SCREEN_ADMIRALTY;
             break;
+        case 'd':
+        case 'D':
+            state.current_screen = SCREEN_DIPLOMACY;
+            break;
         case 'e':
         case 'E':
             next_turn();

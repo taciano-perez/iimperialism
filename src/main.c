@@ -59,6 +59,8 @@ int main(void) {
             run_overlay(OVL_PRODUCTION);
         } else if (state.current_screen == SCREEN_ADMIRALTY) {
             run_overlay(OVL_ADMIRALTY);
+        } else if (state.current_screen == SCREEN_DIPLOMACY) {
+            run_overlay(OVL_DIPLOMACY);
         }
 
         key = cgetc();
@@ -77,6 +79,8 @@ int main(void) {
                     handle_screen_input_production(key);
                 } else if (state.current_screen == SCREEN_ADMIRALTY) {
                     handle_screen_input_admiralty(key);
+                } else if (state.current_screen == SCREEN_DIPLOMACY) {
+                    handle_screen_input_diplomacy(key);
                 }
                 break;
         }

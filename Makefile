@@ -26,6 +26,7 @@ C_SOURCES  = \
 	$(SRC_DIR)/transport.c \
 	$(SRC_DIR)/production.c \
 	$(SRC_DIR)/admiralty.c \
+	$(SRC_DIR)/diplomacy.c \
 	$(SRC_DIR)/strings.c \
 	$(SRC_DIR)/ui.c \
 	$(SRC_DIR)/gamestate.c \
@@ -36,7 +37,8 @@ C_SOURCES  = \
 	$(SRC_DIR)/ovl_transport.c \
 	$(SRC_DIR)/ovl_admiralty.c \
 	$(SRC_DIR)/ovl_admiralty_trader.c \
-	$(SRC_DIR)/ovl_admiralty_warship.c
+	$(SRC_DIR)/ovl_admiralty_warship.c \
+	$(SRC_DIR)/ovl_diplomacy.c
 
 ASM_SOURCES = \
 	$(ASM_DIR)/werner.s \
@@ -49,6 +51,7 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/transport.o \
 	$(BUILD_DIR)/production.o \
 	$(BUILD_DIR)/admiralty.o \
+	$(BUILD_DIR)/diplomacy.o \
 	$(BUILD_DIR)/strings.o \
 	$(BUILD_DIR)/ui.o \
 	$(BUILD_DIR)/werner.o \
@@ -64,7 +67,8 @@ OVERLAY_OBJECTS = \
 	$(BUILD_DIR)/ovl_transport.o \
 	$(BUILD_DIR)/ovl_admiralty.o \
 	$(BUILD_DIR)/ovl_admiralty_trader.o \
-	$(BUILD_DIR)/ovl_admiralty_warship.o
+	$(BUILD_DIR)/ovl_admiralty_warship.o \
+	$(BUILD_DIR)/ovl_diplomacy.o
 
 # Main compiler
 
@@ -105,9 +109,11 @@ disk: iimperialism overlays $(BUILD_DIR)/loader.system
 	$(AC) -p $(DISK) ATRD BIN 0x8800 < $(BUILD_DIR)/atrd.bin
 	-$(AC) -d $(DISK) AWRS
 	$(AC) -p $(DISK) AWRS BIN 0x8800 < $(BUILD_DIR)/awrs.bin
+	-$(AC) -d $(DISK) DSCR
+	$(AC) -p $(DISK) DSCR BIN 0x8800 < $(BUILD_DIR)/dscr.bin
 	$(AC) -l $(DISK)
 
-overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/atrd.bin $(BUILD_DIR)/awrs.bin
+overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/atrd.bin $(BUILD_DIR)/awrs.bin $(BUILD_DIR)/dscr.bin
 
 iimperialism: $(MAIN_OBJECTS) | $(BUILD_DIR)
 	$(CC) $(LDFLAGS) -o $(BUILD_DIR)/iimperialism -m $(BUILD_DIR)/iimperialism.map $(MAIN_OBJECTS)
@@ -144,6 +150,9 @@ $(BUILD_DIR)/atrd.bin: $(BUILD_DIR)/ovl_admiralty_trader.o | $(BUILD_DIR)
 
 $(BUILD_DIR)/awrs.bin: $(BUILD_DIR)/ovl_admiralty_warship.o | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/awrs.bin $(BUILD_DIR)/ovl_admiralty_warship.o
+
+$(BUILD_DIR)/dscr.bin: $(BUILD_DIR)/ovl_diplomacy.o | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/ovl_diplomacy.o
 
 $(BUILD_DIR)/loader.o: $(LOADER_DIR)/loader.s | $(BUILD_DIR)
 	ca65 $(LOADER_DIR)/loader.s -o $(BUILD_DIR)/loader.o
