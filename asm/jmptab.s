@@ -12,6 +12,8 @@
 ;  $0824  JMP _cgetc
 ;  $0827  JMP _scan_uint
 ;  $082A  JMP _print_int
+;  $082D  JMP _get_resource_name
+;  $0830  JMP _get_relation_name
 
     .import _clear_screen
     .import _clear_input_area
@@ -23,6 +25,8 @@
     .import _cgetc
     .import _scan_uint
     .import _print_int
+    .import _get_resource_name
+    .import _get_relation_name
 
     .segment "JMPTAB"
 
@@ -36,3 +40,5 @@
     jmp _cgetc                      ; $0824
     jmp _scan_uint                  ; $0827
     jmp _print_int                  ; $082A
+    jmp _get_resource_name          ; $082D
+    jmp _get_relation_name          ; $0830

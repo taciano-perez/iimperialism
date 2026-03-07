@@ -12,11 +12,9 @@ LOADER_DIR = $(ROOT_DIR)/asm/loader
 
 ifeq ($(OS),Windows_NT)
 MKDIR_P  = mkdir -p
-MV_CMD    = mv -f
 CLEAN_CMD = powershell.exe -NoProfile -Command "if (Test-Path '$(BUILD_DIR)') { Remove-Item -Recurse -Force -ErrorAction SilentlyContinue '$(BUILD_DIR)' }; Remove-Item -Force -ErrorAction SilentlyContinue '$(SRC_DIR)/*.o','$(ASM_DIR)/*.o'"
 else
 MKDIR_P  = mkdir -p
-MV_CMD    = mv -f
 CLEAN_CMD = rm -rf $(BUILD_DIR) $(SRC_DIR)/*.o $(ASM_DIR)/*.o
 endif
 
@@ -123,12 +121,10 @@ $(BUILD_DIR):
 
 # Main and overlay object files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $<
-	$(MV_CMD) $(SRC_DIR)/$*.o $@
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 $(BUILD_DIR)/%.o: $(ASM_DIR)/%.s | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $<
-	$(MV_CMD) $(ASM_DIR)/$*.o $@
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 # Overlay binaries: raw 2KB images, zero-padded to exactly 2048 bytes.
 # Must be on the disk alongside the main binary (DOS 3.3 type B).
@@ -151,8 +147,11 @@ $(BUILD_DIR)/atrd.bin: $(BUILD_DIR)/ovl_admiralty_trader.o | $(BUILD_DIR)
 $(BUILD_DIR)/awrs.bin: $(BUILD_DIR)/ovl_admiralty_warship.o | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/awrs.bin $(BUILD_DIR)/ovl_admiralty_warship.o
 
-$(BUILD_DIR)/dscr.bin: $(BUILD_DIR)/ovl_diplomacy.o | $(BUILD_DIR)
-	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/ovl_diplomacy.o
+$(BUILD_DIR)/dscr.bin: $(BUILD_DIR)/ovl_diplomacy_entry.o $(BUILD_DIR)/ovl_diplomacy.o | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/ovl_diplomacy_entry.o $(BUILD_DIR)/ovl_diplomacy.o
+
+$(BUILD_DIR)/ovl_diplomacy_entry.o: $(ASM_DIR)/ovl_diplomacy_entry.s | $(BUILD_DIR)
+	ca65 $(ASM_DIR)/ovl_diplomacy_entry.s -o $(BUILD_DIR)/ovl_diplomacy_entry.o
 
 $(BUILD_DIR)/loader.o: $(LOADER_DIR)/loader.s | $(BUILD_DIR)
 	ca65 $(LOADER_DIR)/loader.s -o $(BUILD_DIR)/loader.o

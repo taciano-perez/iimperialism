@@ -12,4 +12,13 @@ extern const char STR_WARSHIP_COST2[];
 extern const char STR_SIR_TRAIN_WORKERS1[];
 extern const char STR_SIR_TRAIN_WORKERS2[];
 
+extern const char STR_RELATION_TERRIBLE[];
+extern const char STR_RELATION_BAD[];
+extern const char STR_RELATION_NEUTRAL[];
+extern const char STR_RELATION_GOOD[];
+extern const char STR_RELATION_EXCELLENT[];
+extern const char* const STR_RESOURCE[];
+const char* get_resource_name(unsigned int resource);
+const char* get_relation_name(unsigned int relation);
+
 #endif /* STRINGS_H */

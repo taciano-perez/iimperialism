@@ -22,6 +22,17 @@ within the Apple II's constraints:
 See `docs/MEMORY.md` for memory and overlay details.
 See `docs/FLOPPY.md` for floppy contents and autoboot behavior.
 
+## Diplomacy Relations
+
+Foreign nation relations are stored as numeric values in the game state and shown
+in the diplomacy screen as text using these ranges:
+
+- `0-49`: Terrible
+- `50-99`: Bad
+- `100-149`: Neutral
+- `150-199`: Good
+- `200+`: Excellent
+
 ## File Structure
 
 | File | Purpose |

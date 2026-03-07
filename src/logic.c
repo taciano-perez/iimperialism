@@ -4,6 +4,34 @@
 #pragma code-name (push, "LOWCODE")
 
 void init_game() {
+    static const char* foreign_nation_names[FOREIGN_NATION_COUNT] = {
+        "Ordune",
+        "Deneb",
+        "Loke",
+        "Pont",
+        "Kathay"
+    };
+    static const int foreign_nation_relations[FOREIGN_NATION_COUNT] = {
+        RELATION_NEUTRAL, RELATION_BAD, RELATION_GOOD, RELATION_EXCELLENT, RELATION_TERRIBLE
+    };
+    static const int foreign_nation_exports[FOREIGN_NATION_COUNT][FOREIGN_TRADE_ENTRY_COUNT] = {
+        { RESOURCE_STEEL, RESOURCE_FURNITURE, RESOURCE_LUMBER },
+        { RESOURCE_CLOTHES, RESOURCE_TOOLS, RESOURCE_GUNS },
+        { RESOURCE_WOOL, RESOURCE_WOOL, RESOURCE_COAL },
+        { RESOURCE_IRON, RESOURCE_TIMBER, RESOURCE_WOOL },
+        { RESOURCE_WOOL, RESOURCE_COAL, RESOURCE_TIMBER }
+    };
+    static const int foreign_nation_imports[FOREIGN_NATION_COUNT][FOREIGN_TRADE_ENTRY_COUNT] = {
+        { RESOURCE_TIMBER, RESOURCE_IRON, RESOURCE_WOOL },
+        { RESOURCE_COAL, RESOURCE_TIMBER, RESOURCE_WOOL },
+        { RESOURCE_STEEL, RESOURCE_GUNS, RESOURCE_CLOTHES },
+        { RESOURCE_FURNITURE, RESOURCE_CLOTHES, RESOURCE_GUNS },
+        { RESOURCE_FURNITURE, RESOURCE_GUNS, RESOURCE_LUMBER }
+    };
+    
+    unsigned char i;
+    unsigned char j;
+
     // Initialize game state with default values
     state.timber = 10;
     state.wool = 10;
@@ -44,6 +72,19 @@ void init_game() {
 
     state.traders = 2;
     state.frigates = 1;
+
+    for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
+        snprintf(state.foreign_nations[i].name,
+                 sizeof(state.foreign_nations[i].name),
+                 "%s",
+                 foreign_nation_names[i]);
+        state.foreign_nations[i].relations = foreign_nation_relations[i];
+
+        for (j = 0; j < FOREIGN_TRADE_ENTRY_COUNT; ++j) {
+            state.foreign_nations[i].exports[j] = foreign_nation_exports[i][j];
+            state.foreign_nations[i].imports[j] = foreign_nation_imports[i][j];
+        }
+    }
 
     state.turn_number = 1;
     snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");

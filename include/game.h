@@ -25,11 +25,47 @@
 #define SCREEN_DIPLOMACY 5
 
 /* ============================================================================
+ * Resource Constants
+ * ============================================================================
+ */
+#define RESOURCE_TIMBER 0
+#define RESOURCE_WOOL 1 
+#define RESOURCE_IRON 2
+#define RESOURCE_COAL 3
+#define RESOURCE_LUMBER 4
+#define RESOURCE_FABRIC 5
+#define RESOURCE_STEEL 6
+#define RESOURCE_FURNITURE 7
+#define RESOURCE_CLOTHES 8
+#define RESOURCE_TOOLS 9
+#define RESOURCE_GUNS 10
+
+/* ============================================================================
+ * Diplomacy Constants
+ * ============================================================================
+ */
+#define RELATION_TERRIBLE 0
+#define RELATION_BAD 50
+#define RELATION_NEUTRAL 100  
+#define RELATION_GOOD 150
+#define RELATION_EXCELLENT 200
+
+/* ============================================================================
  * Gameplay constants
  * ============================================================================
  */
 #define CAPACITY_PER_TRADER 3
 #define GUNS_PER_FRIGATE 2
+#define FOREIGN_NATION_COUNT 5
+#define FOREIGN_TRADE_ENTRY_COUNT 3
+#define FOREIGN_NATION_NAME_LENGTH 6
+
+typedef struct {
+    char name[FOREIGN_NATION_NAME_LENGTH + 1];
+    unsigned int relations;
+    unsigned int exports[FOREIGN_TRADE_ENTRY_COUNT];
+    unsigned int imports[FOREIGN_TRADE_ENTRY_COUNT];
+} ForeignNation;
 
 /* ============================================================================
  * Game State Structure
@@ -81,6 +117,9 @@ typedef struct {
     unsigned int traders;
     unsigned int frigates;
 
+    /* Foreign nations */
+    ForeignNation foreign_nations[FOREIGN_NATION_COUNT];
+
     /* Game metadata */
     unsigned int turn_number;
     char nation_name[20];
@@ -109,6 +148,8 @@ unsigned int scan_uint(int x, int y, unsigned int max_digits);
 
 // main.c (resident — accessible to overlays via jump table at $0821)
 void render_warehouse_box(void);
+const char* get_resource_name(unsigned int resource);
+const char* get_relation_name(unsigned int relation);
 
 // gamestate.c
 int save_game(const GameState* state);

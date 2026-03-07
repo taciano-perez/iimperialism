@@ -4,7 +4,7 @@
 
 #define SAVE_FILE "GAME.DATA"
 #define MAGIC_NUMBER 0x4947  /* "IG" for Imperialism Game */
-#define VERSION 1
+#define VERSION 2
 
 #pragma code-name (push, "LOWCODE")
 

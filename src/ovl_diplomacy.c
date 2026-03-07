@@ -1,88 +1,67 @@
 #include "game.h"
+#include "strings.h"
 
 #define BOX_X1 0
 #define BOX_Y1 2
 #define BOX_X2 39
 #define BOX_Y2 19
 
+#define NATION_X 1
+#define RELATION_X 10
+#define EXPORT_X 20
+#define IMPORT_X 30
+#define FIRST_ROW_Y 4
+#define ROW_HEIGHT 3
+
 #define state (*s)
 
-const char STR_STEEL[] = "Steel";
-const char STR_FURNITURE[] = "Furniture";
-const char STR_GUNS[] = "Guns";
-const char STR_WOOL[] = "Wool";
-const char STR_TIMBER[] = "Timber";
-const char STR_COAL[] = "Coal";
+static unsigned char get_row_y(unsigned char nation_index);
+static void render_trade_column(unsigned char x, unsigned char y, const unsigned int* resources);
+static void render_nation_row(GameState* s, unsigned char nation_index);
 
 void render_diplomacy_screen(GameState *s) {
+    unsigned char i;
+
     clear_screen();
-    print(0, 0, "Diplomatic Office");
+    print(0, 0, "Foreign Office");
     print(34, 0, "Turn:");
     print_int_right_aligned(39, 0, state.turn_number);
 
-    // box(BOX_X1, BOX_Y1+1, BOX_X2, BOX_Y2);
-    print(1, 2, "Nation");
-    print(10, 2, "Relations");
-    print(20, 2, "Exports");
-    print(30, 2, "Imports");
-    
-    // ORDUNE
-    box(BOX_X1, BOX_Y1+1, BOX_X2, BOX_Y1+4);
-    print(1, 4, "1)Ordune");
-    print(10, 4, "Neutral");
-    print(20, 3, STR_STEEL);
-    print(20, 4, STR_FURNITURE);
-    print(20, 5, STR_GUNS);
-    print(30, 3, STR_WOOL);
-    print(30, 4, STR_TIMBER);
-    print(30, 5, STR_COAL);
+    print(NATION_X, 2, "Nation");
+    print(RELATION_X, 2, "Relations");
+    print(EXPORT_X, 2, "Exports");
+    print(IMPORT_X, 2, "Imports");
 
-    // DENEB
-    box(BOX_X1, BOX_Y1+4, BOX_X2, BOX_Y1+7);
-    print(1, 7, "2)Deneb");
-    print(10, 7, "Good");
-    print(20, 6, STR_STEEL);
-    print(20, 7, STR_FURNITURE);
-    print(20, 8, STR_GUNS);
-    print(30, 6, STR_WOOL);
-    print(30, 7, STR_TIMBER);
-    print(30, 8, STR_COAL);
-
-    // LOKE
-    box(BOX_X1, BOX_Y1+7, BOX_X2, BOX_Y1+10);
-    print(1, 10, "3)Loke");
-    print(10, 10, "Excellent");
-    print(20, 9, STR_STEEL);
-    print(20, 10, STR_FURNITURE);
-    print(20, 11, STR_GUNS);
-    print(30, 9, STR_WOOL);
-    print(30, 10, STR_TIMBER);
-    print(30, 11, STR_COAL);
-
-    // PONT
-    box(BOX_X1, BOX_Y1+10, BOX_X2, BOX_Y1+13);
-    print(1, 13, "4)Pont");
-    print(10, 13, "Bad");
-    print(20, 12, STR_STEEL);
-    print(20, 13, STR_FURNITURE);
-    print(20, 14, STR_GUNS);
-    print(30, 12, STR_WOOL);
-    print(30, 13, STR_TIMBER);
-    print(30, 14, STR_COAL);
-
-    // KATHAY
-    box(BOX_X1, BOX_Y1+13, BOX_X2, BOX_Y1+16);
-    print(1, 16, "5)Kathay");
-    print(10, 16, "Good");
-    print(20, 15, STR_STEEL);
-    print(20, 16, STR_FURNITURE);
-    print(20, 17, STR_GUNS);
-    print(30, 15, STR_WOOL);
-    print(30, 16, STR_TIMBER);
-    print(30, 17, STR_COAL);
+    for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
+        render_nation_row(s, i);
+    }
 
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
     print(5, 20, "Your diplomats await orders.");
-    // print(5, 21, "");
-    // print(5, 22, "");
+}
+
+static unsigned char get_row_y(unsigned char nation_index) {
+    return FIRST_ROW_Y + (nation_index * ROW_HEIGHT);
+}
+
+static void render_trade_column(unsigned char x, unsigned char y, const unsigned int* resources) {
+    unsigned char i;
+
+    for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {
+        print(x, y + i - 1, get_resource_name(resources[i]));
+    }
+}
+
+static void render_nation_row(GameState* s, unsigned char nation_index) {
+    unsigned char y;
+
+    y = get_row_y(nation_index);
+
+    box(BOX_X1, y - 1, BOX_X2, y + 2);
+    print_int(NATION_X, y, nation_index + 1);
+    print(NATION_X + 1, y, ")");
+    print(NATION_X + 2, y, state.foreign_nations[nation_index].name);
+    print(RELATION_X, y, get_relation_name(state.foreign_nations[nation_index].relations));
+    render_trade_column(EXPORT_X, y, state.foreign_nations[nation_index].exports);
+    render_trade_column(IMPORT_X, y, state.foreign_nations[nation_index].imports);
 }
