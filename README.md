@@ -13,7 +13,7 @@ The game requires at least 128KB of memory. It uses a custom memory layout to fi
 within the Apple II's constraints:
 
 - Screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`, `TSCR`,
-  `ASCR`, `ATRD`, `AWRS`) loaded on demand.
+  `ASCR`, `ATRD`, `AWRS`, `TEXP`) loaded on demand.
 - UI primitives and core game logic are kept in **LOWCODE** (`$0824-$1FFF`) below
   the HGR screen to preserve resident code space.
 - Disk autoboot uses ProDOS `SYS` loader `IIMP.SYSTEM` to launch `IIMPERIALISM`
@@ -48,6 +48,8 @@ in the diplomacy screen as text using these ranges:
 | `src/ovl_admiralty.c` | Admiralty screen overlay (`ascr.bin`) |
 | `src/ovl_admiralty_trader.c` | Admiralty trader flow overlay (`atrd.bin`) |
 | `src/ovl_admiralty_warship.c` | Admiralty warship flow overlay (`awrs.bin`) |
+| `src/ovl_trade_expedition.c` | Diplomacy trade expedition overlay (`texp.bin`) |
+| `asm/ovl_trade_expedition_entry.s` | Fixed entry stub for trade expedition overlay |
 | `asm/ovl_asm.s` | AUX RAM copy and trampoline helpers |
 | `asm/jmptab.s` | Resident jump table used by overlays |
 | `asm/werner.s` | Reserves HGR segment |
@@ -58,7 +60,7 @@ in the diplomacy screen as text using these ranges:
 | `config/apple2-hgr.cfg` | Main linker config |
 | `config/apple2-ovl.cfg` | Overlay linker config |
 | `assets/iimperialism.dsk` | ProDOS disk image |
-| `Makefile` | Build rules for main binary, overlays, loader, and disk |
+| `Makefile` | Build rules for main binary, overlay entry stubs, overlays, loader, and disk |
 | `build-run.sh` | Build + disk update + emulator launch helper |
 | `tools/ac.jar` | AppleCommander utility |
 
@@ -115,16 +117,16 @@ To clean artifacts:
 make clean
 ```
 
-To inspect overlay occupancy (used bytes vs trailing padding):
+To inspect resident memory usage and overlay occupancy:
 
 ```bash
-make overlay-usage
+make memory-usage
 ```
 
 In your setup (Git Bash on Windows), use:
 
 ```bash
-make overlay-usage
+make memory-usage
 ```
 
 ## Running on an Emulator

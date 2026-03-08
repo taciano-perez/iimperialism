@@ -131,6 +131,8 @@ extern GameState state;
 // logic.c
 void init_game();
 void next_turn();
+void seed_random(unsigned int seed);
+unsigned int rand_range(unsigned int min, unsigned int max);
 
 // ui.c
 void ui_init();

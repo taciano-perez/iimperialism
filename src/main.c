@@ -15,7 +15,7 @@ GameState state;
 
 void render_warehouse_box() {
     box(BOX1_X1, BOX1_Y1, BOX1_X2, BOX1_Y2);
-    print ((BOX1_X1+1), BOX1_Y1, "Warehouse");
+    print ((BOX1_X1+1), BOX1_Y1, "Our Warehouse");
 
     print((BOX1_X1+1), (BOX1_Y1+1), "Timber: ");
     print_int_right_aligned((BOX1_X1+11), (BOX1_Y1+1), state.timber);
@@ -47,9 +47,10 @@ int main(void) {
 
     char key;
 
-    init_game();
     init_overlays();
     ui_init();
+    seed_random(1);
+    init_game();
     while (1) { // main game loop
         if (state.current_screen == SCREEN_INDUSTRY) {
             run_overlay(OVL_INDUSTRY);

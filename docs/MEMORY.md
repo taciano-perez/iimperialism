@@ -47,6 +47,14 @@ Current overlay files:
 - `ASCR` admiralty screen
 - `ATRD` admiralty build-trader flow
 - `AWRS` admiralty build-warship flow
+- `TEXP` diplomacy trade expedition flow
+
+To inspect current resident segment usage plus overlay occupancy from build
+artifacts, run:
+
+```bash
+make memory-usage
+```
 
 Runtime flow (`run_overlay(id)`):
 
@@ -56,6 +64,13 @@ Runtime flow (`run_overlay(id)`):
 4. Set ZP trampoline parameters (`$9A-$9E`) for AUX -> MAIN copy.
 5. Call trampoline at `$0100` to copy AUX -> MAIN with RAMRD enabled.
 6. Execute overlay entry at `$8800`, passing `&state`.
+
+For overlays with helper functions, use an explicit assembly entry stub so the
+intended entry point stays at `$8800` even if function ordering changes during
+compilation. Current examples:
+
+- `asm/ovl_diplomacy_entry.s` -> `render_diplomacy_screen()`
+- `asm/ovl_trade_expedition_entry.s` -> `trade_expedition()`
 
 Why trampoline code is at `$0100`:
 
@@ -105,15 +120,29 @@ Example: diplomacy overlay as ID `6`, file `DSCR`.
 case OVL_DIPLOMACY: return OVL_FILE_DIPLOMACY;
 ```
 
-4. Add object and binary rules in `Makefile`:
+4. Add object and binary rules in `Makefile`.
+
+If the overlay contains multiple functions, add an assembly entry stub and link it
+first so the correct entry symbol lands at `$8800`:
+
+```asm
+    .export _ovl_example_entry
+    .import _render_example_screen
+
+    .segment "CODE"
+
+_ovl_example_entry:
+    jmp _render_example_screen
+```
+
+Then add the stub object and binary rules in `Makefile`:
 
 ```makefile
-$(BUILD_DIR)/ovl_diplomacy.o: $(SRC_DIR)/ovl_diplomacy.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $<
-	$(MV_CMD) $(SRC_DIR)/ovl_diplomacy.o $@
+$(BUILD_DIR)/ovl_example_entry.o: $(ASM_DIR)/ovl_example_entry.s | $(BUILD_DIR)
+	ca65 $(ASM_DIR)/ovl_example_entry.s -o $(BUILD_DIR)/ovl_example_entry.o
 
-$(BUILD_DIR)/dscr.bin: $(BUILD_DIR)/ovl_diplomacy.o | $(BUILD_DIR)
-	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/ovl_diplomacy.o
+$(BUILD_DIR)/escr.bin: $(BUILD_DIR)/ovl_example_entry.o $(BUILD_DIR)/ovl_example.o | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/escr.bin $(BUILD_DIR)/ovl_example_entry.o $(BUILD_DIR)/ovl_example.o
 ```
 
 5. Add `$(BUILD_DIR)/dscr.bin` to `overlays` target.
@@ -137,6 +166,9 @@ If the overlay needs a resident function not in JMPTAB, append a new JMP entry i
 | LOWCODE | `$0824-$1FFF` | ~3.9KB free (approx) | Most effective for reducing resident pressure |
 | AUX RAM | `$9000-$BEFF` | ~12KB | Available for future cache/expansion |
 | Language Card | `$D400-$DFFF` | 3KB | Separate RAM bank |
+
+Use `make memory-usage` to get the current used/free breakdown for resident
+memory windows and overlay binaries from the latest build.
 
 ## cc65 Configuration Reference
 

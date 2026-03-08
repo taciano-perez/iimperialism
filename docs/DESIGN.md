@@ -47,6 +47,7 @@ Sub-flows are also overlays:
 
 - `OVL_ADMIRALTY_TRADER` (`ATRD`) for trader construction
 - `OVL_ADMIRALTY_WARSHIP` (`AWRS`) for frigate construction
+- `OVL_TRADE_EXPEDITION` (`TEXP`) for diplomacy trade expedition flow
 
 ### Input Handlers
 
@@ -54,6 +55,7 @@ Sub-flows are also overlays:
 - `src/transport.c`: edit transport orders, build wagons, return
 - `src/production.c`: edit production orders, train workers, return
 - `src/admiralty.c`: build traders/warships, return
+- `src/diplomacy.c`: launch trade expedition flow, return
 
 ## Data Model
 

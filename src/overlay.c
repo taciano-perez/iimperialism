@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdio.h>
 #include "game.h"
 #include "overlay.h"
@@ -17,17 +18,22 @@ static const char* overlay_filename(unsigned char id) {
         case OVL_ADMIRALTY_TRADER:  return OVL_FILE_ADMIRALTY_TRADER;
         case OVL_ADMIRALTY_WARSHIP: return OVL_FILE_ADMIRALTY_WARSHIP;
         case OVL_DIPLOMACY: return OVL_FILE_DIPLOMACY;
+        case OVL_TRADE_EXPEDITION: return OVL_FILE_TRADE_EXPEDITION;
         default:             return 0;
     }
 }
 
-static void overlay_load_failed(const char* filename) {
+static void overlay_load_failed(const char* filename, const char* reason, unsigned int detail) {
     clear_screen();
     print(1, 1, "Overlay load failed");
     if (filename) {
         print(1, 3, filename);
     } else {
         print(1, 3, "Invalid overlay id");
+    }
+    if (reason) {
+        print(1, 5, reason);
+        print_int(1, 6, detail);
     }
     while (1) {
     }
@@ -40,14 +46,14 @@ static void load_overlay_file(const char* filename) {
 
     f = fopen(filename, "rb");
     if (!f) {
-        overlay_load_failed(filename);
+        overlay_load_failed(filename, "fopen errno:", (unsigned int)errno);
     }
 
     bytes_read = fread((void*)OVERLAY_SLOT, 1, OVERLAY_SIZE, f);
     fclose(f);
 
     if (bytes_read != OVERLAY_SIZE) {
-        overlay_load_failed(filename);
+        overlay_load_failed(filename, "fread bytes:", bytes_read);
     }
 }
 
@@ -64,7 +70,7 @@ void run_overlay(unsigned char id) {
 
     filename = overlay_filename(id);
     if (!filename) {
-        overlay_load_failed(0);
+        overlay_load_failed(0, 0, 0);
     }
 
     load_overlay_file(filename);

@@ -28,7 +28,6 @@ void init_game() {
         { RESOURCE_FURNITURE, RESOURCE_CLOTHES, RESOURCE_GUNS },
         { RESOURCE_FURNITURE, RESOURCE_GUNS, RESOURCE_LUMBER }
     };
-    
     unsigned char i;
     unsigned char j;
 

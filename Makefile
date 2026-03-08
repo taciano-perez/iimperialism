@@ -11,7 +11,6 @@ BUILD_DIR  = $(ROOT_DIR)/build
 LOADER_DIR = $(ROOT_DIR)/asm/loader
 
 ifeq ($(OS),Windows_NT)
-MKDIR_P  = mkdir -p
 CLEAN_CMD = powershell.exe -NoProfile -Command "if (Test-Path '$(BUILD_DIR)') { Remove-Item -Recurse -Force -ErrorAction SilentlyContinue '$(BUILD_DIR)' }; Remove-Item -Force -ErrorAction SilentlyContinue '$(SRC_DIR)/*.o','$(ASM_DIR)/*.o'"
 else
 MKDIR_P  = mkdir -p
@@ -28,6 +27,7 @@ C_SOURCES  = \
 	$(SRC_DIR)/strings.c \
 	$(SRC_DIR)/ui.c \
 	$(SRC_DIR)/gamestate.c \
+	$(SRC_DIR)/random.c \
 	$(SRC_DIR)/logic.c \
 	$(SRC_DIR)/overlay.c \
 	$(SRC_DIR)/ovl_industry.c \
@@ -36,7 +36,8 @@ C_SOURCES  = \
 	$(SRC_DIR)/ovl_admiralty.c \
 	$(SRC_DIR)/ovl_admiralty_trader.c \
 	$(SRC_DIR)/ovl_admiralty_warship.c \
-	$(SRC_DIR)/ovl_diplomacy.c
+	$(SRC_DIR)/ovl_diplomacy.c \
+	$(SRC_DIR)/ovl_trade_expedition.c
 
 ASM_SOURCES = \
 	$(ASM_DIR)/werner.s \
@@ -54,6 +55,7 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/ui.o \
 	$(BUILD_DIR)/werner.o \
 	$(BUILD_DIR)/gamestate.o \
+	$(BUILD_DIR)/random.o \
 	$(BUILD_DIR)/logic.o \
 	$(BUILD_DIR)/overlay.o \
 	$(BUILD_DIR)/ovl_asm.o \
@@ -66,7 +68,8 @@ OVERLAY_OBJECTS = \
 	$(BUILD_DIR)/ovl_admiralty.o \
 	$(BUILD_DIR)/ovl_admiralty_trader.o \
 	$(BUILD_DIR)/ovl_admiralty_warship.o \
-	$(BUILD_DIR)/ovl_diplomacy.o
+	$(BUILD_DIR)/ovl_diplomacy.o \
+	$(BUILD_DIR)/ovl_trade_expedition.o
 
 # Main compiler
 
@@ -109,15 +112,21 @@ disk: iimperialism overlays $(BUILD_DIR)/loader.system
 	$(AC) -p $(DISK) AWRS BIN 0x8800 < $(BUILD_DIR)/awrs.bin
 	-$(AC) -d $(DISK) DSCR
 	$(AC) -p $(DISK) DSCR BIN 0x8800 < $(BUILD_DIR)/dscr.bin
+	-$(AC) -d $(DISK) TEXP
+	$(AC) -p $(DISK) TEXP BIN 0x8800 < $(BUILD_DIR)/texp.bin
 	$(AC) -l $(DISK)
 
-overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/atrd.bin $(BUILD_DIR)/awrs.bin $(BUILD_DIR)/dscr.bin
+overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/atrd.bin $(BUILD_DIR)/awrs.bin $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/texp.bin
 
 iimperialism: $(MAIN_OBJECTS) | $(BUILD_DIR)
 	$(CC) $(LDFLAGS) -o $(BUILD_DIR)/iimperialism -m $(BUILD_DIR)/iimperialism.map $(MAIN_OBJECTS)
 
 $(BUILD_DIR):
+ifeq ($(OS),Windows_NT)
+	powershell.exe -NoProfile -Command "New-Item -ItemType Directory -Force '$(BUILD_DIR)' | Out-Null"
+else
 	$(MKDIR_P) $(BUILD_DIR)
+endif
 
 # Main and overlay object files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
@@ -150,8 +159,14 @@ $(BUILD_DIR)/awrs.bin: $(BUILD_DIR)/ovl_admiralty_warship.o | $(BUILD_DIR)
 $(BUILD_DIR)/dscr.bin: $(BUILD_DIR)/ovl_diplomacy_entry.o $(BUILD_DIR)/ovl_diplomacy.o | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/ovl_diplomacy_entry.o $(BUILD_DIR)/ovl_diplomacy.o
 
+$(BUILD_DIR)/texp.bin: $(BUILD_DIR)/ovl_trade_expedition_entry.o $(BUILD_DIR)/ovl_trade_expedition.o | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/texp.bin $(BUILD_DIR)/ovl_trade_expedition_entry.o $(BUILD_DIR)/ovl_trade_expedition.o
+
 $(BUILD_DIR)/ovl_diplomacy_entry.o: $(ASM_DIR)/ovl_diplomacy_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_diplomacy_entry.s -o $(BUILD_DIR)/ovl_diplomacy_entry.o
+
+$(BUILD_DIR)/ovl_trade_expedition_entry.o: $(ASM_DIR)/ovl_trade_expedition_entry.s | $(BUILD_DIR)
+	ca65 $(ASM_DIR)/ovl_trade_expedition_entry.s -o $(BUILD_DIR)/ovl_trade_expedition_entry.o
 
 $(BUILD_DIR)/loader.o: $(LOADER_DIR)/loader.s | $(BUILD_DIR)
 	ca65 $(LOADER_DIR)/loader.s -o $(BUILD_DIR)/loader.o
@@ -162,5 +177,6 @@ $(BUILD_DIR)/loader.system: $(BUILD_DIR)/loader.o $(LOADER_DIR)/loader.cfg | $(B
 clean:
 	$(CLEAN_CMD)
 
-overlay-usage: overlays
-	powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(TOOLS_DIR)/overlay-usage.ps1" "$(BUILD_DIR)"
+memory-usage: SHELL := cmd.exe
+memory-usage: iimperialism overlays
+	powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(TOOLS_DIR)/memory-usage.ps1" "$(BUILD_DIR)"

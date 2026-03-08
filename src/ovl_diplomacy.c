@@ -38,6 +38,7 @@ void render_diplomacy_screen(GameState *s) {
 
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
     print(5, 20, "Your diplomats await orders.");
+    print(5, 21, "Trade expedition or Return?");
 }
 
 static unsigned char get_row_y(unsigned char nation_index) {
