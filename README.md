@@ -170,8 +170,9 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
 ## TODO
 
 - Add science screen
-- Add diplomacy screen
-- Add trade voyage screens
+- Add battle screens
 - Add main menu
 - Add save/load/quit screen
 - Add retirement/end screen
+- Add splash screen at startup
+- Randomize country names and resources
