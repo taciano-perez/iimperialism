@@ -47,6 +47,7 @@ Current overlay files:
 - `ASCR` admiralty screen
 - `ATRD` admiralty build-trader flow
 - `AWRS` admiralty build-warship flow
+- `DSCR` diplomacy screen
 - `TEXP` diplomacy trade expedition flow
 
 To inspect current resident segment usage plus overlay occupancy from build
@@ -59,11 +60,17 @@ make memory-usage
 Runtime flow (`run_overlay(id)`):
 
 1. Map overlay ID to ProDOS filename.
-2. Load exactly 2048 bytes from disk into main RAM `OVERLAY_SLOT` (`$8800`).
-3. Copy main RAM `$8800-$8FFF` to AUX RAM at the same address (`main_to_aux`).
-4. Set ZP trampoline parameters (`$9A-$9E`) for AUX -> MAIN copy.
-5. Call trampoline at `$0100` to copy AUX -> MAIN with RAMRD enabled.
-6. Execute overlay entry at `$8800`, passing `&state`.
+2. Call the resident ProDOS loader helper in `asm/prodos_overlay_load.s`.
+3. Use ProDOS MLI `OPEN` / `READ` / `CLOSE` to load exactly 2048 bytes into
+   main RAM `OVERLAY_SLOT` (`$8800`).
+4. Copy main RAM `$8800-$8FFF` to AUX RAM at the same address (`main_to_aux`).
+5. Set ZP trampoline parameters (`$9A-$9E`) for AUX -> MAIN copy.
+6. Call trampoline at `$0100` to copy AUX -> MAIN with RAMRD enabled.
+7. Execute overlay entry at `$8800`, passing `&state`.
+
+The runtime overlay path intentionally avoids `fopen()` / `fread()`. Direct
+MLI calls are more robust under the game's current resident memory pressure
+than the Apple II `stdio` path.
 
 For overlays with helper functions, use an explicit assembly entry stub so the
 intended entry point stays at `$8800` even if function ordering changes during
@@ -121,6 +128,9 @@ case OVL_DIPLOMACY: return OVL_FILE_DIPLOMACY;
 ```
 
 4. Add object and binary rules in `Makefile`.
+
+The resident overlay loader does not need changes unless the new overlay file
+name requires a different filename mapping.
 
 If the overlay contains multiple functions, add an assembly entry stub and link it
 first so the correct entry symbol lands at `$8800`:

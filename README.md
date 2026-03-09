@@ -13,7 +13,9 @@ The game requires at least 128KB of memory. It uses a custom memory layout to fi
 within the Apple II's constraints:
 
 - Screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`, `TSCR`,
-  `ASCR`, `ATRD`, `AWRS`, `TEXP`) loaded on demand.
+  `ASCR`, `ATRD`, `AWRS`, `DSCR`, `TEXP`) loaded on demand.
+- Overlay binaries are loaded at runtime with direct ProDOS MLI `OPEN` / `READ` /
+  `CLOSE` calls instead of `stdio`.
 - UI primitives and core game logic are kept in **LOWCODE** (`$0824-$1FFF`) below
   the HGR screen to preserve resident code space.
 - Disk autoboot uses ProDOS `SYS` loader `IIMP.SYSTEM` to launch `IIMPERIALISM`
@@ -48,7 +50,10 @@ in the diplomacy screen as text using these ranges:
 | `src/ovl_admiralty.c` | Admiralty screen overlay (`ascr.bin`) |
 | `src/ovl_admiralty_trader.c` | Admiralty trader flow overlay (`atrd.bin`) |
 | `src/ovl_admiralty_warship.c` | Admiralty warship flow overlay (`awrs.bin`) |
+| `src/ovl_diplomacy.c` | Diplomacy screen overlay (`dscr.bin`) |
 | `src/ovl_trade_expedition.c` | Diplomacy trade expedition overlay (`texp.bin`) |
+| `asm/prodos_overlay_load.s` | Resident ProDOS MLI overlay loader (`OPEN` / `READ` / `CLOSE`) |
+| `asm/ovl_diplomacy_entry.s` | Fixed entry stub for diplomacy overlay |
 | `asm/ovl_trade_expedition_entry.s` | Fixed entry stub for trade expedition overlay |
 | `asm/ovl_asm.s` | AUX RAM copy and trampoline helpers |
 | `asm/jmptab.s` | Resident jump table used by overlays |

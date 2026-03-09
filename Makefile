@@ -58,6 +58,7 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/random.o \
 	$(BUILD_DIR)/logic.o \
 	$(BUILD_DIR)/overlay.o \
+	$(BUILD_DIR)/prodos_overlay_load.o \
 	$(BUILD_DIR)/ovl_asm.o \
 	$(BUILD_DIR)/jmptab.o
 

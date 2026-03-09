@@ -1,11 +1,11 @@
-#include <errno.h>
-#include <stdio.h>
 #include "game.h"
 #include "overlay.h"
 
 /* Assembly routines from overlay.s */
 extern void install_trampoline(void);
 extern void main_to_aux(unsigned int src, unsigned int dst, unsigned char pages);
+extern unsigned char __fastcall__ prodos_load_overlay(const char* filename);
+extern unsigned int overlay_bytes_read;
 
 #pragma code-name (push, "LOWCODE")
 
@@ -41,19 +41,15 @@ static void overlay_load_failed(const char* filename, const char* reason, unsign
 
 /* Load one overlay binary from disk into OVERLAY_SLOT (MAIN $8800). */
 static void load_overlay_file(const char* filename) {
-    FILE* f;
-    unsigned int bytes_read;
+    unsigned char error_code;
 
-    f = fopen(filename, "rb");
-    if (!f) {
-        overlay_load_failed(filename, "fopen errno:", (unsigned int)errno);
+    error_code = prodos_load_overlay(filename);
+    if (error_code != 0) {
+        overlay_load_failed(filename, "ProDOS err:", (unsigned int)error_code);
     }
 
-    bytes_read = fread((void*)OVERLAY_SLOT, 1, OVERLAY_SIZE, f);
-    fclose(f);
-
-    if (bytes_read != OVERLAY_SIZE) {
-        overlay_load_failed(filename, "fread bytes:", bytes_read);
+    if (overlay_bytes_read != OVERLAY_SIZE) {
+        overlay_load_failed(filename, "read bytes:", overlay_bytes_read);
     }
 }
 

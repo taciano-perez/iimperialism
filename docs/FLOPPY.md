@@ -20,6 +20,7 @@ Current catalog (from `ac -l`) includes:
 - `ASCR` (`BIN`, `A=$A000`) - admiralty overlay.
 - `ATRD` (`BIN`, `A=$8800`) - admiralty trader overlay.
 - `AWRS` (`BIN`, `A=$8800`) - admiralty warship overlay.
+- `DSCR` (`BIN`, `A=$8800`) - diplomacy overlay.
 - `TEXP` (`BIN`, `A=$8800`) - diplomacy trade expedition overlay.
 
 Not present on the game disk:
@@ -33,7 +34,8 @@ Boot sequence:
 
 1. ProDOS boots and runs the first `*.SYSTEM` file (`IIMP.SYSTEM`).
 2. `IIMP.SYSTEM` loads `IIMPERIALISM` (BIN) and jumps to its load address.
-3. `IIMPERIALISM` initializes game state and later loads screen overlays from disk.
+3. `IIMPERIALISM` initializes game state and later loads screen overlays from disk
+   with direct ProDOS MLI reads.
 
 ## Loader Implementation
 
