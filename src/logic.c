@@ -3,6 +3,88 @@
 
 #pragma code-name (push, "LOWCODE")
 
+static unsigned int get_resource_base_price(unsigned int resource);
+static unsigned char get_relation_tier(unsigned int relations);
+static unsigned int apply_percent(unsigned int value, unsigned int percent);
+static void update_foreign_market_prices(void);
+
+static unsigned int get_resource_base_price(unsigned int resource) {
+    static const unsigned int base_prices[] = {
+        6U,  /* timber */
+        6U,  /* wool */
+        8U,  /* iron */
+        8U,  /* coal */
+        12U, /* lumber */
+        12U, /* fabric */
+        16U, /* steel */
+        20U, /* furniture */
+        20U, /* clothes */
+        24U, /* tools */
+        28U  /* guns */
+    };
+
+    if (resource > RESOURCE_GUNS) {
+        return 1U;
+    }
+
+    return base_prices[resource];
+}
+
+static unsigned char get_relation_tier(unsigned int relations) {
+    if (relations < RELATION_BAD) {
+        return 0U;
+    }
+
+    if (relations < RELATION_NEUTRAL) {
+        return 1U;
+    }
+
+    if (relations < RELATION_GOOD) {
+        return 2U;
+    }
+
+    if (relations < RELATION_EXCELLENT) {
+        return 3U;
+    }
+
+    return 4U;
+}
+
+static unsigned int apply_percent(unsigned int value, unsigned int percent) {
+    return ((value * percent) + 50U) / 100U;
+}
+
+static void update_foreign_market_prices(void) {
+    unsigned char i;
+    unsigned char j;
+
+    for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
+        unsigned char relation_tier;
+
+        relation_tier = get_relation_tier(state.foreign_nations[i].relations);
+
+        for (j = 0; j < FOREIGN_TRADE_ENTRY_COUNT; ++j) {
+            unsigned int export_base;
+            unsigned int import_base;
+            unsigned int export_percent;
+            unsigned int import_percent;
+
+            export_base = get_resource_base_price(state.foreign_nations[i].exports[j]);
+            import_base = get_resource_base_price(state.foreign_nations[i].imports[j]);
+
+            export_percent = 85U + rand_range(0U, 15U);
+            if (export_percent > (relation_tier * 3U)) {
+                export_percent -= relation_tier * 3U;
+            }
+
+            import_percent = 110U + rand_range(0U, 20U) + (relation_tier * 4U);
+
+            state.foreign_nations[i].export_prices[j] = apply_percent(export_base, export_percent);
+            state.foreign_nations[i].import_prices[j] = apply_percent(import_base, import_percent);
+        }
+    }
+}
+
 void init_game() {
     static const char* foreign_nation_names[FOREIGN_NATION_COUNT] = {
         "Ordune",
@@ -85,6 +167,8 @@ void init_game() {
         }
     }
 
+    update_foreign_market_prices();
+
     state.turn_number = 1;
     snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
     state.current_screen = SCREEN_DIPLOMACY;
@@ -122,6 +206,8 @@ void next_turn() {
     state.production_clothes = MIN(state.production_clothes, state.fabric / 2);
     state.production_tools = MIN(state.production_tools, state.steel / 2);
     state.production_guns = MIN(state.production_guns, state.steel / 2);
+
+    update_foreign_market_prices();
 
     // update turn number
     state.turn_number++;

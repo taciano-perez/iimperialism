@@ -65,6 +65,8 @@ typedef struct {
     unsigned int relations;
     unsigned int exports[FOREIGN_TRADE_ENTRY_COUNT];
     unsigned int imports[FOREIGN_TRADE_ENTRY_COUNT];
+    unsigned int export_prices[FOREIGN_TRADE_ENTRY_COUNT];
+    unsigned int import_prices[FOREIGN_TRADE_ENTRY_COUNT];
 } ForeignNation;
 
 /* ============================================================================
