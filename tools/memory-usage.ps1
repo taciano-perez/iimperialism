@@ -64,11 +64,13 @@ if ($segments.ContainsKey('STARTUP')) {
 }
 
 if ($segments.ContainsKey('JMPTAB')) {
-    $fixedRows += New-UsageRow 'JMPTAB' 0x080F 0x0832 $segments['JMPTAB'].Size
+    $seg = $segments['JMPTAB']
+    $fixedRows += New-UsageRow 'JMPTAB' $seg.Start $seg.End $seg.Size
 }
 
 if ($segments.ContainsKey('LOWCODE')) {
-    $fixedRows += New-UsageRow 'LOWCODE' 0x0833 0x1FFF $segments['LOWCODE'].Size
+    $seg = $segments['LOWCODE']
+    $fixedRows += New-UsageRow 'LOWCODE' $seg.Start 0x1FFF $seg.Size
 }
 
 $highSegments = @('CODE', 'RODATA', 'DATA', 'INIT', 'ONCE', 'BSS')

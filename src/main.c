@@ -12,6 +12,7 @@
 
 // Global state instance
 GameState state;
+static unsigned char selected_trade_nation;
 
 void render_warehouse_box() {
     box(BOX1_X1, BOX1_Y1, BOX1_X2, BOX1_Y2);
@@ -43,6 +44,14 @@ void render_warehouse_box() {
     print_int_right_aligned((BOX1_X1+39), (BOX1_Y1+4), state.guns);
 }
 
+void set_selected_trade_nation(unsigned char nation_index) {
+    selected_trade_nation = nation_index;
+}
+
+unsigned char get_selected_trade_nation(void) {
+    return selected_trade_nation;
+}
+
 int main(void) {
 
     char key;
@@ -62,6 +71,9 @@ int main(void) {
             run_overlay(OVL_ADMIRALTY);
         } else if (state.current_screen == SCREEN_DIPLOMACY) {
             run_overlay(OVL_DIPLOMACY);
+            continue; // skip input handling and go directly to next screen
+        } else if (state.current_screen == SCREEN_TRADE_EXPEDITION) {
+            run_overlay(OVL_TRADE_EXPEDITION);
         }
 
         key = cgetc();
@@ -80,8 +92,6 @@ int main(void) {
                     handle_screen_input_production(key);
                 } else if (state.current_screen == SCREEN_ADMIRALTY) {
                     handle_screen_input_admiralty(key);
-                } else if (state.current_screen == SCREEN_DIPLOMACY) {
-                    handle_screen_input_diplomacy(key);
                 }
                 break;
         }

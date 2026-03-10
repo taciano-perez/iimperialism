@@ -14,6 +14,8 @@
 ;  $082A  JMP _print_int
 ;  $082D  JMP _get_resource_name
 ;  $0830  JMP _get_relation_name
+;  $0833  JMP _set_selected_trade_nation
+;  $0836  JMP _get_selected_trade_nation
 
     .import _clear_screen
     .import _clear_input_area
@@ -27,6 +29,8 @@
     .import _print_int
     .import _get_resource_name
     .import _get_relation_name
+    .import _set_selected_trade_nation
+    .import _get_selected_trade_nation
 
     .segment "JMPTAB"
 
@@ -42,3 +46,5 @@
     jmp _print_int                  ; $082A
     jmp _get_resource_name          ; $082D
     jmp _get_relation_name          ; $0830
+    jmp _set_selected_trade_nation  ; $0833
+    jmp _get_selected_trade_nation  ; $0836

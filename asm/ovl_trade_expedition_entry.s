@@ -1,7 +1,7 @@
     .export _ovl_trade_expedition_entry
-    .import _trade_expedition
+    .import _render_trade_market
 
     .segment "CODE"
 
 _ovl_trade_expedition_entry:
-    jmp _trade_expedition
+    jmp _render_trade_market

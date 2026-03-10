@@ -23,6 +23,7 @@
 #define SCREEN_PRODUCTION 3
 #define SCREEN_ADMIRALTY 4
 #define SCREEN_DIPLOMACY 5
+#define SCREEN_TRADE_EXPEDITION 6
 
 /* ============================================================================
  * Resource Constants
@@ -154,6 +155,8 @@ unsigned int scan_uint(int x, int y, unsigned int max_digits);
 void render_warehouse_box(void);
 const char* get_resource_name(unsigned int resource);
 const char* get_relation_name(unsigned int relation);
+void set_selected_trade_nation(unsigned char nation_index);
+unsigned char get_selected_trade_nation(void);
 
 // gamestate.c
 int save_game(const GameState* state);

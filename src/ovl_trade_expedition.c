@@ -5,50 +5,75 @@
 
 #define state (*s)
 
-static void render_trade_screen(GameState *s, unsigned char nation_index);
+static void buy_commodities(GameState *s, unsigned char nation_index);
 
-void trade_expedition(GameState *s) {
-    unsigned int selection;
+void render_trade_market(GameState *s) {
     unsigned char nation_index;
-
-    while (1) {
-        clear_input_area();
-        print(5, 20, "Trade with which nation (1-5)?");
-
-        selection = scan_uint(36, 20, 1);
-        if (selection < 1 || selection > FOREIGN_NATION_COUNT) {
-            print(5, 21, "Invalid nation");
-            cgetc();
-            continue;
-        }
-        nation_index = (unsigned char)(selection - 1);
-
-        print(5, 22, "Fleet sailing to the Sea of");
-        print(33, 22, state.foreign_nations[nation_index].name);
-        cgetc();
-        render_trade_screen(s, nation_index);
-        return;
-    }
-}
-
-static void render_trade_screen(GameState *s, unsigned char nation_index) {
     unsigned char i;
+    unsigned char key;
 
-
+    nation_index = get_selected_trade_nation();
     clear_screen();
     print(0, 0, "The nation of");
     print(14, 0, state.foreign_nations[nation_index].name);
 
     render_warehouse_box();
 
-    print(1, PRICE_BOX_Y1-1, "Market of");
-    print(11, PRICE_BOX_Y1-1, state.foreign_nations[nation_index].name);
+    print(1, PRICE_BOX_Y1-1, "Local market prices");
     box(0, PRICE_BOX_Y1, 39, PRICE_BOX_Y1+4);
     for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {
-        print(1, PRICE_BOX_Y1 + 1 + i, get_resource_name(state.foreign_nations[nation_index].imports[i]));
-        print(20, PRICE_BOX_Y1 + 1 + i, get_resource_name(state.foreign_nations[nation_index].exports[i]));
-    }
+        print_int(0, PRICE_BOX_Y1 + 1 + i, i+1);
+        print(1, PRICE_BOX_Y1 + 1 + i, ")");
+        print(2, PRICE_BOX_Y1 + 1 + i, get_resource_name(state.foreign_nations[nation_index].imports[i]));
+        print_int_right_aligned(14, PRICE_BOX_Y1 + 1 + i, state.foreign_nations[nation_index].import_prices[i]);
 
-    cgetc();
-    return;
+        print_int(19, PRICE_BOX_Y1 + 1 + i, i+4);
+        print(20, PRICE_BOX_Y1 + 1 + i, ")");
+        print(21, PRICE_BOX_Y1 + 1 + i, get_resource_name(state.foreign_nations[nation_index].exports[i]));
+        print_int_right_aligned(33, PRICE_BOX_Y1 + 1 + i, state.foreign_nations[nation_index].export_prices[i]);
+    }
+    print(1, PRICE_BOX_Y1+6, "Fleet capacity:");
+    print_int_right_aligned(29, PRICE_BOX_Y1+6, state.traders * CAPACITY_PER_TRADER);
+
+    draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
+    while (1) {
+        clear_input_area();
+        print(5, 20, "Buy, Sell or Quit?");
+        key = cgetc();
+        switch (key) {
+            case 'B':
+            case 'b':
+                buy_commodities(s, nation_index);
+                break;
+            case 'Q':
+            case 'q':
+                state.current_screen = SCREEN_DIPLOMACY;
+                return;
+        }
+    }
+}
+
+static void buy_commodities(GameState *s, unsigned char nation_index) {
+    unsigned char i;
+    unsigned int input;
+
+    while (1) {
+        clear_input_area();
+        print(5, 20, "Commodity to buy?");
+        for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {
+            print_int((i*9)+5, 21, i+4);
+            print((i*9)+6, 21, ")");
+            print((i*9)+7, 21, get_resource_name(state.foreign_nations[nation_index].exports[i]));
+        }
+        while (1) {
+            input = scan_uint(35, 21, 1);
+            switch (input) {
+                case 4:
+                case 5:
+                case 6:
+                    print(5, 22, get_resource_name(state.foreign_nations[nation_index].exports[input-4]));
+                    break;
+            }
+        }   
+    }
 }
