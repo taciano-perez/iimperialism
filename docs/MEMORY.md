@@ -9,7 +9,7 @@ $0118-$01FF  6502 hardware stack
 $0200-$03FF  System / ProDOS vectors
 $0400-$07FF  Text screen page 1
 $0803-$080E  STARTUP            (cc65 crt0)
-$080F-$0823  JMPTAB             (resident jump table used by overlays)
+$080F-$083B  JMPTAB             (resident jump table used by overlays)
 $0824-$1FFF  LOWCODE            (resident UI + core logic)
 $2000-$3FFF  HGR page 1         (graphics memory; no code here)
 $4000-...    CODE/RODATA/DATA   (main resident code + data)
@@ -105,6 +105,14 @@ $0818  JMP _print_int_right_aligned
 $081B  JMP _draw_picture_at
 $081E  JMP _box
 $0821  JMP _render_warehouse_box
+$0824  JMP _cgetc
+$0827  JMP _scan_uint
+$082A  JMP _print_int
+$082D  JMP _get_resource_name
+$0830  JMP _get_relation_name
+$0833  JMP _set_selected_trade_nation
+$0836  JMP _get_selected_trade_nation
+$0839  JMP _clear_area
 ```
 
 Rule: never change existing entry addresses. Append only.
@@ -167,7 +175,8 @@ $(AC) -p $(DISK) DSCR BIN 0x8800 < $(BUILD_DIR)/dscr.bin
 
 If the overlay needs a resident function not in JMPTAB, append a new JMP entry in
 `asm/jmptab.s`, export it from `config/apple2-ovl.cfg`, and declare it in
-`include/game.h`.
+`include/game.h`. `clear_area(int x, int y, int width, int height)` is the latest
+example, exposed at `$0839` for overlay use.
 
 ## Expansion Areas
 

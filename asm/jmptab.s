@@ -16,6 +16,7 @@
 ;  $0830  JMP _get_relation_name
 ;  $0833  JMP _set_selected_trade_nation
 ;  $0836  JMP _get_selected_trade_nation
+;  $0839  JMP _clear_area
 
     .import _clear_screen
     .import _clear_input_area
@@ -31,6 +32,7 @@
     .import _get_relation_name
     .import _set_selected_trade_nation
     .import _get_selected_trade_nation
+    .import _clear_area
 
     .segment "JMPTAB"
 
@@ -48,3 +50,4 @@
     jmp _get_relation_name          ; $0830
     jmp _set_selected_trade_nation  ; $0833
     jmp _get_selected_trade_nation  ; $0836
+    jmp _clear_area                 ; $0839

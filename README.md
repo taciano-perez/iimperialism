@@ -175,4 +175,4 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
 - Add save/load/quit screen
 - Add retirement/end screen
 - Add splash screen at startup
-- Randomize country names and resources
+- Randomize country names and their exports/imports
