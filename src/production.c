@@ -42,37 +42,37 @@ static void production_orders(void) {
             case 'l':
             case 'L':
                 change_resource_production_order("lumber", &state.production_lumber, 
-                    MIN(state.timber / 2, (state.production_lumber + state.available_workers)));
+                    MIN(state.resources[RESOURCE_TIMBER] / 2, (state.production_lumber + state.available_workers)));
                 return;
             case 'f':
             case 'F':
                 change_resource_production_order("fabric", &state.production_fabric, 
-                    MIN(state.wool / 2, (state.production_fabric + state.available_workers)));
+                    MIN(state.resources[RESOURCE_WOOL] / 2, (state.production_fabric + state.available_workers)));
                 return;
             case 's':
             case 'S':
                 change_resource_production_order("steel", &state.production_steel, 
-                    MIN(MIN(state.iron / 2, state.coal / 2), (state.production_steel + state.available_workers)));
+                    MIN(MIN(state.resources[RESOURCE_IRON] / 2, state.resources[RESOURCE_COAL] / 2), (state.production_steel + state.available_workers)));
                 return;
             case 'U':
             case 'u':
                 change_resource_production_order("furniture", &state.production_furniture,
-                    MIN(state.lumber / 2, (state.production_furniture + state.available_workers)));
+                    MIN(state.resources[RESOURCE_LUMBER] / 2, (state.production_furniture + state.available_workers)));
                 return;
             case 'c':
             case 'C':
                 change_resource_production_order("clothes", &state.production_clothes,
-                    MIN(state.fabric / 2, (state.production_clothes + state.available_workers)));
+                    MIN(state.resources[RESOURCE_FABRIC] / 2, (state.production_clothes + state.available_workers)));
                 return;
             case 't':
             case 'T':
                 change_resource_production_order("tools", &state.production_tools,
-                    MIN(state.steel / 2, (state.production_tools + state.available_workers)));
+                    MIN(state.resources[RESOURCE_STEEL] / 2, (state.production_tools + state.available_workers)));
                 return;
             case 'g':
             case 'G':
                 change_resource_production_order("guns", &state.production_guns,
-                    MIN(state.steel / 2, (state.production_guns + state.available_workers)));
+                    MIN(state.resources[RESOURCE_STEEL] / 2, (state.production_guns + state.available_workers)));
                 return;
             case 'r':
             case 'R':
@@ -90,7 +90,7 @@ static void train_new_workers(void) {
     unsigned int workers_to_train;
 
     clear_input_area();
-    max_workers = MIN(state.furniture, state.clothes);
+    max_workers = MIN(state.resources[RESOURCE_FURNITURE], state.resources[RESOURCE_CLOTHES]);
     if (max_workers == 0) {
         print(5, 20, STR_SIR_TRAIN_WORKERS1);
         print(5, 21, STR_SIR_TRAIN_WORKERS2);
@@ -111,8 +111,8 @@ static void train_new_workers(void) {
                 clear_input_area();
                 continue;
             } else {
-                state.furniture -= workers_to_train;
-                state.clothes -= workers_to_train;
+                state.resources[RESOURCE_FURNITURE] -= workers_to_train;
+                state.resources[RESOURCE_CLOTHES] -= workers_to_train;
                 state.available_workers += workers_to_train;
                 break;
             }

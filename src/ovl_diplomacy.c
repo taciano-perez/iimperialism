@@ -53,7 +53,7 @@ void render_diplomacy_screen(GameState *s) {
             case 'r':
             case 'R':
                 state.current_screen = SCREEN_INDUSTRY;
-                break;
+                return;
         }
     }
 

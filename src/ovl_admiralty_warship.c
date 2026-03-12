@@ -8,7 +8,7 @@ void admiralty_build_warship_overlay(GameState *s) {
     unsigned int warships_to_build;
 
     clear_input_area();
-    max_warships = MIN(MIN(MIN(state.lumber, state.fabric), state.guns),
+    max_warships = MIN(MIN(MIN(state.resources[RESOURCE_LUMBER], state.resources[RESOURCE_FABRIC]), state.resources[RESOURCE_GUNS]),
                        state.available_workers);
 
     if (max_warships == 0) {
@@ -32,9 +32,9 @@ void admiralty_build_warship_overlay(GameState *s) {
             continue;
         }
 
-        state.lumber -= warships_to_build;
-        state.fabric -= warships_to_build;
-        state.guns -= warships_to_build;
+        state.resources[RESOURCE_LUMBER] -= warships_to_build;
+        state.resources[RESOURCE_FABRIC] -= warships_to_build;
+        state.resources[RESOURCE_GUNS] -= warships_to_build;
         state.available_workers -= warships_to_build;
         state.frigates += warships_to_build;
         return;

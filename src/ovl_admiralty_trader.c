@@ -8,7 +8,7 @@ void admiralty_build_trader_overlay(GameState *s) {
     unsigned int traders_to_build;
 
     clear_input_area();
-    max_traders = MIN(MIN(state.lumber, state.fabric), state.available_workers);
+    max_traders = MIN(MIN(state.resources[RESOURCE_LUMBER], state.resources[RESOURCE_FABRIC]), state.available_workers);
 
     if (max_traders == 0) {
         print(5, 20, "Trader cost: 1 lumber, 1 fabric, &");
@@ -29,8 +29,8 @@ void admiralty_build_trader_overlay(GameState *s) {
             continue;
         }
 
-        state.lumber -= traders_to_build;
-        state.fabric -= traders_to_build;
+        state.resources[RESOURCE_LUMBER] -= traders_to_build;
+        state.resources[RESOURCE_FABRIC] -= traders_to_build;
         state.available_workers -= traders_to_build;
         state.traders += traders_to_build;
         return;

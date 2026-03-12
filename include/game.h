@@ -40,6 +40,7 @@
 #define RESOURCE_CLOTHES 8
 #define RESOURCE_TOOLS 9
 #define RESOURCE_GUNS 10
+#define RESOURCE_COUNT 11
 
 /* ============================================================================
  * Diplomacy Constants
@@ -75,22 +76,8 @@ typedef struct {
  * ============================================================================
  */
 typedef struct {
-    /* Raw materials */
-    unsigned int timber;
-    unsigned int wool;
-    unsigned int iron;
-    unsigned int coal;
-
-    /* Processed materials */
-    unsigned int lumber;
-    unsigned int fabric;
-    unsigned int steel;
-
-    /* Finished goods */
-    unsigned int furniture;
-    unsigned int clothes;
-    unsigned int tools;
-    unsigned int guns;
+    /* Resource inventory, indexed by RESOURCE_* constants. */
+    unsigned int resources[RESOURCE_COUNT];
 
     /* Provincial yields */
     unsigned int number_of_provinces;

@@ -70,7 +70,7 @@ static void build_wagons(void) {
     unsigned int wagons_to_build;
 
     clear_input_area();
-    max_wagons = MIN(state.lumber, state.steel);
+    max_wagons = MIN(state.resources[RESOURCE_LUMBER], state.resources[RESOURCE_STEEL]);
     if (max_wagons == 0) {
         print(5, 20, STR_NOT_ENOUGH_RESOURCES);
         cgetc();
@@ -86,8 +86,8 @@ static void build_wagons(void) {
                 clear_input_area();
                 continue;
             } else {
-                state.lumber -= wagons_to_build;
-                state.steel -= wagons_to_build;
+                state.resources[RESOURCE_LUMBER] -= wagons_to_build;
+                state.resources[RESOURCE_STEEL] -= wagons_to_build;
                 state.available_wagons += wagons_to_build;
                 break;
             }

@@ -114,19 +114,19 @@ void init_game() {
     unsigned char j;
 
     // Initialize game state with default values
-    state.timber = 10;
-    state.wool = 10;
-    state.iron = 5;
-    state.coal = 5;
+    state.resources[RESOURCE_TIMBER] = 10;
+    state.resources[RESOURCE_WOOL] = 10;
+    state.resources[RESOURCE_IRON] = 5;
+    state.resources[RESOURCE_COAL] = 5;
 
-    state.lumber = 2;
-    state.fabric = 2;
-    state.steel = 2;
+    state.resources[RESOURCE_LUMBER] = 2;
+    state.resources[RESOURCE_FABRIC] = 2;
+    state.resources[RESOURCE_STEEL] = 2;
 
-    state.furniture = 2;
-    state.clothes = 2;
-    state.tools = 2;
-    state.guns = 2;
+    state.resources[RESOURCE_FURNITURE] = 2;
+    state.resources[RESOURCE_CLOTHES] = 2;
+    state.resources[RESOURCE_TOOLS] = 2;
+    state.resources[RESOURCE_GUNS] = 2;
 
     state.number_of_provinces = 4;
     state.timber_yield_per_province = 2;
@@ -176,36 +176,36 @@ void init_game() {
 
 void next_turn() {
     // Update resources based on transport orders
-    state.timber += state.transport_timber;
-    state.wool += state.transport_wool;
-    state.iron += state.transport_iron;
-    state.coal += state.transport_coal;
+    state.resources[RESOURCE_TIMBER] += state.transport_timber;
+    state.resources[RESOURCE_WOOL] += state.transport_wool;
+    state.resources[RESOURCE_IRON] += state.transport_iron;
+    state.resources[RESOURCE_COAL] += state.transport_coal;
 
     // Update resources based on production orders 
-    state.lumber += state.production_lumber;
-    state.timber -= 2 * state.production_lumber;
-    state.fabric += state.production_fabric;
-    state.wool -= 2 * state.production_fabric;
-    state.steel += state.production_steel;
-    state.iron -= 2 * state.production_steel;
-    state.coal -= 2 * state.production_steel;
-    state.furniture += state.production_furniture;
-    state.lumber -= 2 * state.production_furniture;
-    state.clothes += state.production_clothes;
-    state.fabric -= 2 * state.production_clothes;
-    state.tools += state.production_tools;
-    state.steel -= 2 * state.production_tools;
-    state.guns += state.production_guns;
-    state.steel -= 2 * state.production_guns;
+    state.resources[RESOURCE_LUMBER] += state.production_lumber;
+    state.resources[RESOURCE_TIMBER] -= 2 * state.production_lumber;
+    state.resources[RESOURCE_FABRIC] += state.production_fabric;
+    state.resources[RESOURCE_WOOL] -= 2 * state.production_fabric;
+    state.resources[RESOURCE_STEEL] += state.production_steel;
+    state.resources[RESOURCE_IRON] -= 2 * state.production_steel;
+    state.resources[RESOURCE_COAL] -= 2 * state.production_steel;
+    state.resources[RESOURCE_FURNITURE] += state.production_furniture;
+    state.resources[RESOURCE_LUMBER] -= 2 * state.production_furniture;
+    state.resources[RESOURCE_CLOTHES] += state.production_clothes;
+    state.resources[RESOURCE_FABRIC] -= 2 * state.production_clothes;
+    state.resources[RESOURCE_TOOLS] += state.production_tools;
+    state.resources[RESOURCE_STEEL] -= 2 * state.production_tools;
+    state.resources[RESOURCE_GUNS] += state.production_guns;
+    state.resources[RESOURCE_STEEL] -= 2 * state.production_guns;
 
     // cap production orders to available resources
-    state.production_lumber = MIN(state.production_lumber, state.timber / 2);
-    state.production_fabric = MIN(state.production_fabric, state.wool / 2);
-    state.production_steel = MIN(state.production_steel, MIN(state.iron / 2, state.coal / 2));
-    state.production_furniture = MIN(state.production_furniture, state.lumber / 2);
-    state.production_clothes = MIN(state.production_clothes, state.fabric / 2);
-    state.production_tools = MIN(state.production_tools, state.steel / 2);
-    state.production_guns = MIN(state.production_guns, state.steel / 2);
+    state.production_lumber = MIN(state.production_lumber, state.resources[RESOURCE_TIMBER] / 2);
+    state.production_fabric = MIN(state.production_fabric, state.resources[RESOURCE_WOOL] / 2);
+    state.production_steel = MIN(state.production_steel, MIN(state.resources[RESOURCE_IRON] / 2, state.resources[RESOURCE_COAL] / 2));
+    state.production_furniture = MIN(state.production_furniture, state.resources[RESOURCE_LUMBER] / 2);
+    state.production_clothes = MIN(state.production_clothes, state.resources[RESOURCE_FABRIC] / 2);
+    state.production_tools = MIN(state.production_tools, state.resources[RESOURCE_STEEL] / 2);
+    state.production_guns = MIN(state.production_guns, state.resources[RESOURCE_STEEL] / 2);
 
     update_foreign_market_prices();
 

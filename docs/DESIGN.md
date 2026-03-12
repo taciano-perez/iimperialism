@@ -15,9 +15,11 @@ The player cycles through screen overlays to adjust orders, then advances the tu
 
 ### Resource Layers
 
-- Raw: timber, wool, iron, coal
-- Processed: lumber, fabric, steel
-- Finished: furniture, clothes, tools, guns
+- `GameState.resources[]` stores warehouse inventory, indexed by `RESOURCE_*`
+  constants in `include/game.h`.
+- Raw: `RESOURCE_TIMBER`, `RESOURCE_WOOL`, `RESOURCE_IRON`, `RESOURCE_COAL`
+- Processed: `RESOURCE_LUMBER`, `RESOURCE_FABRIC`, `RESOURCE_STEEL`
+- Finished: `RESOURCE_FURNITURE`, `RESOURCE_CLOTHES`, `RESOURCE_TOOLS`, `RESOURCE_GUNS`
 
 ### Capacity and Workforce
 
@@ -61,7 +63,7 @@ Sub-flows are also overlays:
 
 Global `GameState state` (see `include/game.h`) includes:
 
-- resource inventories
+- resource inventories in `resources[RESOURCE_COUNT]`
 - province yields
 - transport orders and available wagons
 - production orders and available workers
