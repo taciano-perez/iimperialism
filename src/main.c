@@ -15,8 +15,8 @@ GameState state;
 static unsigned char selected_trade_nation;
 
 void render_warehouse_box() {
-    box(BOX1_X1, BOX1_Y1, BOX1_X2, BOX1_Y2);
-    print ((BOX1_X1+1), BOX1_Y1, "Our Warehouse");
+    box(BOX1_X1, BOX1_Y1+1, BOX1_X2, BOX1_Y2);
+    print ((BOX1_X1+1), BOX1_Y1, "Warehouse");
 
     print((BOX1_X1+1), (BOX1_Y1+1), "Timber: ");
     print_int_right_aligned((BOX1_X1+11), (BOX1_Y1+1), state.resources[RESOURCE_TIMBER]);
@@ -50,6 +50,30 @@ void set_selected_trade_nation(unsigned char nation_index) {
 
 unsigned char get_selected_trade_nation(void) {
     return selected_trade_nation;
+}
+
+unsigned int get_trade_max_quantity(unsigned char mode, unsigned int resource, unsigned int price) {
+    unsigned int max_quantity;
+
+    max_quantity = state.remaining_turn_capacity;
+    if (mode == 0) {
+        max_quantity = MIN(max_quantity, state.money / price);
+    } else {
+        max_quantity = MIN(max_quantity, state.resources[resource]);
+    }
+
+    return max_quantity;
+}
+
+void apply_trade(unsigned char mode, unsigned int resource, unsigned int quantity, unsigned int price) {
+    state.remaining_turn_capacity -= quantity;
+    if (mode == 0) {
+        state.resources[resource] += quantity;
+        state.money -= quantity * price;
+    } else {
+        state.resources[resource] -= quantity;
+        state.money += quantity * price;
+    }
 }
 
 int main(void) {

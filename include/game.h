@@ -112,6 +112,7 @@ typedef struct {
 
     /* Game metadata */
     unsigned int turn_number;
+    unsigned int money;
     char nation_name[20];
     unsigned int current_screen;
 
@@ -148,6 +149,8 @@ const char* get_resource_name(unsigned int resource);
 const char* get_relation_name(unsigned int relation);
 void set_selected_trade_nation(unsigned char nation_index);
 unsigned char get_selected_trade_nation(void);
+unsigned int get_trade_max_quantity(unsigned char mode, unsigned int resource, unsigned int price);
+void apply_trade(unsigned char mode, unsigned int resource, unsigned int quantity, unsigned int price);
 
 // gamestate.c
 int save_game(const GameState* state);

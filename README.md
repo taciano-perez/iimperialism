@@ -5,7 +5,7 @@ and its Tiny Graphics Interface (TGI) for Hi-Res Graphics (HGR) mode.
 
 This project is inspired by Imperialism and Taipan!. It is a turn-based resource
 management game where players manage a supply chain from raw materials through
-production stages to finished goods.
+production stages to finished goods while managing cash and foreign trade prices.
 
 ## Overview
 

@@ -7,6 +7,7 @@ The current playable loop focuses on:
 
 - resource extraction and transport
 - production planning and workforce management
+- trade expeditions driven by foreign market prices
 - naval expansion (traders and frigates)
 
 The player cycles through screen overlays to adjust orders, then advances the turn.
@@ -20,6 +21,15 @@ The player cycles through screen overlays to adjust orders, then advances the tu
 - Raw: `RESOURCE_TIMBER`, `RESOURCE_WOOL`, `RESOURCE_IRON`, `RESOURCE_COAL`
 - Processed: `RESOURCE_LUMBER`, `RESOURCE_FABRIC`, `RESOURCE_STEEL`
 - Finished: `RESOURCE_FURNITURE`, `RESOURCE_CLOTHES`, `RESOURCE_TOOLS`, `RESOURCE_GUNS`
+
+### Money and Trade
+
+- `GameState.money` stores the treasury used for market purchases.
+- Foreign nations advertise buy/sell prices through `export_prices[]` and
+  `import_prices[]`.
+- Trade expeditions are limited by both `remaining_turn_capacity` and cash on hand.
+- Buying spends money at the nation's export price; selling earns money at the
+  nation's import price.
 
 ### Capacity and Workforce
 
@@ -65,11 +75,13 @@ Sub-flows are also overlays:
 Global `GameState state` (see `include/game.h`) includes:
 
 - resource inventories in `resources[RESOURCE_COUNT]`
+- treasury (`money`)
 - province yields
 - transport orders and available wagons
 - production orders and available workers
 - navy counts (`traders`, `frigates`)
 - metadata (`turn_number`, `nation_name`, `current_screen`)
+- turn-specific trade state (`remaining_turn_capacity`)
 
 Persistence is handled in `src/gamestate.c` via `GAME.DATA`.
 

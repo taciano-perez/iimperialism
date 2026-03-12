@@ -15,6 +15,10 @@ void handle_screen_trade_expedition(GameState *s) {
     nation_index = get_selected_trade_nation();
 
     while (1) {
+
+        clear_area(32, 0, 5, 1);
+        print_int_right_aligned(39, 0, state.money);
+
         clear_area(29, 15, 5, 1);
         print_int_right_aligned(29, 15, state.remaining_turn_capacity);
 
@@ -46,7 +50,7 @@ static void trade_commodities(GameState *s, unsigned char nation_index, unsigned
     unsigned int resource;
     const unsigned int* trade_list;
     unsigned char menu_base;
-    unsigned int capacity;
+    unsigned int price;
 
     if (mode == TRADE_MODE_BUY) {
         trade_list = state.foreign_nations[nation_index].exports;
@@ -73,12 +77,14 @@ static void trade_commodities(GameState *s, unsigned char nation_index, unsigned
         while (1) {
             input = scan_uint(39, 21, 1);
             if (input >= menu_base && input < (unsigned int)(menu_base + FOREIGN_TRADE_ENTRY_COUNT)) {
-                resource = trade_list[input - menu_base];
-                capacity = state.remaining_turn_capacity;
-                max_quantity = capacity;
-                if (mode == TRADE_MODE_SELL) {
-                    max_quantity = MIN(max_quantity, state.resources[resource]);
+                i = (unsigned char)(input - menu_base);
+                resource = trade_list[i];
+                if (mode == TRADE_MODE_BUY) {
+                    price = state.foreign_nations[nation_index].export_prices[i];
+                } else {
+                    price = state.foreign_nations[nation_index].import_prices[i];
                 }
+                max_quantity = get_trade_max_quantity(mode, resource, price);
 
                 while (1) {
                     clear_area(28, 22, 3, 1);
@@ -86,12 +92,7 @@ static void trade_commodities(GameState *s, unsigned char nation_index, unsigned
                     print_int_right_aligned(23, 22, max_quantity);
                     quantity = scan_uint(28, 22, 3);
                     if (quantity <= max_quantity) {
-                        state.remaining_turn_capacity -= quantity;
-                        if (mode == TRADE_MODE_BUY) {
-                            state.resources[resource] += quantity;
-                        } else {
-                            state.resources[resource] -= quantity;
-                        }
+                        apply_trade(mode, resource, quantity, price);
                         return;
                     }
                 }

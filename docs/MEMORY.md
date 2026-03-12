@@ -115,6 +115,8 @@ $0830  JMP _get_relation_name
 $0833  JMP _set_selected_trade_nation
 $0836  JMP _get_selected_trade_nation
 $0839  JMP _clear_area
+$083C  JMP _get_trade_max_quantity
+$083F  JMP _apply_trade
 ```
 
 Rule: never change existing entry addresses. Append only.
@@ -177,8 +179,9 @@ $(AC) -p $(DISK) DSCR BIN 0x8800 < $(BUILD_DIR)/dscr.bin
 
 If the overlay needs a resident function not in JMPTAB, append a new JMP entry in
 `asm/jmptab.s`, export it from `config/apple2-ovl.cfg`, and declare it in
-`include/game.h`. `clear_area(int x, int y, int width, int height)` is the latest
-example, exposed at `$0839` for overlay use.
+`include/game.h`. Current examples include `clear_area(int x, int y, int width, int height)`
+at `$0839` and the resident trade helpers `get_trade_max_quantity()` / `apply_trade()`
+at `$083C` and `$083F`.
 
 ## Expansion Areas
 

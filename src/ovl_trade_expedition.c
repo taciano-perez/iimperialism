@@ -13,6 +13,8 @@ void render_trade_market(GameState *s) {
     clear_screen();
     print(0, 0, "The nation of");
     print(14, 0, state.foreign_nations[nation_index].name);
+    print(27, 0, "Money:");
+    print_int_right_aligned(39, 0, state.money);
 
     render_warehouse_box();
 

@@ -17,6 +17,8 @@
 ;  $0833  JMP _set_selected_trade_nation
 ;  $0836  JMP _get_selected_trade_nation
 ;  $0839  JMP _clear_area
+;  $083C  JMP _get_trade_max_quantity
+;  $083F  JMP _apply_trade
 
     .import _clear_screen
     .import _clear_input_area
@@ -33,6 +35,8 @@
     .import _set_selected_trade_nation
     .import _get_selected_trade_nation
     .import _clear_area
+    .import _get_trade_max_quantity
+    .import _apply_trade
 
     .segment "JMPTAB"
 
@@ -51,3 +55,5 @@
     jmp _set_selected_trade_nation  ; $0833
     jmp _get_selected_trade_nation  ; $0836
     jmp _clear_area                 ; $0839
+    jmp _get_trade_max_quantity     ; $083C
+    jmp _apply_trade                ; $083F
