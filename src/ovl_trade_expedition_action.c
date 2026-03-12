@@ -3,7 +3,10 @@
 
 #define state (*s)
 
-static void buy_commodities(GameState *s, unsigned char nation_index, unsigned int capacity);
+#define TRADE_MODE_BUY  0
+#define TRADE_MODE_SELL 1
+
+static void trade_commodities(GameState *s, unsigned char nation_index, unsigned char mode);
 
 void handle_screen_trade_expedition(GameState *s) {
     unsigned char key;
@@ -21,7 +24,11 @@ void handle_screen_trade_expedition(GameState *s) {
         switch (key) {
             case 'B':
             case 'b':
-                buy_commodities(s, nation_index, state.remaining_turn_capacity);
+                trade_commodities(s, nation_index, TRADE_MODE_BUY);
+                return;
+            case 'S':
+            case 's':
+                trade_commodities(s, nation_index, TRADE_MODE_SELL);
                 return;
             case 'Q':
             case 'q':
@@ -31,39 +38,63 @@ void handle_screen_trade_expedition(GameState *s) {
     }
 }
 
-static void buy_commodities(GameState *s, unsigned char nation_index, unsigned int capacity) {
+static void trade_commodities(GameState *s, unsigned char nation_index, unsigned char mode) {
     unsigned char i;
     unsigned int input;
     unsigned int quantity;
-    unsigned char selected_export_index;
+    unsigned int max_quantity;
+    unsigned int resource;
+    const unsigned int* trade_list;
+    unsigned char menu_base;
+    unsigned int capacity;
+
+    if (mode == TRADE_MODE_BUY) {
+        trade_list = state.foreign_nations[nation_index].exports;
+        menu_base = 4;
+    } else {
+        trade_list = state.foreign_nations[nation_index].imports;
+        menu_base = 1;
+    }
 
     while (1) {
         clear_input_area();
-        print(5, 20, "Commodity to buy?");
-        for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {
-            print_int((i * 12) + 5, 21, i + 4);
-            print((i * 12) + 6, 21, ")");
-            print((i * 12) + 7, 21, get_resource_name(state.foreign_nations[nation_index].exports[i]));
+        if (mode == TRADE_MODE_BUY) {
+            print(5, 20, "Commodity to buy?");
+        } else {
+            print(5, 20, "Commodity to sell?");
         }
+
+        for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {
+            print_int((i * 12) + 5, 21, i + menu_base);
+            print((i * 12) + 6, 21, ")");
+            print((i * 12) + 7, 21, get_resource_name(trade_list[i]));
+        }
+
         while (1) {
-            input = scan_uint(38, 21, 1);
-            switch (input) {
-                case 4:
-                case 5:
-                case 6:
-                    selected_export_index = (unsigned char)(input - 4);
-                    while (1) {
-                        clear_area(28, 22, 3, 1);
-                        print(5, 22, "How many? (Max:    )");
-                        print_int_right_aligned(23, 22, capacity);
-                        quantity = scan_uint(28, 22, 3);
-                        if (quantity <= capacity) {
-                            capacity -= quantity;
-                            state.remaining_turn_capacity = capacity;
-                            state.resources[state.foreign_nations[nation_index].exports[selected_export_index]] += quantity;
-                            return;
+            input = scan_uint(39, 21, 1);
+            if (input >= menu_base && input < (unsigned int)(menu_base + FOREIGN_TRADE_ENTRY_COUNT)) {
+                resource = trade_list[input - menu_base];
+                capacity = state.remaining_turn_capacity;
+                max_quantity = capacity;
+                if (mode == TRADE_MODE_SELL) {
+                    max_quantity = MIN(max_quantity, state.resources[resource]);
+                }
+
+                while (1) {
+                    clear_area(28, 22, 3, 1);
+                    print(5, 22, "How many? (Max:    )");
+                    print_int_right_aligned(23, 22, max_quantity);
+                    quantity = scan_uint(28, 22, 3);
+                    if (quantity <= max_quantity) {
+                        state.remaining_turn_capacity -= quantity;
+                        if (mode == TRADE_MODE_BUY) {
+                            state.resources[resource] += quantity;
+                        } else {
+                            state.resources[resource] -= quantity;
                         }
+                        return;
                     }
+                }
             }
         }
     }
