@@ -172,6 +172,8 @@ void init_game() {
     state.turn_number = 1;
     snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
     state.current_screen = SCREEN_DIPLOMACY;
+    
+    state.remaining_turn_capacity = state.traders * CAPACITY_PER_TRADER;
 }
 
 void next_turn() {
@@ -208,6 +210,8 @@ void next_turn() {
     state.production_guns = MIN(state.production_guns, state.resources[RESOURCE_STEEL] / 2);
 
     update_foreign_market_prices();
+
+    state.remaining_turn_capacity = state.traders * CAPACITY_PER_TRADER;
 
     // update turn number
     state.turn_number++;

@@ -48,7 +48,8 @@ Current overlay files:
 - `ATRD` admiralty build-trader flow
 - `AWRS` admiralty build-warship flow
 - `DSCR` diplomacy screen
-- `TEXP` diplomacy trade expedition flow
+- `TEXP` diplomacy trade expedition market screen
+- `TXAC` diplomacy trade expedition action flow
 
 To inspect current resident segment usage plus overlay occupancy from build
 artifacts, run:
@@ -77,7 +78,8 @@ intended entry point stays at `$8800` even if function ordering changes during
 compilation. Current examples:
 
 - `asm/ovl_diplomacy_entry.s` -> `render_diplomacy_screen()`
-- `asm/ovl_trade_expedition_entry.s` -> `trade_expedition()`
+- `asm/ovl_trade_expedition_entry.s` -> `render_trade_market()`
+- `asm/ovl_trade_expedition_action_entry.s` -> `handle_screen_trade_expedition()`
 
 Why trampoline code is at `$0100`:
 

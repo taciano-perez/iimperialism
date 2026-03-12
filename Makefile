@@ -36,7 +36,8 @@ C_SOURCES  = \
 	$(SRC_DIR)/ovl_admiralty_trader.c \
 	$(SRC_DIR)/ovl_admiralty_warship.c \
 	$(SRC_DIR)/ovl_diplomacy.c \
-	$(SRC_DIR)/ovl_trade_expedition.c
+	$(SRC_DIR)/ovl_trade_expedition.c \
+	$(SRC_DIR)/ovl_trade_expedition_action.c
 
 ASM_SOURCES = \
 	$(ASM_DIR)/werner.s \
@@ -68,7 +69,8 @@ OVERLAY_OBJECTS = \
 	$(BUILD_DIR)/ovl_admiralty_trader.o \
 	$(BUILD_DIR)/ovl_admiralty_warship.o \
 	$(BUILD_DIR)/ovl_diplomacy.o \
-	$(BUILD_DIR)/ovl_trade_expedition.o
+	$(BUILD_DIR)/ovl_trade_expedition.o \
+	$(BUILD_DIR)/ovl_trade_expedition_action.o
 
 # Main compiler
 
@@ -113,9 +115,11 @@ disk: iimperialism overlays $(BUILD_DIR)/loader.system
 	$(AC) -p $(DISK) DSCR BIN 0x8800 < $(BUILD_DIR)/dscr.bin
 	-$(AC) -d $(DISK) TEXP
 	$(AC) -p $(DISK) TEXP BIN 0x8800 < $(BUILD_DIR)/texp.bin
+	-$(AC) -d $(DISK) TXAC
+	$(AC) -p $(DISK) TXAC BIN 0x8800 < $(BUILD_DIR)/txac.bin
 	$(AC) -l $(DISK)
 
-overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/atrd.bin $(BUILD_DIR)/awrs.bin $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/texp.bin
+overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/atrd.bin $(BUILD_DIR)/awrs.bin $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/texp.bin $(BUILD_DIR)/txac.bin
 
 iimperialism: $(MAIN_OBJECTS) | $(BUILD_DIR)
 	$(CC) $(LDFLAGS) -o $(BUILD_DIR)/iimperialism -m $(BUILD_DIR)/iimperialism.map $(MAIN_OBJECTS)
@@ -161,11 +165,17 @@ $(BUILD_DIR)/dscr.bin: $(BUILD_DIR)/ovl_diplomacy_entry.o $(BUILD_DIR)/ovl_diplo
 $(BUILD_DIR)/texp.bin: $(BUILD_DIR)/ovl_trade_expedition_entry.o $(BUILD_DIR)/ovl_trade_expedition.o | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/texp.bin $(BUILD_DIR)/ovl_trade_expedition_entry.o $(BUILD_DIR)/ovl_trade_expedition.o
 
+$(BUILD_DIR)/txac.bin: $(BUILD_DIR)/ovl_trade_expedition_action_entry.o $(BUILD_DIR)/ovl_trade_expedition_action.o | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/txac.bin $(BUILD_DIR)/ovl_trade_expedition_action_entry.o $(BUILD_DIR)/ovl_trade_expedition_action.o
+
 $(BUILD_DIR)/ovl_diplomacy_entry.o: $(ASM_DIR)/ovl_diplomacy_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_diplomacy_entry.s -o $(BUILD_DIR)/ovl_diplomacy_entry.o
 
 $(BUILD_DIR)/ovl_trade_expedition_entry.o: $(ASM_DIR)/ovl_trade_expedition_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_trade_expedition_entry.s -o $(BUILD_DIR)/ovl_trade_expedition_entry.o
+
+$(BUILD_DIR)/ovl_trade_expedition_action_entry.o: $(ASM_DIR)/ovl_trade_expedition_action_entry.s | $(BUILD_DIR)
+	ca65 $(ASM_DIR)/ovl_trade_expedition_action_entry.s -o $(BUILD_DIR)/ovl_trade_expedition_action_entry.o
 
 $(BUILD_DIR)/loader.o: $(LOADER_DIR)/loader.s | $(BUILD_DIR)
 	ca65 $(LOADER_DIR)/loader.s -o $(BUILD_DIR)/loader.o

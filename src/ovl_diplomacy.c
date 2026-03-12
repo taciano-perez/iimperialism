@@ -56,7 +56,6 @@ void render_diplomacy_screen(GameState *s) {
                 return;
         }
     }
-
 }
 
 static unsigned char get_row_y(unsigned char nation_index) {

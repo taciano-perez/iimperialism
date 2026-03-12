@@ -114,6 +114,9 @@ typedef struct {
     unsigned int turn_number;
     char nation_name[20];
     unsigned int current_screen;
+
+    /* turn-specific data */
+    unsigned int remaining_turn_capacity;
 } GameState;
 
 extern GameState state;

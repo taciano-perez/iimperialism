@@ -21,7 +21,8 @@ Current catalog (from `ac -l`) includes:
 - `ATRD` (`BIN`, `A=$8800`) - admiralty trader overlay.
 - `AWRS` (`BIN`, `A=$8800`) - admiralty warship overlay.
 - `DSCR` (`BIN`, `A=$8800`) - diplomacy overlay.
-- `TEXP` (`BIN`, `A=$8800`) - diplomacy trade expedition overlay.
+- `TEXP` (`BIN`, `A=$8800`) - diplomacy trade expedition market overlay.
+- `TXAC` (`BIN`, `A=$8800`) - diplomacy trade expedition action overlay.
 
 Not present on the game disk:
 

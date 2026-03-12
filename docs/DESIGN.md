@@ -49,7 +49,8 @@ Sub-flows are also overlays:
 
 - `OVL_ADMIRALTY_TRADER` (`ATRD`) for trader construction
 - `OVL_ADMIRALTY_WARSHIP` (`AWRS`) for frigate construction
-- `OVL_TRADE_EXPEDITION` (`TEXP`) for diplomacy trade expedition flow
+- `OVL_TRADE_EXPEDITION` (`TEXP`) for the trade expedition market screen
+- `OVL_TRADE_EXPEDITION_ACTION` (`TXAC`) for trade expedition input/actions
 
 ### Input Handlers
 

@@ -74,6 +74,8 @@ int main(void) {
             continue; // skip input handling and go directly to next screen
         } else if (state.current_screen == SCREEN_TRADE_EXPEDITION) {
             run_overlay(OVL_TRADE_EXPEDITION);
+            run_overlay(OVL_TRADE_EXPEDITION_ACTION);
+            continue;
         }
 
         key = cgetc();
