@@ -171,7 +171,12 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
 
 ## TODO
 
-- Add battle screens
+- Finish battle screen 
+  - make hit ratio proportional to firepower
+  - 5% chance of enemy hitting traders
+  - introduce enemy powers and not only pirates
+  - ensure we can handle >12 ships
+- Simplify legacy screens to save memory
 - Add science screen
 - Add main menu
 - Add save/load/quit screen

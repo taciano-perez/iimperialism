@@ -152,7 +152,7 @@ void init_game() {
     state.available_workers = 6;
 
     state.traders = 2;
-    state.frigates = 11;
+    state.frigates = 14;
     state.money = 100;
 
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {

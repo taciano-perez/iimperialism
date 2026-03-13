@@ -96,8 +96,8 @@ void render_battle_screen(GameState *s) {
         draw_picture_at(SHIP, x_offset, y_offset);
     }
 
-    // Render pirate fleet
-    print(23, 0, "Pirate Fleet");
+    // Render enemy fleet
+    print(23, 0, "Enemy Fleet");
     print(23, 1, "Firepower:");
     render_firepower(1, visible_enemy_ships);
     for (i = 0; i < visible_enemy_ships; i++) {
