@@ -100,6 +100,8 @@ int main(void) {
             run_overlay(OVL_TRADE_EXPEDITION);
             run_overlay(OVL_TRADE_EXPEDITION_ACTION);
             continue;
+        } else if (state.current_screen == SCREEN_BATTLE) {
+            run_overlay(OVL_BATTLE);
         }
 
         key = cgetc();

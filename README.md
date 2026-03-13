@@ -171,10 +171,10 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
 
 ## TODO
 
-- Add science screen
 - Add battle screens
+- Add science screen
 - Add main menu
 - Add save/load/quit screen
 - Add retirement/end screen
-- Add splash screen at startup
+- Add splash screen at startup and seed random number gen
 - Randomize country names and their exports/imports

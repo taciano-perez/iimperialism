@@ -11,6 +11,7 @@
 #define WISEMAN_PORTRAIT 0
 #define INDUSTRY_PORTRAIT 1
 #define ADMIRAL_PORTRAIT 2
+#define SHIP 3
 /* Add more picture indices here as you add pictures */
 
 /* ============================================================================
@@ -24,6 +25,7 @@
 #define SCREEN_ADMIRALTY 4
 #define SCREEN_DIPLOMACY 5
 #define SCREEN_TRADE_EXPEDITION 6
+#define SCREEN_BATTLE 7
 
 /* ============================================================================
  * Resource Constants

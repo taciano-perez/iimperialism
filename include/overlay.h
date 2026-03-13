@@ -17,6 +17,7 @@
 #define OVL_DIPLOMACY 6
 #define OVL_TRADE_EXPEDITION 7
 #define OVL_TRADE_EXPEDITION_ACTION 8
+#define OVL_BATTLE 9
 
 /* Disk file names for the overlay binaries (ProDOS, uppercase, no extension) */
 #define OVL_FILE_INDUSTRY   "ISCR"
@@ -28,6 +29,7 @@
 #define OVL_FILE_DIPLOMACY "DSCR"
 #define OVL_FILE_TRADE_EXPEDITION "TEXP"
 #define OVL_FILE_TRADE_EXPEDITION_ACTION "TXAC"
+#define OVL_FILE_BATTLE "BSCR"
 
 /* Zero-page trampoline parameters ($9A-$9E, outside cc65 ZP range $80-$99).
  * Set by run_overlay before calling the trampoline at $0100. */

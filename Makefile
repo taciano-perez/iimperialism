@@ -37,7 +37,8 @@ C_SOURCES  = \
 	$(SRC_DIR)/ovl_admiralty_warship.c \
 	$(SRC_DIR)/ovl_diplomacy.c \
 	$(SRC_DIR)/ovl_trade_expedition.c \
-	$(SRC_DIR)/ovl_trade_expedition_action.c
+	$(SRC_DIR)/ovl_trade_expedition_action.c \
+	$(SRC_DIR)/ovl_battle.c
 
 ASM_SOURCES = \
 	$(ASM_DIR)/werner.s \
@@ -70,7 +71,8 @@ OVERLAY_OBJECTS = \
 	$(BUILD_DIR)/ovl_admiralty_warship.o \
 	$(BUILD_DIR)/ovl_diplomacy.o \
 	$(BUILD_DIR)/ovl_trade_expedition.o \
-	$(BUILD_DIR)/ovl_trade_expedition_action.o
+	$(BUILD_DIR)/ovl_trade_expedition_action.o \
+	$(BUILD_DIR)/ovl_battle.o
 
 # Main compiler
 
@@ -117,9 +119,11 @@ disk: iimperialism overlays $(BUILD_DIR)/loader.system
 	$(AC) -p $(DISK) TEXP BIN 0x8800 < $(BUILD_DIR)/texp.bin
 	-$(AC) -d $(DISK) TXAC
 	$(AC) -p $(DISK) TXAC BIN 0x8800 < $(BUILD_DIR)/txac.bin
+	-$(AC) -d $(DISK) BSCR
+	$(AC) -p $(DISK) BSCR BIN 0x8800 < $(BUILD_DIR)/bscr.bin
 	$(AC) -l $(DISK)
 
-overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/atrd.bin $(BUILD_DIR)/awrs.bin $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/texp.bin $(BUILD_DIR)/txac.bin
+overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/atrd.bin $(BUILD_DIR)/awrs.bin $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/texp.bin $(BUILD_DIR)/txac.bin $(BUILD_DIR)/bscr.bin
 
 iimperialism: $(MAIN_OBJECTS) | $(BUILD_DIR)
 	$(CC) $(LDFLAGS) -o $(BUILD_DIR)/iimperialism -m $(BUILD_DIR)/iimperialism.map $(MAIN_OBJECTS)
@@ -167,6 +171,9 @@ $(BUILD_DIR)/texp.bin: $(BUILD_DIR)/ovl_trade_expedition_entry.o $(BUILD_DIR)/ov
 
 $(BUILD_DIR)/txac.bin: $(BUILD_DIR)/ovl_trade_expedition_action_entry.o $(BUILD_DIR)/ovl_trade_expedition_action.o | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/txac.bin $(BUILD_DIR)/ovl_trade_expedition_action_entry.o $(BUILD_DIR)/ovl_trade_expedition_action.o
+
+$(BUILD_DIR)/bscr.bin: $(BUILD_DIR)/ovl_battle.o | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/bscr.bin $(BUILD_DIR)/ovl_battle.o
 
 $(BUILD_DIR)/ovl_diplomacy_entry.o: $(ASM_DIR)/ovl_diplomacy_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_diplomacy_entry.s -o $(BUILD_DIR)/ovl_diplomacy_entry.o
