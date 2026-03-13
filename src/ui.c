@@ -39,6 +39,14 @@ void clear_area(int x, int y, int width, int height) {
     tgi_setcolor (TGI_COLOR_WHITE);
 }
 
+void paint_area(int x, int y, int width, int height, unsigned char color) {
+    tgi_setcolor (color);
+    tgi_bar(x * CHAR_WIDTH, y * CHAR_HEIGHT,
+            (x + width) * CHAR_WIDTH - 1,
+            (y + height) * CHAR_HEIGHT - 1);
+    tgi_setcolor (TGI_COLOR_WHITE);
+}
+
 void print (const int x, const int y, const char* text) {
     draw_custom_text (x*CHAR_WIDTH, y*CHAR_HEIGHT, text);
 }

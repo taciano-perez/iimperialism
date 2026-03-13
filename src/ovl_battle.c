@@ -1,6 +1,17 @@
+#include <conio.h>
+#include <tgi.h>
 #include "game.h"
 
 #define state (*s)
+
+static void animate_first_navy_ship_hit(void) {
+    unsigned char i;
+
+    for (i = 0; i < 6; ++i) {
+        paint_area(0, 2, 4, 3, TGI_COLOR_WHITE);
+        draw_picture_at(SHIP, 0, 2);
+    }
+}
 
 void render_battle_screen(GameState *s) {
     unsigned int i;
@@ -28,5 +39,20 @@ void render_battle_screen(GameState *s) {
     draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
     print(5, 20, "Our fleet is ambushed by pirates!");
     print(5, 21, "Fight or Run?");
+
+    while (1) {
+        unsigned char key;
+        key = cgetc();
+        switch (key) {
+            case 'F':
+            case 'f':
+                animate_first_navy_ship_hit();
+                break;
+            case 'R':
+            case 'r':
+                state.current_screen = SCREEN_DIPLOMACY;
+                return;
+        }
+    }
 
 }

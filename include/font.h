@@ -107,7 +107,7 @@ static const unsigned char font_data[96][8] = {
 /* Map characters to indices in font_data */
 static const unsigned char* get_font_data(char c) {
     unsigned char uc = (unsigned char)c;
-    if (uc < 32 || uc >= 127) {
+    if (uc < 32 || uc > 127) {
         uc = 32; // Default to space for out of range
     }
     return font_data[uc - 32];

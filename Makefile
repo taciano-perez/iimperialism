@@ -172,8 +172,8 @@ $(BUILD_DIR)/texp.bin: $(BUILD_DIR)/ovl_trade_expedition_entry.o $(BUILD_DIR)/ov
 $(BUILD_DIR)/txac.bin: $(BUILD_DIR)/ovl_trade_expedition_action_entry.o $(BUILD_DIR)/ovl_trade_expedition_action.o | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/txac.bin $(BUILD_DIR)/ovl_trade_expedition_action_entry.o $(BUILD_DIR)/ovl_trade_expedition_action.o
 
-$(BUILD_DIR)/bscr.bin: $(BUILD_DIR)/ovl_battle.o | $(BUILD_DIR)
-	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/bscr.bin $(BUILD_DIR)/ovl_battle.o
+$(BUILD_DIR)/bscr.bin: $(BUILD_DIR)/ovl_battle_entry.o $(BUILD_DIR)/ovl_battle.o | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/bscr.bin $(BUILD_DIR)/ovl_battle_entry.o $(BUILD_DIR)/ovl_battle.o
 
 $(BUILD_DIR)/ovl_diplomacy_entry.o: $(ASM_DIR)/ovl_diplomacy_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_diplomacy_entry.s -o $(BUILD_DIR)/ovl_diplomacy_entry.o
@@ -183,6 +183,9 @@ $(BUILD_DIR)/ovl_trade_expedition_entry.o: $(ASM_DIR)/ovl_trade_expedition_entry
 
 $(BUILD_DIR)/ovl_trade_expedition_action_entry.o: $(ASM_DIR)/ovl_trade_expedition_action_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_trade_expedition_action_entry.s -o $(BUILD_DIR)/ovl_trade_expedition_action_entry.o
+
+$(BUILD_DIR)/ovl_battle_entry.o: $(ASM_DIR)/ovl_battle_entry.s | $(BUILD_DIR)
+	ca65 $(ASM_DIR)/ovl_battle_entry.s -o $(BUILD_DIR)/ovl_battle_entry.o
 
 $(BUILD_DIR)/loader.o: $(LOADER_DIR)/loader.s | $(BUILD_DIR)
 	ca65 $(LOADER_DIR)/loader.s -o $(BUILD_DIR)/loader.o

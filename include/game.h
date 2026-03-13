@@ -138,6 +138,7 @@ void ui_exit();
 void clear_screen();
 void clear_input_area();
 void clear_area(int x, int y, int width, int height);
+void paint_area(int x, int y, int width, int height, unsigned char color);
 void print (const int x, const int y, const char* text);
 void print_right_aligned(const int x, const int y, const char* text);
 void print_int_right_aligned(int x, int y, unsigned int value);
