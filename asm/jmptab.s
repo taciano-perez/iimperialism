@@ -20,6 +20,7 @@
 ;  $083C  JMP _get_trade_max_quantity
 ;  $083F  JMP _apply_trade
 ;  $0842  JMP _paint_area
+;  $0845  JMP _rand_range
 
     .import _clear_screen
     .import _clear_input_area
@@ -39,6 +40,7 @@
     .import _get_trade_max_quantity
     .import _apply_trade
     .import _paint_area
+    .import _rand_range
 
     .segment "JMPTAB"
 
@@ -60,3 +62,4 @@
     jmp _get_trade_max_quantity     ; $083C
     jmp _apply_trade                ; $083F
     jmp _paint_area                 ; $0842
+    jmp _rand_range                 ; $0845

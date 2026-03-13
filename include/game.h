@@ -156,6 +156,7 @@ void set_selected_trade_nation(unsigned char nation_index);
 unsigned char get_selected_trade_nation(void);
 unsigned int get_trade_max_quantity(unsigned char mode, unsigned int resource, unsigned int price);
 void apply_trade(unsigned char mode, unsigned int resource, unsigned int quantity, unsigned int price);
+unsigned int rand_range(unsigned int min, unsigned int max);
 
 // gamestate.c
 int save_game(const GameState* state);
