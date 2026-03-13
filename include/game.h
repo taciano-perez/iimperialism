@@ -11,7 +11,9 @@
 #define WISEMAN_PORTRAIT 0
 #define INDUSTRY_PORTRAIT 1
 #define ADMIRAL_PORTRAIT 2
-#define SHIP 3
+#define SHIP_PIRATE 3
+#define SHIP 4
+
 /* Add more picture indices here as you add pictures */
 
 /* ============================================================================

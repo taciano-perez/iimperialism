@@ -67,7 +67,7 @@ void print_int(const int x, const int y, unsigned int value) {
 }
 
 void draw_picture_at(const unsigned char picture_index, const unsigned char x_byte, unsigned char y) {
-    draw_picture(picture_index, x_byte*CHAR_WIDTH, y*CHAR_HEIGHT);
+    draw_picture(picture_index, x_byte, y*CHAR_HEIGHT);
 }
 
 void box (const int x1, const int y1, const int x2, const int y2) {
