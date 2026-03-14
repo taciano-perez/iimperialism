@@ -6,27 +6,39 @@
 
 #define state (*s)
 
-static void render_firepower(unsigned char is_enemy, unsigned int ship_count) {
-    if (is_enemy) {
-        clear_area(35, 1, 4, 1);
-        print_int_right_aligned(38, 1, ship_count * GUNS_PER_FRIGATE);
-    } else {
-        clear_area(12, 1, 4, 1);
-        print_int_right_aligned(15, 1, ship_count * GUNS_PER_FRIGATE);
-    }
+static void render_firepower(unsigned char is_enemy, unsigned char ship_count) {
+    unsigned char clear_x;
+    unsigned char print_x;
+
+    clear_x = is_enemy ? 35 : 12;
+    print_x = is_enemy ? 38 : 15;
+
+    clear_area(clear_x, 1, 4, 1);
+    print_int_right_aligned(print_x, 1, ship_count * GUNS_PER_FRIGATE);
 }
 
 static void get_ship_position(unsigned char is_enemy,
                               unsigned char ship_index,
                               unsigned char* x_offset,
                               unsigned char* y_offset) {
-    static const unsigned char player_ship_columns[3] = { 0, 6, 12 };
-    static const unsigned char pirate_ship_columns[3] = { 23, 29, 35 };
-    const unsigned char* ship_columns;
+    static const unsigned char ship_x_offsets[MAX_VISIBLE_SHIPS] = {
+        0, 6, 12,
+        0, 6, 12,
+        0, 6, 12,
+        0, 6, 12
+    };
+    static const unsigned char ship_y_offsets[MAX_VISIBLE_SHIPS] = {
+        2, 2, 2,
+        6, 6, 6,
+        10, 10, 10,
+        14, 14, 14
+    };
 
-    ship_columns = is_enemy ? pirate_ship_columns : player_ship_columns;
-    *x_offset = ship_columns[ship_index % 3];
-    *y_offset = 2 + ((ship_index / 3) * 4);
+    *x_offset = ship_x_offsets[ship_index];
+    if (is_enemy) {
+        *x_offset += 23;
+    }
+    *y_offset = ship_y_offsets[ship_index];
 }
 
 static void animate_ship_hit(unsigned char is_enemy, unsigned char x_offset, unsigned char y_offset) {
@@ -75,7 +87,7 @@ static void handle_ship_hit(unsigned char is_enemy, unsigned char* ship_count) {
 }
 
 void render_battle_screen(GameState *s) {
-    unsigned int i;
+    unsigned char i;
     unsigned char visible_friendly_ships;
     unsigned char visible_enemy_ships;
 

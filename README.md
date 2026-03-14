@@ -72,7 +72,8 @@ in the diplomacy screen as text using these ranges:
 | `tools/ac.jar` | AppleCommander utility |
 
 Documentation: `docs/FLOPPY.md`, `docs/MEMORY.md`, `docs/DESIGN.md`,
-`docs/FONT.md`, `docs/PICTURES.md`, `docs/STRUCTURE.md`
+`docs/FONT.md`, `docs/PICTURES.md`, `docs/STRUCTURE.md`,
+`docs/OPTIMIZE_CODE.md`
 
 ## Prerequisites
 
@@ -175,7 +176,7 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
   - make hit ratio proportional to firepower
   - 5% chance of enemy hitting traders
   - introduce enemy powers and not only pirates
-  - ensure we can handle >12 ships
+  - add sound effects
 - Simplify legacy screens to save memory
 - Add science screen
 - Add main menu
