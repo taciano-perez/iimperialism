@@ -102,7 +102,11 @@ static void trade_expedition(GameState *s) {
         print(33, 22, state.foreign_nations[nation_index].name);
         cgetc();
         set_selected_trade_nation(nation_index);
-        state.current_screen = SCREEN_TRADE_EXPEDITION;
+        if (rand_range(0, 1) == 0) {
+            state.current_screen = SCREEN_BATTLE;
+        } else {
+            state.current_screen = SCREEN_TRADE_EXPEDITION;
+        }
         return;
     }
 }

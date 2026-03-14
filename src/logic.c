@@ -172,7 +172,7 @@ void init_game() {
 
     state.turn_number = 1;
     snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
-    state.current_screen = SCREEN_BATTLE;
+    state.current_screen = SCREEN_DIPLOMACY;
     
     state.remaining_turn_capacity = state.traders * CAPACITY_PER_TRADER;
 }
