@@ -127,26 +127,32 @@ void render_battle_screen(GameState *s) {
     }
 
     draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
-    print(5, 20, "Fleet ambushed by pirates!");
-    print(5, 21, "Fight or Run?");
+    print(5, 20, "Ambushed by pirates!");
 
     while (1) {
         unsigned char key;
+        clear_area(5, 21, 22, 22);
+        print(5, 21, "Fight or Run?");
         key = cgetc();
         switch (key) {
             case 'F':
             case 'f':
-                handle_ship_hit(1, &visible_enemy_ships, visible_friendly_ships);
-                if (visible_enemy_ships == 0) {
-                    print(5, 22, "Victory!");
-                    state.current_screen = SCREEN_TRADE_EXPEDITION;
-                    return;
-                }
-                handle_ship_hit(0, &visible_friendly_ships, visible_enemy_ships);
-                if (visible_friendly_ships == 0) {
-                    print(5, 22, "Fleet defeated!");
-                    state.current_screen = SCREEN_DIPLOMACY;
-                    return;
+                print(5, 22, "Aye, we'll fight!");
+                for (i = 0; i < visible_friendly_ships; ++i) {
+                    handle_ship_hit(1, &visible_enemy_ships, visible_friendly_ships);
+                    if (visible_enemy_ships == 0) {
+                        clear_input_area();
+                        print(5, 20, "Victory!");
+                        state.current_screen = SCREEN_TRADE_EXPEDITION;
+                        return;
+                    }
+                    handle_ship_hit(0, &visible_friendly_ships, visible_enemy_ships);
+                    if (visible_friendly_ships == 0) {
+                        clear_input_area();
+                        print(5, 20, "Defeat!");
+                        state.current_screen = SCREEN_DIPLOMACY;
+                        return;
+                    }
                 }
                 break;
             case 'R':
