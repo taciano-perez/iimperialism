@@ -55,7 +55,9 @@ static void animate_ship_hit(unsigned char is_enemy, unsigned char x_offset, uns
     }
 }
 
-static void handle_ship_hit(unsigned char is_enemy, unsigned char* ship_count) {
+static void handle_ship_hit(unsigned char is_enemy,
+                            unsigned char* ship_count,
+                            unsigned char attacker_ship_count) {
     unsigned char ship_index;
     unsigned char last_index;
     unsigned char x_offset;
@@ -63,6 +65,7 @@ static void handle_ship_hit(unsigned char is_enemy, unsigned char* ship_count) {
     unsigned char last_x_offset;
     unsigned char last_y_offset;
     unsigned char picture;
+    unsigned char total_ship_count;
 
     if (*ship_count == 0) {
         return;
@@ -73,7 +76,8 @@ static void handle_ship_hit(unsigned char is_enemy, unsigned char* ship_count) {
 
     animate_ship_hit(is_enemy, x_offset, y_offset);
 
-    if (rand_range(0, 1) == 0) {
+    total_ship_count = attacker_ship_count + *ship_count;
+    if (rand_range(0, total_ship_count - 1) < attacker_ship_count) {
         picture = is_enemy ? SHIP_PIRATE : SHIP;
         last_index = *ship_count - 1;
         clear_area(x_offset, y_offset, 4, 4);
@@ -132,13 +136,13 @@ void render_battle_screen(GameState *s) {
         switch (key) {
             case 'F':
             case 'f':
-                handle_ship_hit(1, &visible_enemy_ships);
+                handle_ship_hit(1, &visible_enemy_ships, visible_friendly_ships);
                 if (visible_enemy_ships == 0) {
                     print(5, 22, "Victory!");
                     state.current_screen = SCREEN_TRADE_EXPEDITION;
                     return;
                 }
-                handle_ship_hit(0, &visible_friendly_ships);
+                handle_ship_hit(0, &visible_friendly_ships, visible_enemy_ships);
                 if (visible_friendly_ships == 0) {
                     print(5, 22, "Fleet defeated!");
                     state.current_screen = SCREEN_DIPLOMACY;
