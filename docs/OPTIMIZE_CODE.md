@@ -126,6 +126,27 @@ This works well for:
 - text positions
 - clear/draw helper calls
 
+## Avoid Duplicate Literals
+
+Repeated string literals can waste space, especially inside overlays.
+
+If the same text is used multiple times in one module, prefer one local static
+string and reuse it:
+
+- good: `static const char STR_LABEL[] = "Firepower:";`
+- avoid repeating the same literal at multiple call sites
+
+This is most useful when:
+
+- the string appears more than once in a constrained module
+- the string is only needed locally
+- you want to reduce duplicate `RODATA`
+
+For overlays, prefer a local static string over a resident string symbol unless
+that resident data is explicitly part of the overlay ABI. Overlays can safely call
+resident functions through the jump table, but direct references to resident data
+symbols are usually not link-safe.
+
 ## Keep Changes Local First
 
 A local overlay optimization is usually safer than moving code into main memory.

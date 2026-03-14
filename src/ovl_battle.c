@@ -6,6 +6,8 @@
 
 #define state (*s)
 
+static const char STR_BATTLE_FIREPOWER[] = "Firepower:";
+
 static void render_firepower(unsigned char is_enemy, unsigned char ship_count) {
     unsigned char clear_x;
     unsigned char print_x;
@@ -98,7 +100,7 @@ void render_battle_screen(GameState *s) {
 
     // Render player's navy
     print(0, 0, "Haxaco Navy");
-    print(0, 1, "Firepower:");
+    print(0, 1, STR_BATTLE_FIREPOWER);
     render_firepower(0, visible_friendly_ships);
     for (i = 0; i < visible_friendly_ships; i++) {
         unsigned char x_offset;
@@ -110,7 +112,7 @@ void render_battle_screen(GameState *s) {
 
     // Render enemy fleet
     print(23, 0, "Enemy Fleet");
-    print(23, 1, "Firepower:");
+    print(23, 1, STR_BATTLE_FIREPOWER);
     render_firepower(1, visible_enemy_ships);
     for (i = 0; i < visible_enemy_ships; i++) {
         unsigned char x_offset;
@@ -121,7 +123,7 @@ void render_battle_screen(GameState *s) {
     }
 
     draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
-    print(5, 20, "Our fleet is ambushed by pirates!");
+    print(5, 20, "Fleet ambushed by pirates!");
     print(5, 21, "Fight or Run?");
 
     while (1) {
@@ -130,8 +132,18 @@ void render_battle_screen(GameState *s) {
         switch (key) {
             case 'F':
             case 'f':
-                handle_ship_hit(0, &visible_friendly_ships);
                 handle_ship_hit(1, &visible_enemy_ships);
+                if (visible_enemy_ships == 0) {
+                    print(5, 22, "Victory!");
+                    state.current_screen = SCREEN_TRADE_EXPEDITION;
+                    return;
+                }
+                handle_ship_hit(0, &visible_friendly_ships);
+                if (visible_friendly_ships == 0) {
+                    print(5, 22, "Fleet defeated!");
+                    state.current_screen = SCREEN_DIPLOMACY;
+                    return;
+                }
                 break;
             case 'R':
             case 'r':

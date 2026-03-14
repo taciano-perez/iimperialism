@@ -175,6 +175,7 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
 - Finish battle screen 
   - make hit ratio proportional to firepower
   - 5% chance of enemy hitting traders
+  - capture booty
   - introduce enemy powers and not only pirates
   - add sound effects
 - Simplify legacy screens to save memory
