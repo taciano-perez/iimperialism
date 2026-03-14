@@ -131,6 +131,7 @@ void render_battle_screen(GameState *s) {
 
     while (1) {
         unsigned char key;
+        unsigned char previous_friendly_ships;
         clear_area(5, 21, 22, 22);
         print(5, 21, "Fight or Run?");
         key = cgetc();
@@ -146,7 +147,11 @@ void render_battle_screen(GameState *s) {
                         state.current_screen = SCREEN_TRADE_EXPEDITION;
                         return;
                     }
+                    previous_friendly_ships = visible_friendly_ships;
                     handle_ship_hit(0, &visible_friendly_ships, visible_enemy_ships);
+                    if (visible_friendly_ships != previous_friendly_ships) {
+                        --state.frigates;
+                    }
                     if (visible_friendly_ships == 0) {
                         clear_input_area();
                         print(5, 20, "Defeat!");

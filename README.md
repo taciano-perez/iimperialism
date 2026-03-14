@@ -173,6 +173,7 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
 ## TODO
 
 - Finish battle screen 
+  - Randomize # of attackers based on turn
   - 5% chance of enemy hitting traders
   - capture booty
   - introduce enemy powers and not only pirates
