@@ -153,7 +153,8 @@ void init_game() {
 
     state.traders = 2;
     state.frigates = 14;
-    state.money = 100;
+    state.money = 21000;
+    state.science_level = 0;
 
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
         snprintf(state.foreign_nations[i].name,

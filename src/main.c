@@ -104,6 +104,7 @@ int main(void) {
             run_overlay(OVL_BATTLE);
         } else if (state.current_screen == SCREEN_SCIENCE) {
             run_overlay(OVL_SCIENCE);
+            continue;
         }
 
         key = cgetc();

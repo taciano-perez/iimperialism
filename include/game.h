@@ -64,6 +64,7 @@
  */
 #define CAPACITY_PER_TRADER 3
 #define GUNS_PER_FRIGATE 2
+#define SCIENCE_RESEARCH_COST_MULTIPLIER 1000U
 #define FOREIGN_NATION_COUNT 5
 #define FOREIGN_TRADE_ENTRY_COUNT 3
 #define FOREIGN_NATION_NAME_LENGTH 6
@@ -119,6 +120,7 @@ typedef struct {
     /* Game metadata */
     unsigned int turn_number;
     unsigned int money;
+    unsigned char science_level;
     char nation_name[20];
     unsigned int current_screen;
 
