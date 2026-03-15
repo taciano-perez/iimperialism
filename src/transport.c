@@ -3,7 +3,7 @@
 #include "game.h"
 #include "strings.h"
 
-static char buffer[42];
+static char buffer[6];
 
 static void change_resource_transport_order(const char* resource_name, unsigned int* transport_order, unsigned int max_transport) {
     signed int delta;

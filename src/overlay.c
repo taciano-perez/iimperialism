@@ -28,11 +28,11 @@ static const char* overlay_filename(unsigned char id) {
 
 static void overlay_load_failed(const char* filename, const char* reason, unsigned int detail) {
     clear_screen();
-    print(1, 1, "Overlay load failed");
+    print(1, 1, "Ovl ld fail");
     if (filename) {
         print(1, 3, filename);
     } else {
-        print(1, 3, "Invalid overlay id");
+        print(1, 3, "Inval ovl");
     }
     if (reason) {
         print(1, 5, reason);
@@ -48,11 +48,11 @@ static void load_overlay_file(const char* filename) {
 
     error_code = prodos_load_overlay(filename);
     if (error_code != 0) {
-        overlay_load_failed(filename, "ProDOS err:", (unsigned int)error_code);
+        overlay_load_failed(filename, "ProDOS err", (unsigned int)error_code);
     }
 
     if (overlay_bytes_read != OVERLAY_SIZE) {
-        overlay_load_failed(filename, "read bytes:", overlay_bytes_read);
+        overlay_load_failed(filename, "read bytes", overlay_bytes_read);
     }
 }
 

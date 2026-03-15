@@ -14,21 +14,21 @@ enum {
 };
 
 static const char TECH_1[] = "1)Railways";
-static const char TECH_2[] = "2)Flush decks";
-static const char TECH_3[] = "3)Steel rails";
-static const char TECH_4[] = "4)Shell guns";
-static const char TECH_5[] = "5)Telegraph";
-static const char TECH_6[] = "6)Breech loaders";
+static const char TECH_2[] = "2)Carronade";
+static const char TECH_3[] = "3)Clipper ships";
+static const char TECH_4[] = "4)Telegraph";
+static const char TECH_5[] = "5)Shell guns";
+static const char TECH_6[] = "6)Steel hulls";
 static const char* const TECH_NAMES[] = {
     TECH_1, TECH_2, TECH_3, TECH_4, TECH_5, TECH_6
 };
 
 static const char DESC_1[] = "2x wagon capacity";
-static const char DESC_2[] = "2x warship firepower";
-static const char DESC_3[] = "3x wagon capacity";
-static const char DESC_4[] = "3x warship firepower";
-static const char DESC_5[] = "4x wagon capacity";
-static const char DESC_6[] = "4x warship firepower";
+static const char DESC_2[] = "2x guns per warship";
+static const char DESC_3[] = "2x trader capacity";
+static const char DESC_4[] = "4x wagon capacity";
+static const char DESC_5[] = "4x guns per warship";
+static const char DESC_6[] = "4x trader capacity";
 static const char* const TECH_DESCRIPTIONS[] = {
     DESC_1, DESC_2, DESC_3, DESC_4, DESC_5, DESC_6
 };
@@ -101,6 +101,15 @@ void render_science_screen(GameState *s) {
                     if (next_level < SCIENCE_LEVEL_COUNT && state.money >= next_cost) {
                         state.money -= next_cost;
                         state.science_level = next_level;
+                        if (next_level == 2U) {
+                            state.guns_per_frigate = GUNS_PER_FRIGATE_BASE * 2U;
+                        } else if (next_level == 3U) {
+                            state.capacity_per_trader = CAPACITY_PER_TRADER_BASE * 2U;
+                        } else if (next_level == 5U) {
+                            state.guns_per_frigate = GUNS_PER_FRIGATE_BASE * 4U;
+                        } else if (next_level == 6U) {
+                            state.capacity_per_trader = CAPACITY_PER_TRADER_BASE * 4U;
+                        }
                         break;
                     }
                     continue;

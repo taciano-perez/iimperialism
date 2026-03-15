@@ -75,12 +75,18 @@ if ($segments.ContainsKey('LOWCODE')) {
 
 $highSegments = @('CODE', 'RODATA', 'DATA', 'INIT', 'ONCE', 'BSS')
 $highUsed = 0
+$highMaxEnd = 0x3FFF
 foreach ($name in $highSegments) {
     if ($segments.ContainsKey($name)) {
         $highUsed += $segments[$name].Size
+        if ($segments[$name].End -gt $highMaxEnd) {
+            $highMaxEnd = $segments[$name].End
+        }
     }
 }
-$fixedRows += New-UsageRow 'HIGH_MAIN_POOL' 0x4000 0x8DFF $highUsed
+$residentSafeEnd = 0x87FF
+$fixedRows += New-UsageRow 'RESIDENT_MAIN_SAFE' 0x4000 $residentSafeEnd ($highMaxEnd - 0x4000 + 1)
+$fixedRows += New-UsageRow 'OVERLAY_SLOT' 0x8800 0x8FFF 0
 
 $stackStart = 0x8E00
 $stackEnd = 0x95FF
@@ -111,6 +117,27 @@ if ($detailRows) {
     Write-Host ''
     Write-Host 'High Main Pool Breakdown'
     $detailRows | Format-Table -AutoSize
+}
+
+$overlapRows = @()
+foreach ($name in $highSegments) {
+    if ($segments.ContainsKey($name)) {
+        $seg = $segments[$name]
+        if ($seg.End -gt $residentSafeEnd) {
+            $overlapRows += [PSCustomObject]@{
+                Segment = $name
+                Start   = Format-HexAddr $seg.Start
+                End     = Format-HexAddr $seg.End
+                Note    = 'Overlaps overlay-reserved RAM ($8800-$8FFF)'
+            }
+        }
+    }
+}
+
+if ($overlapRows.Count -gt 0) {
+    Write-Host ''
+    Write-Host 'Resident / Overlay Overlap Warnings'
+    $overlapRows | Format-Table -AutoSize
 }
 
 $overlayFiles = Get-ChildItem $BuildDir -File -Filter '*.bin' | Sort-Object Name

@@ -36,6 +36,8 @@ The player cycles through screen overlays to adjust orders, then advances the tu
 - Wagons limit transport throughput
 - Workers limit production throughput
 - Traders and frigates are built in admiralty workflows
+- Science research increases `capacity_per_trader` and `guns_per_frigate`,
+  which affect trade-expedition capacity and battle firepower
 
 ### Turn Progression
 
@@ -81,6 +83,8 @@ Global `GameState state` (see `include/game.h`) includes:
 - transport orders and available wagons
 - production orders and available workers
 - navy counts (`traders`, `frigates`)
+- derived navy stats (`capacity_per_trader`, `guns_per_frigate`)
+- science progression (`science_level`)
 - metadata (`turn_number`, `nation_name`, `current_screen`)
 - turn-specific trade state (`remaining_turn_capacity`)
 

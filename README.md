@@ -6,6 +6,7 @@ and its Tiny Graphics Interface (TGI) for Hi-Res Graphics (HGR) mode.
 This project is inspired by Imperialism and Taipan!. It is a turn-based resource
 management game where players manage a supply chain from raw materials through
 production stages to finished goods while managing cash and foreign trade prices.
+Science research unlocks higher trader capacity and warship firepower over time.
 
 ## Overview
 
@@ -180,6 +181,7 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
   - capture booty
   - introduce enemy powers and not only pirates
   - add sound effects
+- Expand the science tree with more technologies and effects
 - Simplify legacy screens to save memory
 - Add main menu
 - Add save/load/quit screen

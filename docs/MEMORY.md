@@ -120,6 +120,8 @@ $0836  JMP _get_selected_trade_nation
 $0839  JMP _clear_area
 $083C  JMP _get_trade_max_quantity
 $083F  JMP _apply_trade
+$0842  JMP _paint_area
+$0845  JMP _rand_range
 ```
 
 Rule: never change existing entry addresses. Append only.

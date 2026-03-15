@@ -7,16 +7,14 @@
 #define state (*s)
 
 static const char STR_BATTLE_FIREPOWER[] = "Firepower:";
+static unsigned char current_guns_per_frigate;
 
 static void render_firepower(unsigned char is_enemy, unsigned char ship_count) {
     unsigned char clear_x;
-    unsigned char print_x;
 
     clear_x = is_enemy ? 35 : 12;
-    print_x = is_enemy ? 38 : 15;
-
     clear_area(clear_x, 1, 4, 1);
-    print_int_right_aligned(print_x, 1, ship_count * GUNS_PER_FRIGATE);
+    print_int_right_aligned(clear_x + 3, 1, ship_count * current_guns_per_frigate);
 }
 
 static void get_ship_position(unsigned char is_enemy,
@@ -97,7 +95,7 @@ void render_battle_screen(GameState *s) {
     unsigned char visible_friendly_ships;
     unsigned char visible_enemy_ships;
 
-    clear_screen();
+    current_guns_per_frigate = state.guns_per_frigate;
 
     visible_friendly_ships = MIN(state.frigates, MAX_VISIBLE_SHIPS);
     visible_enemy_ships = MIN(state.frigates, MAX_VISIBLE_SHIPS);
@@ -125,9 +123,6 @@ void render_battle_screen(GameState *s) {
         get_ship_position(1, (unsigned char)i, &x_offset, &y_offset);
         draw_picture_at(SHIP_PIRATE, x_offset, y_offset);
     }
-
-    draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
-    print(5, 20, "Ambushed by pirates!");
 
     while (1) {
         unsigned char key;

@@ -62,8 +62,8 @@
  * Gameplay constants
  * ============================================================================
  */
-#define CAPACITY_PER_TRADER 3
-#define GUNS_PER_FRIGATE 2
+#define CAPACITY_PER_TRADER_BASE 2
+#define GUNS_PER_FRIGATE_BASE 2
 #define SCIENCE_RESEARCH_COST_MULTIPLIER 1000U
 #define FOREIGN_NATION_COUNT 5
 #define FOREIGN_TRADE_ENTRY_COUNT 3
@@ -113,6 +113,9 @@ typedef struct {
     /* Navy */
     unsigned int traders;
     unsigned int frigates;
+    /* Cached science-adjusted navy stats used by overlays and turn logic. */
+    unsigned char capacity_per_trader;
+    unsigned char guns_per_frigate;
 
     /* Foreign nations */
     ForeignNation foreign_nations[FOREIGN_NATION_COUNT];
@@ -120,6 +123,7 @@ typedef struct {
     /* Game metadata */
     unsigned int turn_number;
     unsigned int money;
+    /* Highest patented science level, from 0 up to the current tree limit. */
     unsigned char science_level;
     char nation_name[20];
     unsigned int current_screen;

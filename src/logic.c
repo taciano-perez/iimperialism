@@ -153,6 +153,8 @@ void init_game() {
 
     state.traders = 2;
     state.frigates = 14;
+    state.capacity_per_trader = CAPACITY_PER_TRADER_BASE;
+    state.guns_per_frigate = GUNS_PER_FRIGATE_BASE;
     state.money = 21000;
     state.science_level = 0;
 
@@ -175,7 +177,7 @@ void init_game() {
     snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
     state.current_screen = SCREEN_SCIENCE;
     
-    state.remaining_turn_capacity = state.traders * CAPACITY_PER_TRADER;
+    state.remaining_turn_capacity = state.traders * state.capacity_per_trader;
 }
 
 void next_turn() {
@@ -213,7 +215,7 @@ void next_turn() {
 
     update_foreign_market_prices();
 
-    state.remaining_turn_capacity = state.traders * CAPACITY_PER_TRADER;
+    state.remaining_turn_capacity = state.traders * state.capacity_per_trader;
 
     // update turn number
     state.turn_number++;
