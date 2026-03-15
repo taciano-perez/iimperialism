@@ -185,6 +185,8 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
   - add sound effects
 - Expand the science tree with wagon capacity improvements
 - Simplify legacy screens to save memory
+  - reuse buffers in ui.c
+  - do we still need the buffer in ui_buffers.h/.c?
 - Add main menu
 - Add save/load/quit screen
 - Add retirement/end screen
