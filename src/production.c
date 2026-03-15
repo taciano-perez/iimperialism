@@ -14,11 +14,10 @@ static void change_resource_production_order(const char* resource_name, unsigned
         print(5, 20, "Produce how many units of");
         print(31, 20, resource_name);
         print(5, 21, STR_PER_TURN_MAX_FMT);
-        print_int_right_aligned(25, 21, max_production);
+        sprintf(ui_buffer, STR_MAX_FMT, max_production);
+        print(14, 21, ui_buffer);
         new_production_order = scan_uint(25, 21, 5);
         if (new_production_order > max_production) {
-            print(5, 22, STR_SIR_WE_LACK_RESOURCES);
-            cgetc();
             continue;
         } else {
             *production_order = new_production_order;
@@ -36,7 +35,7 @@ static void production_orders(void) {
         print (5, 20, "Orders for Lumber, Fabric, Steel, ");
         print (5, 21, "fUrniture, Clothes, Tools, Guns,");
         print (5, 22, "or Quit?");
-        key = cgetc_at(16, 22);
+        key = cgetc();
         switch (key) {
             case 'l':
             case 'L':
@@ -76,10 +75,6 @@ static void production_orders(void) {
             case 'q':
             case 'Q':
                 return;
-            default:
-                print(18, 22, STR_INVALID_ANSWER);
-                cgetc();
-                continue;
         }
     }
 }
@@ -105,8 +100,6 @@ static void train_new_workers(void) {
             print (5, 22, ui_buffer);
             workers_to_train = scan_uint(12, 22, 5);
             if (workers_to_train > max_workers) {
-                print(19, 22, STR_NOT_ENOUGH_RESOURCES);
-                cgetc();
                 clear_input_area();
                 continue;
             } else {

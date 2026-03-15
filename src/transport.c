@@ -13,11 +13,10 @@ static void change_resource_transport_order(const char* resource_name, unsigned 
         print(5, 20, "Transport how many units of");
         print(33, 20, resource_name);
         print(5, 21, STR_PER_TURN_MAX_FMT);
-        print_int_right_aligned(25, 21, max_transport);
+        sprintf(ui_buffer, STR_MAX_FMT, max_transport);
+        print(14, 21, ui_buffer);
         *transport_order = scan_uint(25, 21, 5);
         if (*transport_order > max_transport) {
-            print(5, 22, STR_SIR_WE_LACK_RESOURCES);
-            cgetc();
             continue;
         } else {
             delta = (signed int)*transport_order - (signed int)old_order;
@@ -34,7 +33,7 @@ static void transport_orders(void) {
         clear_input_area();
         print (5, 20, "Orders for Timber, Wool, Iron,");
         print (5, 21, "or Coal?");
-        key = cgetc_at(14, 21);
+        key = cgetc();
         switch (key) {
             case 't':
             case 'T':
@@ -56,10 +55,6 @@ static void transport_orders(void) {
                 change_resource_transport_order("coal", &state.transport_coal,
                     MIN(state.coal_yield_per_province * state.number_of_provinces, state.transport_coal + state.available_wagons));
                 return;
-            default:
-                print(5, 22, STR_INVALID_ANSWER);
-                cgetc();
-                continue;
         }
     }
 }
@@ -81,8 +76,6 @@ static void build_wagons(void) {
             print(28, 20, ui_buffer);
             wagons_to_build = scan_uint(5, 21, 5);
             if (wagons_to_build > max_wagons) {
-                print(5, 22, STR_NOT_ENOUGH_RESOURCES);
-                cgetc();
                 clear_input_area();
                 continue;
             } else {
