@@ -60,6 +60,15 @@ artifacts, run:
 make memory-usage
 ```
 
+The memory-usage report distinguishes between:
+
+- `RESIDENT_MAIN_SAFE` for resident main-binary content that must stay below
+  `$8800`
+- `OVERLAY_SLOT` for the overlay load/execution window at `$8800-$8FFF`
+
+This matters because resident-code growth into `$8800-$8FFF` can break overlay
+loading even if the older, broader high-memory totals still appeared to fit.
+
 Runtime flow (`run_overlay(id)`):
 
 1. Map overlay ID to ProDOS filename.

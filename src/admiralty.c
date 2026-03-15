@@ -11,8 +11,8 @@ void handle_screen_input_admiralty(char key) {
         case 'W':
             run_overlay(OVL_ADMIRALTY_WARSHIP);
             break;
-        case 'r':
-        case 'R':
+        case 'q':
+        case 'Q':
             state.current_screen = SCREEN_INDUSTRY;
             break;
     }

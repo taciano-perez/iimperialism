@@ -42,6 +42,7 @@ in the diplomacy screen as text using these ranges:
 |------|---------|
 | `src/main.c` | Main loop and screen dispatch |
 | `src/ui.c` | UI primitives (`print`, `box`, `clear_screen`, etc.) |
+| `src/ui_buffers.c` | Shared scratch UI buffer storage |
 | `src/logic.c` | `init_game()`, `next_turn()` |
 | `src/gamestate.c` | Save/load game state (`GAME.DATA`) |
 | `src/overlay.c` | `init_overlays()`, `run_overlay()` |
@@ -66,6 +67,7 @@ in the diplomacy screen as text using these ranges:
 | `asm/loader/loader.s` | Vendored cc65 loader source (patched for fixed target BIN) |
 | `asm/loader/loader.cfg` | Linker config for loader system file |
 | `include/game.h` | `GameState` and shared declarations |
+| `include/ui_buffers.h` | Shared UI buffer declarations |
 | `include/overlay.h` | Overlay IDs, filenames, trampoline ZP macros |
 | `config/apple2-hgr.cfg` | Main linker config |
 | `config/apple2-ovl.cfg` | Overlay linker config |
@@ -181,7 +183,7 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
   - capture booty
   - introduce enemy powers and not only pirates
   - add sound effects
-- Expand the science tree with more technologies and effects
+- Expand the science tree with wagon capacity improvements
 - Simplify legacy screens to save memory
 - Add main menu
 - Add save/load/quit screen
@@ -189,3 +191,6 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
 - Add splash screen at startup and seed random number gen
 - Randomize country names and their exports/imports
 - On ovl_diplomacy, lower the chance of a battle (currently at 50% for testing)
+- Decrease the relationship status per turn
+- Adjust the initial money amount
+- Admiralty improvement: increase cost of traders and warships according to science level

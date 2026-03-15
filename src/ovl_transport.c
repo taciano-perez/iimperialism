@@ -40,5 +40,5 @@ void render_transport_screen(GameState *s) {
     draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
     print(5, 20, "What are your orders, sir?");
     print(5, 21, "Change Transport per turn,");
-    print(5, 22, "Build wagons or Return?");
+    print(5, 22, "Build wagons or Quit?");
 }

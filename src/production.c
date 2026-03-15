@@ -2,8 +2,7 @@
 #include <stdio.h>
 #include "game.h"
 #include "strings.h"
-
-static char buffer[42];
+#include "ui_buffers.h"
 
 static void change_resource_production_order(const char* resource_name, unsigned int* production_order, unsigned int max_production) {
     signed int delta;
@@ -12,10 +11,10 @@ static void change_resource_production_order(const char* resource_name, unsigned
     while (1) {
         old_order = *production_order;
         clear_input_area();
-        sprintf(buffer, "Produce how many units of %s", resource_name);
-        print(5, 20, buffer);
-        sprintf(buffer, STR_PER_TURN_MAX_FMT, max_production);
-        print(5, 21, buffer);
+        print(5, 20, "Produce how many units of");
+        print(31, 20, resource_name);
+        print(5, 21, STR_PER_TURN_MAX_FMT);
+        print_int_right_aligned(25, 21, max_production);
         new_production_order = scan_uint(25, 21, 5);
         if (new_production_order > max_production) {
             print(5, 22, STR_SIR_WE_LACK_RESOURCES);
@@ -36,7 +35,7 @@ static void production_orders(void) {
         clear_input_area();
         print (5, 20, "Orders for Lumber, Fabric, Steel, ");
         print (5, 21, "fUrniture, Clothes, Tools, Guns,");
-        print (5, 22, "or Return?");
+        print (5, 22, "or Quit?");
         key = cgetc_at(16, 22);
         switch (key) {
             case 'l':
@@ -74,8 +73,8 @@ static void production_orders(void) {
                 change_resource_production_order("guns", &state.production_guns,
                     MIN(state.resources[RESOURCE_STEEL] / 2, (state.production_guns + state.available_workers)));
                 return;
-            case 'r':
-            case 'R':
+            case 'q':
+            case 'Q':
                 return;
             default:
                 print(18, 22, STR_INVALID_ANSWER);
@@ -102,8 +101,8 @@ static void train_new_workers(void) {
             print(5, 20, STR_SIR_TRAIN_WORKERS1);
             print(5, 21, STR_SIR_TRAIN_WORKERS2);
             print(20, 21, "Train how many?");
-            sprintf(buffer, STR_MAX_FMT, max_workers);
-            print (5, 22, buffer);
+            sprintf(ui_buffer, STR_MAX_FMT, max_workers);
+            print (5, 22, ui_buffer);
             workers_to_train = scan_uint(12, 22, 5);
             if (workers_to_train > max_workers) {
                 print(19, 22, STR_NOT_ENOUGH_RESOURCES);
@@ -130,8 +129,8 @@ void handle_screen_input_production(char key) {
         case 'T':
             train_new_workers();
             break;
-        case 'r':
-        case 'R':
+        case 'q':
+        case 'Q':
             state.current_screen = SCREEN_INDUSTRY;
             break;
     }

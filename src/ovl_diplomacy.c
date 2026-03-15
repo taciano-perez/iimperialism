@@ -41,7 +41,7 @@ void render_diplomacy_screen(GameState *s) {
 
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
     print(5, 20, "Your diplomats await orders.");
-    print(5, 21, "Trade expedition or Return?");
+    print(5, 21, "Trade expedition or Quit?");
 
     while (1) {
         key = cgetc();
@@ -50,8 +50,8 @@ void render_diplomacy_screen(GameState *s) {
             case 'T':
                 trade_expedition(s);
                 return;
-            case 'r':
-            case 'R':
+            case 'q':
+            case 'Q':
                 state.current_screen = SCREEN_INDUSTRY;
                 return;
         }

@@ -2,8 +2,7 @@
 #include <stdio.h>
 #include "game.h"
 #include "strings.h"
-
-static char buffer[6];
+#include "ui_buffers.h"
 
 static void change_resource_transport_order(const char* resource_name, unsigned int* transport_order, unsigned int max_transport) {
     signed int delta;
@@ -11,10 +10,10 @@ static void change_resource_transport_order(const char* resource_name, unsigned 
     while (1) {
         old_order = *transport_order;
         clear_input_area();
-        sprintf(buffer, "Transport how many units of %s", resource_name);
-        print(5, 20, buffer);
-        sprintf(buffer, STR_PER_TURN_MAX_FMT, max_transport);
-        print(5, 21, buffer);
+        print(5, 20, "Transport how many units of");
+        print(33, 20, resource_name);
+        print(5, 21, STR_PER_TURN_MAX_FMT);
+        print_int_right_aligned(25, 21, max_transport);
         *transport_order = scan_uint(25, 21, 5);
         if (*transport_order > max_transport) {
             print(5, 22, STR_SIR_WE_LACK_RESOURCES);
@@ -77,8 +76,9 @@ static void build_wagons(void) {
         return;
     } else {
         while (1) {
-            sprintf(buffer, "Build how many wagons? (max %u)", max_wagons);
-            print (5, 20, buffer);
+            print(5, 20, "Build how many wagons?");
+            sprintf(ui_buffer, STR_MAX_FMT, max_wagons);
+            print(28, 20, ui_buffer);
             wagons_to_build = scan_uint(5, 21, 5);
             if (wagons_to_build > max_wagons) {
                 print(5, 22, STR_NOT_ENOUGH_RESOURCES);
@@ -105,8 +105,8 @@ void handle_screen_input_transport(char key) {
         case 'T':
             transport_orders();
             break;
-        case 'r':
-        case 'R':
+        case 'q':
+        case 'Q':
             state.current_screen = SCREEN_INDUSTRY;
             break;
     }

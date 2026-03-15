@@ -98,12 +98,6 @@ static const unsigned char SHIP_DATA[] = {
   0x55, 0x02, 0x40, 0x2a, 0x55, 0x00
 };
 
-/* Add more pictures here following the same format:
- * static const unsigned char PICTURE_NAME_DATA[] = {
- *   width, height, data...
- * };
- */
-
 /* ============================================================================
  * Picture Index Array
  * ============================================================================

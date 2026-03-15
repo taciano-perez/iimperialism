@@ -47,5 +47,5 @@ void render_production_screen(GameState *s) {
     draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
     print(5, 20, "What are your orders, sir?");
     print(5, 21, "Change Production per turn, Train");
-    print(5, 22, "new workers or Return?");
+    print(5, 22, "new workers or Quit?");
 }
