@@ -23,6 +23,8 @@ Current catalog (from `ac -l`) includes:
 - `DSCR` (`BIN`, `A=$8800`) - diplomacy overlay.
 - `TEXP` (`BIN`, `A=$8800`) - diplomacy trade expedition market overlay.
 - `TXAC` (`BIN`, `A=$8800`) - diplomacy trade expedition action overlay.
+- `BSCR` (`BIN`, `A=$8800`) - battle overlay.
+- `SSCR` (`BIN`, `A=$8800`) - science overlay.
 
 Not present on the game disk:
 

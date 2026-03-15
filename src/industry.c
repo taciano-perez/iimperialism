@@ -18,6 +18,10 @@ void handle_screen_input_industry(char key) {
         case 'D':
             state.current_screen = SCREEN_DIPLOMACY;
             break;
+        case 's':
+        case 'S':
+            state.current_screen = SCREEN_SCIENCE;
+            break;
         case 'e':
         case 'E':
             next_turn();

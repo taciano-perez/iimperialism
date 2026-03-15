@@ -25,4 +25,8 @@ The `Makefile` writes outputs to `build/`:
 - `build/loader.system` loader system file
 - `build/iimperialism.map` linker map
 
+Current overlay binaries include `iscr.bin`, `pscr.bin`, `tscr.bin`, `ascr.bin`,
+`atrd.bin`, `awrs.bin`, `dscr.bin`, `texp.bin`, `txac.bin`, `bscr.bin`, and
+`sscr.bin`.
+
 Use `make disk` to update `assets/iimperialism.dsk` with current binaries.

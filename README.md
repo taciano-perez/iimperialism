@@ -13,7 +13,7 @@ The game requires at least 128KB of memory. It uses a custom memory layout to fi
 within the Apple II's constraints:
 
 - Screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`, `TSCR`,
-  `ASCR`, `ATRD`, `AWRS`, `DSCR`, `TEXP`, `TXAC`) loaded on demand.
+  `ASCR`, `ATRD`, `AWRS`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`) loaded on demand.
 - Overlay binaries are loaded at runtime with direct ProDOS MLI `OPEN` / `READ` /
   `CLOSE` calls instead of `stdio`.
 - UI primitives and core game logic are kept in **LOWCODE** (`$0824-$1FFF`) below
@@ -53,10 +53,12 @@ in the diplomacy screen as text using these ranges:
 | `src/ovl_diplomacy.c` | Diplomacy screen overlay (`dscr.bin`) |
 | `src/ovl_trade_expedition.c` | Diplomacy trade expedition market overlay (`texp.bin`) |
 | `src/ovl_trade_expedition_action.c` | Diplomacy trade expedition action overlay (`txac.bin`) |
+| `src/ovl_science.c` | Science screen overlay (`sscr.bin`) |
 | `asm/prodos_overlay_load.s` | Resident ProDOS MLI overlay loader (`OPEN` / `READ` / `CLOSE`) |
 | `asm/ovl_diplomacy_entry.s` | Fixed entry stub for diplomacy overlay |
 | `asm/ovl_trade_expedition_entry.s` | Fixed entry stub for trade expedition market overlay |
 | `asm/ovl_trade_expedition_action_entry.s` | Fixed entry stub for trade expedition action overlay |
+| `asm/ovl_science_entry.s` | Fixed entry stub for science overlay |
 | `asm/ovl_asm.s` | AUX RAM copy and trampoline helpers |
 | `asm/jmptab.s` | Resident jump table used by overlays |
 | `asm/werner.s` | Reserves HGR segment |
@@ -179,7 +181,6 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
   - introduce enemy powers and not only pirates
   - add sound effects
 - Simplify legacy screens to save memory
-- Add science screen
 - Add main menu
 - Add save/load/quit screen
 - Add retirement/end screen

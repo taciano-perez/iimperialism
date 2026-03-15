@@ -50,6 +50,8 @@ Current overlay files:
 - `DSCR` diplomacy screen
 - `TEXP` diplomacy trade expedition market screen
 - `TXAC` diplomacy trade expedition action flow
+- `BSCR` battle screen
+- `SSCR` science screen
 
 To inspect current resident segment usage plus overlay occupancy from build
 artifacts, run:
@@ -80,6 +82,7 @@ compilation. Current examples:
 - `asm/ovl_diplomacy_entry.s` -> `render_diplomacy_screen()`
 - `asm/ovl_trade_expedition_entry.s` -> `render_trade_market()`
 - `asm/ovl_trade_expedition_action_entry.s` -> `handle_screen_trade_expedition()`
+- `asm/ovl_science_entry.s` -> `render_science_screen()`
 
 Why trampoline code is at `$0100`:
 

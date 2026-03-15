@@ -54,6 +54,7 @@ Resident main loop (`src/main.c`) dispatches by `state.current_screen`:
 - `SCREEN_TRANSPORT` -> `OVL_TRANSPORT` (`TSCR`)
 - `SCREEN_PRODUCTION` -> `OVL_PRODUCTION` (`PSCR`)
 - `SCREEN_ADMIRALTY` -> `OVL_ADMIRALTY` (`ASCR`)
+- `SCREEN_SCIENCE` -> `OVL_SCIENCE` (`SSCR`)
 
 Sub-flows are also overlays:
 
@@ -113,7 +114,6 @@ On some Windows environments, `make SHELL=cmd disk` is required.
 
 ## Near-Term Roadmap
 
-- science screen
 - diplomacy screen
 - trade voyage screens
 - menu, save/load/quit flow, and endgame/retirement flow

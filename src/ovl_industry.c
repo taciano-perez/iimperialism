@@ -51,7 +51,6 @@ void render_industry_screen(GameState *s) {
 
     /* ADVISOR */
     draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
-    print(5, 20, "What are your orders, sir?");
-    print(5, 21, "Change Transport, Production,");
-    print(5, 22, "Admiralty, Diplomacy, or End turn?");
+    print(5, 20, "Transport, Production, Science,");
+    print(5, 21, "Admiralty, Diplomacy, or End turn?");
 }
