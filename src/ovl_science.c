@@ -3,16 +3,6 @@
 
 #define state (*s)
 
-enum {
-    SCIENCE_RAILWAYS = 1,
-    SCIENCE_FLUSH_DECKS,
-    SCIENCE_STEEL_RAILS,
-    SCIENCE_SHELL_GUNS,
-    SCIENCE_TELEGRAPH,
-    SCIENCE_BREECH_LOADERS,
-    SCIENCE_LEVEL_COUNT
-};
-
 static const char TECH_1[] = "1)Railways";
 static const char TECH_2[] = "2)Carronade";
 static const char TECH_3[] = "3)Clipper ships";
