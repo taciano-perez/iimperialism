@@ -87,8 +87,8 @@ void run_overlay(unsigned char id) {
     /* Call trampoline at $0100: copies OVERLAY_PAGES from AUX to MAIN $8800. */
     ((void(*)(void))0x0100u)();
 
-    /* Execute the overlay, passing a pointer to the game state. */
-    ((void(*)(GameState*))OVERLAY_SLOT)(&state);
+    /* Execute the overlay. Overlays access game state directly via _state. */
+    ((void(*)(void))OVERLAY_SLOT)();
 }
 
 #pragma code-name (pop)

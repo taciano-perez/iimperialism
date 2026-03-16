@@ -4,7 +4,6 @@
 
 #define MAX_VISIBLE_SHIPS 12
 
-#define state (*s)
 
 static const char STR_BATTLE_FIREPOWER[] = "Firepower:";
 static unsigned char current_guns_per_frigate;
@@ -90,7 +89,7 @@ static void handle_ship_hit(unsigned char is_enemy,
     }
 }
 
-void render_battle_screen(register GameState *s) {
+void render_battle_screen(void) {
     unsigned char i;
     unsigned char visible_friendly_ships;
     unsigned char visible_enemy_ships;

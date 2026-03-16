@@ -1,9 +1,7 @@
 #include <conio.h>
 #include "game.h"
 
-#define state (*s)
-
-void admiralty_build_trader_overlay(GameState *s) {
+void admiralty_build_trader_overlay(void) {
     unsigned int max_traders;
     unsigned int traders_to_build;
 

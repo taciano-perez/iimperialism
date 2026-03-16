@@ -173,7 +173,8 @@ BRUN IIMPERIALISM
 This runs a build, updates the disk image, and launches the emulator.
 
 When adding a new screen as an overlay, see `docs/MEMORY.md` under
-"Adding a New Screen as an Overlay".
+"Adding a New Overlay". Note the `_state` address warning in that document — it
+must be re-verified after any change that affects resident code size.
 
 ## TODO
 

@@ -78,7 +78,8 @@ Runtime flow (`run_overlay(id)`):
 4. Copy main RAM `$8800-$8FFF` to AUX RAM at the same address (`main_to_aux`).
 5. Set ZP trampoline parameters (`$9A-$9E`) for AUX -> MAIN copy.
 6. Call trampoline at `$0100` to copy AUX -> MAIN with RAMRD enabled.
-7. Execute overlay entry at `$8800`, passing `&state`.
+7. Execute overlay entry at `$8800` (no arguments — overlays access `state` directly
+   via the hardcoded `_state` symbol exported in `apple2-ovl.cfg`).
 
 The runtime overlay path intentionally avoids `fopen()` / `fread()`. Direct
 MLI calls are more robust under the game's current resident memory pressure
@@ -135,11 +136,36 @@ $0845  JMP _rand_range
 
 Rule: never change existing entry addresses. Append only.
 
+## `_state` Address in Overlay Config
+
+Overlays access `GameState state` directly via `_state`, exported as a fixed address
+in the `SYMBOLS` block of `config/apple2-ovl.cfg`:
+
+```
+_state: type = export, value = $8026;
+```
+
+This address is the BSS start, which is determined by the combined size of CODE +
+RODATA + DATA + INIT in the resident binary. **It changes whenever any of those
+segments grow or shrink.**
+
+After any build that touches resident code, verify the address is still correct:
+
+```bash
+grep "_state" build/iimperialism.map
+```
+
+If the map shows a different address, update `apple2-ovl.cfg` to match before
+running the game. A stale address causes every overlay to read `GameState` fields
+from the wrong offset, producing silent garbage values at runtime with no linker
+error or warning.
+
 ## Adding a New Overlay
 
 Example: diplomacy overlay as ID `6`, file `DSCR`.
 
-1. Create `src/ovl_diplomacy.c` with entry `void render_diplomacy_screen(GameState *s)`.
+1. Create `src/ovl_diplomacy.c` with entry `void render_diplomacy_screen(void)`.
+   Access game state via the global `state` — no parameter needed.
 2. Add to `include/overlay.h`:
 
 ```c

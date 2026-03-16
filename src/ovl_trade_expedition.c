@@ -3,9 +3,7 @@
 
 #define PRICE_BOX_Y1 9
 
-#define state (*s)
-
-void render_trade_market(register GameState *s) {
+void render_trade_market(void) {
     unsigned char nation_index;
     unsigned char i;
 

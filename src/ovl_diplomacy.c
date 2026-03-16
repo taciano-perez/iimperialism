@@ -14,14 +14,12 @@
 #define FIRST_ROW_Y 4
 #define ROW_HEIGHT 3
 
-#define state (*s)
-
 static unsigned char get_row_y(unsigned char nation_index);
 static void render_trade_column(unsigned char x, unsigned char y, const unsigned char* resources);
-static void render_nation_row(GameState* s, unsigned char nation_index);
-static void trade_expedition(GameState *s);
+static void render_nation_row(unsigned char nation_index);
+static void trade_expedition(void);
 
-void render_diplomacy_screen(GameState *s) {
+void render_diplomacy_screen(void) {
     unsigned char i;
     unsigned char key;
 
@@ -36,7 +34,7 @@ void render_diplomacy_screen(GameState *s) {
     print(IMPORT_X, 2, "Imports");
 
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
-        render_nation_row(s, i);
+        render_nation_row(i);
     }
 
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
@@ -48,7 +46,7 @@ void render_diplomacy_screen(GameState *s) {
         switch (key) {
             case 't':
             case 'T':
-                trade_expedition(s);
+                trade_expedition();
                 return;
             case 'q':
             case 'Q':
@@ -70,7 +68,7 @@ static void render_trade_column(unsigned char x, unsigned char y, const unsigned
     }
 }
 
-static void render_nation_row(GameState* s, unsigned char nation_index) {
+static void render_nation_row(unsigned char nation_index) {
     unsigned char y;
 
     y = get_row_y(nation_index);
@@ -84,7 +82,7 @@ static void render_nation_row(GameState* s, unsigned char nation_index) {
     render_trade_column(IMPORT_X, y, state.foreign_nations[nation_index].imports);
 }
 
-static void trade_expedition(GameState *s) {
+static void trade_expedition(void) {
     unsigned int selection;
     unsigned char nation_index;
 

@@ -70,6 +70,25 @@ Be careful with:
 - arithmetic that may exceed 255
 - implicit integer promotion changing the generated code
 
+Note: cc65 with `-Os` already handles most integer promotion cases optimally. Manually
+removing `U` suffixes from small constants (`85U` → `85`) has no measurable effect when
+`-Os` is active — do not spend time on this.
+
+### Use `register` for Hot Struct Pointer Loops
+
+The `register` keyword places a pointer variable in zero-page, making indirect addressing
+cheaper on the 6502. cc65 allows at most two `register` locals per function.
+
+Only apply this when **all** of the following are true:
+
+- the pointer is a pointer-to-struct
+- it is dereferenced 3 or more times in the loop body
+- the loop executes approximately 100 or more iterations per call
+
+Even when all conditions are met, measure before and after. Savings are usually small
+(~50–60 bytes). Do not apply `register` to non-pointer locals or to loops that execute
+rarely.
+
 ## Replace Arithmetic With Lookup Tables
 
 Division and modulo are expensive on 6502 targets.
@@ -250,7 +269,68 @@ When optimizing a screen or module, use this order:
 4. Replace small-domain arithmetic with lookup tables.
 5. Merge duplicated branch bodies that only differ by constants.
 6. Re-measure.
-7. Only then consider moving code across memory regions.
+7. If overlays pass `GameState *s`, consider the parameter-elimination refactor (see above).
+8. Only then consider moving code across memory regions.
+
+## Eliminate Parameter Passing to Overlays
+
+Passing a pointer to `GameState` as a parameter to every overlay entry function is
+expensive: the caller pushes the pointer, the overlay function receives it, and every
+field access is indirect through a register.
+
+A better architecture is to export the fixed address of `_state` from the resident linker
+config so overlays can reference `state` directly as an `extern`:
+
+1. Find `_state`'s address in `iimperialism.map` (it is the first BSS symbol).
+2. Add the export to `config/apple2-ovl.cfg`:
+   ```
+   _state: type = export, value = $802E;
+   ```
+3. Remove `GameState *s` / `register GameState *s` parameters from all overlay functions.
+4. Remove `#define state (*s)` from each overlay file.
+5. Update the dispatch in `overlay.c` to call `((void(*)(void))OVERLAY_SLOT)()`.
+
+This was applied to all 11 overlays and saved **~1,017 bytes** of overlay code with no
+BSS growth and no change in behavior. It is the highest-value single architectural
+change available in this codebase.
+
+**Critical:** the hardcoded address in `apple2-ovl.cfg` must be re-verified from
+`iimperialism.map` after **any** change that grows or shrinks the resident CODE, RODATA,
+DATA, or INIT segments — because those segments precede BSS, and any size change shifts
+`_state`'s address. If the address is stale, every overlay will read `GameState` fields
+from the wrong offset, silently producing garbage values at runtime.
+
+After each build that touches resident code, run:
+```
+grep "_state" build/iimperialism.map
+```
+and confirm the address matches the value in `apple2-ovl.cfg`.
+
+## Compiler Flag Pitfalls
+
+Some flags look promising but do not improve code size for this target.
+
+### `--static-locals` (`-Cl`) — Do Not Use
+
+Adding `-Cl` moves all local variables from the C software stack to BSS/DATA. This
+reduces stack-management code in every function, saving overlay and resident code space,
+but it grows BSS permanently.
+
+Measured result: −596 bytes of code, **+97 bytes of BSS**. On the Apple II, BSS occupies
+RAM just as much as code does. The tradeoff is not acceptable when code size is the
+priority.
+
+Do not add `-Cl` to `CFLAGS`.
+
+### `-Oi` (Inlining) — Do Not Use
+
+Adding `-Oi` causes cc65 to inline small functions at each call site. On a desktop
+compiler, inlining enables further optimizations. On cc65/6502, it duplicates the function
+body at every call site.
+
+Each JSR/RTS pair saved is 6 bytes; each inlined body is much larger. For functions called
+from multiple sites, the result is a net increase in code size. Do not add `-Oi` to
+`CFLAGS`.
 
 ## High-Risk Techniques
 

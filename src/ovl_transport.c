@@ -5,9 +5,7 @@
 #define BOX_X2 39
 #define BOX_Y2 13
 
-#define state (*s)
-
-void render_transport_screen(register GameState *s) {
+void render_transport_screen(void) {
     clear_screen();
     print(0, 0, "Transport Orders");
     print(34, 0, "Turn:");

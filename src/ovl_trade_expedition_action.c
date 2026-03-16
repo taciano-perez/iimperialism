@@ -1,14 +1,12 @@
 #include <conio.h>
 #include "game.h"
 
-#define state (*s)
-
 #define TRADE_MODE_BUY  0
 #define TRADE_MODE_SELL 1
 
-static void trade_commodities(GameState *s, unsigned char nation_index, unsigned char mode);
+static void trade_commodities(unsigned char nation_index, unsigned char mode);
 
-void handle_screen_trade_expedition(GameState *s) {
+void handle_screen_trade_expedition(void) {
     unsigned char key;
     unsigned char nation_index;
 
@@ -28,11 +26,11 @@ void handle_screen_trade_expedition(GameState *s) {
         switch (key) {
             case 'B':
             case 'b':
-                trade_commodities(s, nation_index, TRADE_MODE_BUY);
+                trade_commodities(nation_index, TRADE_MODE_BUY);
                 return;
             case 'S':
             case 's':
-                trade_commodities(s, nation_index, TRADE_MODE_SELL);
+                trade_commodities(nation_index, TRADE_MODE_SELL);
                 return;
             case 'Q':
             case 'q':
@@ -42,7 +40,7 @@ void handle_screen_trade_expedition(GameState *s) {
     }
 }
 
-static void trade_commodities(GameState *s, unsigned char nation_index, unsigned char mode) {
+static void trade_commodities(unsigned char nation_index, unsigned char mode) {
     unsigned char i;
     unsigned int input;
     unsigned int quantity;

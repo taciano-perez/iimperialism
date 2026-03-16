@@ -7,12 +7,7 @@
 
 char buffer[42];
 
-/* #define state (*s) lets the function body use "state.field" syntax
- * identical to the original main.c code.  Must come AFTER #include "game.h"
- * so the extern declaration there is processed without the macro active. */
-#define state (*s)
-
-void render_industry_screen(register GameState *s) {
+void render_industry_screen(void) {
     clear_screen();
 
     print(0,  0, "Ministry of Industry");

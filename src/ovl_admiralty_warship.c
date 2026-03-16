@@ -1,9 +1,7 @@
 #include <conio.h>
 #include "game.h"
 
-#define state (*s)
-
-void admiralty_build_warship_overlay(register GameState *s) {
+void admiralty_build_warship_overlay(void) {
     unsigned int max_warships;
     unsigned int warships_to_build;
 

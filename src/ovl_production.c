@@ -5,9 +5,7 @@
 #define BOX_X2 39
 #define BOX_Y2 14
 
-#define state (*s)
-
-void render_production_screen(register GameState *s) {
+void render_production_screen(void) {
     clear_screen();
     print(0, 0, "Production Orders");
     print(34, 0, "Turn:");

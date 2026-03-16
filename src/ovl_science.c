@@ -1,7 +1,6 @@
 #include <conio.h>
 #include "game.h"
 
-#define state (*s)
 
 static const char TECH_1[] = "1)Railways";
 static const char TECH_2[] = "2)Carronade";
@@ -38,7 +37,7 @@ static void render_technology_row(unsigned char level, unsigned char row, unsign
     print(15, row + 1, TECH_DESCRIPTIONS[level - 1]);
 }
 
-void render_science_screen(register GameState *s) {
+void render_science_screen(void) {
     while (1) {
         unsigned char next_level;
         unsigned int next_cost;
