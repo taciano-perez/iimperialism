@@ -4,9 +4,9 @@
 #include "strings.h"
 #include "ui_buffers.h"
 
-static void change_resource_transport_order(const char* resource_name, unsigned int* transport_order, unsigned int max_transport) {
+static void change_resource_transport_order(const char* resource_name, unsigned char* transport_order, unsigned int max_transport) {
     signed int delta;
-    unsigned int old_order;
+    unsigned char old_order;
     while (1) {
         old_order = *transport_order;
         clear_input_area();

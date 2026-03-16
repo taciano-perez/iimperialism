@@ -3,13 +3,13 @@
 
 #pragma code-name (push, "LOWCODE")
 
-static unsigned int get_resource_base_price(unsigned int resource);
-static unsigned char get_relation_tier(unsigned int relations);
-static unsigned int apply_percent(unsigned int value, unsigned int percent);
+static unsigned char get_resource_base_price(unsigned char resource);
+static unsigned char get_relation_tier(unsigned char relations);
+static unsigned int apply_percent(unsigned int value, unsigned char percent);
 static void update_foreign_market_prices(void);
 
-static unsigned int get_resource_base_price(unsigned int resource) {
-    static const unsigned int base_prices[] = {
+static unsigned char get_resource_base_price(unsigned char resource) {
+    static const unsigned char base_prices[] = {
         6U,  /* timber */
         6U,  /* wool */
         8U,  /* iron */
@@ -24,13 +24,13 @@ static unsigned int get_resource_base_price(unsigned int resource) {
     };
 
     if (resource > RESOURCE_GUNS) {
-        return 1U;
+        return 1;
     }
 
     return base_prices[resource];
 }
 
-static unsigned char get_relation_tier(unsigned int relations) {
+static unsigned char get_relation_tier(unsigned char relations) {
     if (relations < RELATION_BAD) {
         return 0U;
     }
@@ -50,7 +50,7 @@ static unsigned char get_relation_tier(unsigned int relations) {
     return 4U;
 }
 
-static unsigned int apply_percent(unsigned int value, unsigned int percent) {
+static unsigned int apply_percent(unsigned int value, unsigned char percent) {
     return ((value * percent) + 50U) / 100U;
 }
 
@@ -64,10 +64,10 @@ static void update_foreign_market_prices(void) {
         relation_tier = get_relation_tier(state.foreign_nations[i].relations);
 
         for (j = 0; j < FOREIGN_TRADE_ENTRY_COUNT; ++j) {
-            unsigned int export_base;
-            unsigned int import_base;
-            unsigned int export_percent;
-            unsigned int import_percent;
+            unsigned char export_base;
+            unsigned char import_base;
+            unsigned char export_percent;
+            unsigned char import_percent;
 
             export_base = get_resource_base_price(state.foreign_nations[i].exports[j]);
             import_base = get_resource_base_price(state.foreign_nations[i].imports[j]);
@@ -93,17 +93,17 @@ void init_game() {
         "Pont",
         "Kathay"
     };
-    static const int foreign_nation_relations[FOREIGN_NATION_COUNT] = {
+    static const unsigned char foreign_nation_relations[FOREIGN_NATION_COUNT] = {
         RELATION_NEUTRAL, RELATION_BAD, RELATION_GOOD, RELATION_EXCELLENT, RELATION_TERRIBLE
     };
-    static const int foreign_nation_exports[FOREIGN_NATION_COUNT][FOREIGN_TRADE_ENTRY_COUNT] = {
+    static const unsigned char foreign_nation_exports[FOREIGN_NATION_COUNT][FOREIGN_TRADE_ENTRY_COUNT] = {
         { RESOURCE_STEEL, RESOURCE_FURNITURE, RESOURCE_LUMBER },
         { RESOURCE_CLOTHES, RESOURCE_TOOLS, RESOURCE_GUNS },
         { RESOURCE_WOOL, RESOURCE_WOOL, RESOURCE_COAL },
         { RESOURCE_IRON, RESOURCE_TIMBER, RESOURCE_WOOL },
         { RESOURCE_WOOL, RESOURCE_COAL, RESOURCE_TIMBER }
     };
-    static const int foreign_nation_imports[FOREIGN_NATION_COUNT][FOREIGN_TRADE_ENTRY_COUNT] = {
+    static const unsigned char foreign_nation_imports[FOREIGN_NATION_COUNT][FOREIGN_TRADE_ENTRY_COUNT] = {
         { RESOURCE_TIMBER, RESOURCE_IRON, RESOURCE_WOOL },
         { RESOURCE_COAL, RESOURCE_TIMBER, RESOURCE_WOOL },
         { RESOURCE_STEEL, RESOURCE_GUNS, RESOURCE_CLOTHES },

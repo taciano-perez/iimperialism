@@ -31,7 +31,7 @@ const char* const STR_RESOURCE[] = {
     "Guns"
 };
 
-const char* get_resource_name(unsigned int resource) {
+const char* get_resource_name(unsigned char resource) {
     if (resource > RESOURCE_GUNS) {
         return "";
     }
@@ -39,7 +39,7 @@ const char* get_resource_name(unsigned int resource) {
     return STR_RESOURCE[resource];
 }
 
-const char* get_relation_name(unsigned int relation) {
+const char* get_relation_name(unsigned char relation) {
     if (relation < RELATION_BAD) {
         return STR_RELATION_TERRIBLE;
     }

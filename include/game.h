@@ -71,11 +71,11 @@
 
 typedef struct {
     char name[FOREIGN_NATION_NAME_LENGTH + 1];
-    unsigned int relations;
-    unsigned int exports[FOREIGN_TRADE_ENTRY_COUNT];
-    unsigned int imports[FOREIGN_TRADE_ENTRY_COUNT];
-    unsigned int export_prices[FOREIGN_TRADE_ENTRY_COUNT];
-    unsigned int import_prices[FOREIGN_TRADE_ENTRY_COUNT];
+    unsigned char relations;
+    unsigned char exports[FOREIGN_TRADE_ENTRY_COUNT];
+    unsigned char imports[FOREIGN_TRADE_ENTRY_COUNT];
+    unsigned char export_prices[FOREIGN_TRADE_ENTRY_COUNT];
+    unsigned char import_prices[FOREIGN_TRADE_ENTRY_COUNT];
 } ForeignNation;
 
 /* ============================================================================
@@ -87,32 +87,32 @@ typedef struct {
     unsigned int resources[RESOURCE_COUNT];
 
     /* Provincial yields */
-    unsigned int number_of_provinces;
-    unsigned int timber_yield_per_province;
-    unsigned int wool_yield_per_province;
-    unsigned int iron_yield_per_province;
-    unsigned int coal_yield_per_province;
+    unsigned char number_of_provinces;
+    unsigned char timber_yield_per_province;
+    unsigned char wool_yield_per_province;
+    unsigned char iron_yield_per_province;
+    unsigned char coal_yield_per_province;
 
     /* Transport */
-    unsigned int transport_timber;
-    unsigned int transport_wool;
-    unsigned int transport_iron;
-    unsigned int transport_coal;
-    unsigned int available_wagons;
+    unsigned char transport_timber;
+    unsigned char transport_wool;
+    unsigned char transport_iron;
+    unsigned char transport_coal;
+    unsigned char available_wagons;
 
     /* Production orders */
-    unsigned int production_lumber;
-    unsigned int production_fabric;
-    unsigned int production_steel;
-    unsigned int production_furniture;
-    unsigned int production_clothes;
-    unsigned int production_tools;
-    unsigned int production_guns;
+    unsigned char production_lumber;
+    unsigned char production_fabric;
+    unsigned char production_steel;
+    unsigned char production_furniture;
+    unsigned char production_clothes;
+    unsigned char production_tools;
+    unsigned char production_guns;
     unsigned int available_workers;
 
     /* Navy */
-    unsigned int traders;
-    unsigned int frigates;
+    unsigned char traders;
+    unsigned char frigates;
     /* Cached science-adjusted navy stats used by overlays and turn logic. */
     unsigned char capacity_per_trader;
     unsigned char guns_per_frigate;
@@ -122,14 +122,14 @@ typedef struct {
 
     /* Game metadata */
     unsigned int turn_number;
-    unsigned int money;
+    unsigned long money;
     /* Highest patented science level, from 0 up to the current tree limit. */
     unsigned char science_level;
     char nation_name[20];
-    unsigned int current_screen;
+    unsigned char current_screen;
 
     /* turn-specific data */
-    unsigned int remaining_turn_capacity;
+    unsigned char remaining_turn_capacity;
 } GameState;
 
 extern GameState state;
@@ -158,12 +158,12 @@ unsigned int scan_uint(int x, int y, unsigned int max_digits);
 
 // main.c (resident — accessible to overlays via jump table at $0821)
 void render_warehouse_box(void);
-const char* get_resource_name(unsigned int resource);
-const char* get_relation_name(unsigned int relation);
+const char* get_resource_name(unsigned char resource);
+const char* get_relation_name(unsigned char relation);
 void set_selected_trade_nation(unsigned char nation_index);
 unsigned char get_selected_trade_nation(void);
-unsigned int get_trade_max_quantity(unsigned char mode, unsigned int resource, unsigned int price);
-void apply_trade(unsigned char mode, unsigned int resource, unsigned int quantity, unsigned int price);
+unsigned int get_trade_max_quantity(unsigned char mode, unsigned char resource, unsigned int price);
+void apply_trade(unsigned char mode, unsigned char resource, unsigned int quantity, unsigned int price);
 unsigned int rand_range(unsigned int min, unsigned int max);
 
 // gamestate.c

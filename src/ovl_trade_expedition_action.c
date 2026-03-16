@@ -47,8 +47,8 @@ static void trade_commodities(GameState *s, unsigned char nation_index, unsigned
     unsigned int input;
     unsigned int quantity;
     unsigned int max_quantity;
-    unsigned int resource;
-    const unsigned int* trade_list;
+    unsigned char resource;
+    const unsigned char* trade_list;
     unsigned char menu_base;
     unsigned int price;
 

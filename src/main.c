@@ -52,7 +52,7 @@ unsigned char get_selected_trade_nation(void) {
     return selected_trade_nation;
 }
 
-unsigned int get_trade_max_quantity(unsigned char mode, unsigned int resource, unsigned int price) {
+unsigned int get_trade_max_quantity(unsigned char mode, unsigned char resource, unsigned int price) {
     unsigned int max_quantity;
 
     max_quantity = state.remaining_turn_capacity;
@@ -65,7 +65,7 @@ unsigned int get_trade_max_quantity(unsigned char mode, unsigned int resource, u
     return max_quantity;
 }
 
-void apply_trade(unsigned char mode, unsigned int resource, unsigned int quantity, unsigned int price) {
+void apply_trade(unsigned char mode, unsigned char resource, unsigned int quantity, unsigned int price) {
     state.remaining_turn_capacity -= quantity;
     if (mode == 0) {
         state.resources[resource] += quantity;

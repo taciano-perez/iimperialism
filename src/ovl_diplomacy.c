@@ -17,7 +17,7 @@
 #define state (*s)
 
 static unsigned char get_row_y(unsigned char nation_index);
-static void render_trade_column(unsigned char x, unsigned char y, const unsigned int* resources);
+static void render_trade_column(unsigned char x, unsigned char y, const unsigned char* resources);
 static void render_nation_row(GameState* s, unsigned char nation_index);
 static void trade_expedition(GameState *s);
 
@@ -62,7 +62,7 @@ static unsigned char get_row_y(unsigned char nation_index) {
     return FIRST_ROW_Y + (nation_index * ROW_HEIGHT);
 }
 
-static void render_trade_column(unsigned char x, unsigned char y, const unsigned int* resources) {
+static void render_trade_column(unsigned char x, unsigned char y, const unsigned char* resources) {
     unsigned char i;
 
     for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {

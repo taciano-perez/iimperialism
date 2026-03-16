@@ -4,9 +4,9 @@
 #include "strings.h"
 #include "ui_buffers.h"
 
-static void change_resource_production_order(const char* resource_name, unsigned int* production_order, unsigned int max_production) {
+static void change_resource_production_order(const char* resource_name, unsigned char* production_order, unsigned int max_production) {
     signed int delta;
-    unsigned int old_order;
+    unsigned char old_order;
     unsigned int new_production_order;
     while (1) {
         old_order = *production_order;
