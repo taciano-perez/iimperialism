@@ -5,8 +5,6 @@
 #define BOX_X2 39
 #define BOX_Y2 13
 
-char buffer[42];
-
 void render_industry_screen(void) {
     clear_screen();
 
