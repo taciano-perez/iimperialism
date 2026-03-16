@@ -38,7 +38,7 @@ static void render_technology_row(unsigned char level, unsigned char row, unsign
     print(15, row + 1, TECH_DESCRIPTIONS[level - 1]);
 }
 
-void render_science_screen(GameState *s) {
+void render_science_screen(register GameState *s) {
     while (1) {
         unsigned char next_level;
         unsigned int next_cost;

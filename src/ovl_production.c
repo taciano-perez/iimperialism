@@ -7,7 +7,7 @@
 
 #define state (*s)
 
-void render_production_screen(GameState *s) {
+void render_production_screen(register GameState *s) {
     clear_screen();
     print(0, 0, "Production Orders");
     print(34, 0, "Turn:");

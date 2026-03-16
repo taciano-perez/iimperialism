@@ -12,7 +12,7 @@ char buffer[42];
  * so the extern declaration there is processed without the macro active. */
 #define state (*s)
 
-void render_industry_screen(GameState *s) {
+void render_industry_screen(register GameState *s) {
     clear_screen();
 
     print(0,  0, "Ministry of Industry");

@@ -3,7 +3,7 @@
 
 #define state (*s)
 
-void admiralty_build_warship_overlay(GameState *s) {
+void admiralty_build_warship_overlay(register GameState *s) {
     unsigned int max_warships;
     unsigned int warships_to_build;
 

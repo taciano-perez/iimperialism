@@ -5,7 +5,7 @@
 
 #define state (*s)
 
-void render_trade_market(GameState *s) {
+void render_trade_market(register GameState *s) {
     unsigned char nation_index;
     unsigned char i;
 

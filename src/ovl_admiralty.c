@@ -10,7 +10,7 @@
  * so the extern declaration there is processed without the macro active. */
 #define state (*s)
 
-void render_admiralty_screen(GameState *s) {
+void render_admiralty_screen(register GameState *s) {
     clear_screen();
 
     print(0,  0, "Admiralty Headquarters");

@@ -90,7 +90,7 @@ static void handle_ship_hit(unsigned char is_enemy,
     }
 }
 
-void render_battle_screen(GameState *s) {
+void render_battle_screen(register GameState *s) {
     unsigned char i;
     unsigned char visible_friendly_ships;
     unsigned char visible_enemy_ships;

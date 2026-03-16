@@ -7,7 +7,7 @@
 
 #define state (*s)
 
-void render_transport_screen(GameState *s) {
+void render_transport_screen(register GameState *s) {
     clear_screen();
     print(0, 0, "Transport Orders");
     print(34, 0, "Turn:");
