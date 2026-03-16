@@ -146,16 +146,16 @@ void ui_init();
 void ui_exit();
 void clear_screen();
 void clear_input_area();
-void clear_area(int x, int y, int width, int height);
-void paint_area(int x, int y, int width, int height, unsigned char color);
-void print (const int x, const int y, const char* text);
-void print_right_aligned(const int x, const int y, const char* text);
-void print_int_right_aligned(int x, int y, unsigned int value);
-void print_int(const int x, const int y, unsigned int value);
+void clear_area(unsigned char x, unsigned char y, unsigned char width, unsigned char height);
+void paint_area(unsigned char x, unsigned char y, unsigned char width, unsigned char height, unsigned char color);
+void print (unsigned char x, unsigned char y, const char* text);
+void print_right_aligned(unsigned char x, unsigned char y, const char* text);
+void print_int_right_aligned(unsigned char x, unsigned char y, unsigned int value);
+void print_int(unsigned char x, unsigned char y, unsigned int value);
 void draw_picture_at(const unsigned char picture_index, const unsigned char x_byte, unsigned char y);
-void box (const int x1, const int y1, const int x2, const int y2);
-char cgetc_at(int x, int y);
-unsigned int scan_uint(int x, int y, unsigned int max_digits);
+void box (unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
+char cgetc_at(unsigned char x, unsigned char y);
+unsigned int scan_uint(unsigned char x, unsigned char y, unsigned char max_digits);
 
 // main.c (resident — accessible to overlays via jump table at $0821)
 void render_warehouse_box(void);

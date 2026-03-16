@@ -5,6 +5,7 @@
 #include <tgi.h>
 #include "font.h"
 #include "pictures.h"
+#include "ui_buffers.h"
 
 #define CHAR_WIDTH 7
 #define CHAR_HEIGHT 8
@@ -31,7 +32,7 @@ void clear_input_area() {
     tgi_setcolor (TGI_COLOR_WHITE);
 }
 
-void clear_area(int x, int y, int width, int height) {
+void clear_area(unsigned char x, unsigned char y, unsigned char width, unsigned char height) {
     tgi_setcolor (TGI_COLOR_BLACK);
     tgi_bar(x * CHAR_WIDTH, y * CHAR_HEIGHT,
             (x + width) * CHAR_WIDTH - 1,
@@ -39,7 +40,7 @@ void clear_area(int x, int y, int width, int height) {
     tgi_setcolor (TGI_COLOR_WHITE);
 }
 
-void paint_area(int x, int y, int width, int height, unsigned char color) {
+void paint_area(unsigned char x, unsigned char y, unsigned char width, unsigned char height, unsigned char color) {
     tgi_setcolor (color);
     tgi_bar(x * CHAR_WIDTH, y * CHAR_HEIGHT,
             (x + width) * CHAR_WIDTH - 1,
@@ -47,38 +48,36 @@ void paint_area(int x, int y, int width, int height, unsigned char color) {
     tgi_setcolor (TGI_COLOR_WHITE);
 }
 
-void print (const int x, const int y, const char* text) {
+void print (unsigned char x, unsigned char y, const char* text) {
     draw_custom_text (x*CHAR_WIDTH, y*CHAR_HEIGHT, text);
 }
 
-void print_right_aligned(const int x, const int y, const char* text) {
-    unsigned int text_length;
+void print_right_aligned(unsigned char x, unsigned char y, const char* text) {
+    unsigned char text_length;
     int pos_x;
-    text_length = strlen(text);
+    text_length = (unsigned char)strlen(text);
     pos_x = x - text_length + 1;
     if (pos_x < 0) {
         pos_x = 0;
     }
-    print(pos_x, y, text);
+    print((unsigned char)pos_x, y, text);
 }
 
-void print_int_right_aligned(int x, int y, unsigned int value) {
-    char buffer[10];
-    sprintf(buffer, "%u", value);
-    print_right_aligned(x, y, buffer);
+void print_int_right_aligned(unsigned char x, unsigned char y, unsigned int value) {
+    sprintf(ui_buffer, "%u", value);
+    print_right_aligned(x, y, ui_buffer);
 }
 
-void print_int(const int x, const int y, unsigned int value) {
-    char buffer[5];
-    sprintf(buffer, "%u", value);
-    print(x, y, buffer);
+void print_int(unsigned char x, unsigned char y, unsigned int value) {
+    sprintf(ui_buffer, "%u", value);
+    print(x, y, ui_buffer);
 }
 
 void draw_picture_at(const unsigned char picture_index, const unsigned char x_byte, unsigned char y) {
     draw_picture(picture_index, x_byte, y*CHAR_HEIGHT);
 }
 
-void box (const int x1, const int y1, const int x2, const int y2) {
+void box (unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2) {
     tgi_line (x1*CHAR_WIDTH, y1*CHAR_HEIGHT, x1*CHAR_WIDTH, y2*CHAR_HEIGHT);
     tgi_line (x1*CHAR_WIDTH, y1*CHAR_HEIGHT, x2*CHAR_WIDTH+(CHAR_WIDTH-1), y1*CHAR_HEIGHT);
     tgi_line (x2*CHAR_WIDTH+(CHAR_WIDTH-1), y1*CHAR_HEIGHT, x2*CHAR_WIDTH+(CHAR_WIDTH-1), y2*CHAR_HEIGHT);
@@ -86,55 +85,51 @@ void box (const int x1, const int y1, const int x2, const int y2) {
 }
 
 /* Read a single character from the keyboard, echoing it at (x, y). */
-char cgetc_at(int x, int y) {
+char cgetc_at(unsigned char x, unsigned char y) {
     char ch;
-    char buf[2];
-    ch = cgetc();
-    buf[0] = ch;
-    buf[1] = '\0';
-    print(x, y, buf);
+    ui_buffer[0] = ch = cgetc();
+    ui_buffer[1] = '\0';
+    print(x, y, ui_buffer);
     return ch;
 }
 
 /* Read an unsigned integer from the keyboard, echoing digits at (x, y).
  * max_digits limits input length (1-10). Press Enter to confirm. */
-unsigned int scan_uint(int x, int y, unsigned int max_digits) {
-    char buffer[11];
-    unsigned int len = 0;
+unsigned int scan_uint(unsigned char x, unsigned char y, unsigned char max_digits) {
+    unsigned char len = 0;
     char ch;
 
     if (max_digits > 10) max_digits = 10;
-    buffer[0] = '\0';
+    ui_buffer[0] = '\0';
 
     while (1) {
         ch = cgetc();
 
         if (ch >= '0' && ch <= '9') {
             if (len < max_digits) {
-                buffer[len++] = ch;
-                buffer[len] = '\0';
+                ui_buffer[len++] = ch;
+                ui_buffer[len] = '\0';
                 /* Clear field then redraw */
                 tgi_setcolor(TGI_COLOR_BLACK);
                 tgi_bar(x * CHAR_WIDTH, y * CHAR_HEIGHT,
-                        (x + (int)max_digits) * CHAR_WIDTH - 1,
+                        (x + max_digits) * CHAR_WIDTH - 1,
                         y * CHAR_HEIGHT + CHAR_HEIGHT - 1);
                 tgi_setcolor(TGI_COLOR_WHITE);
-                print(x, y, buffer);
+                print(x, y, ui_buffer);
             }
         } else if (ch == '\b' || ch == 127) { /* backspace or delete */
             if (len > 0) {
-                --len;
-                buffer[len] = '\0';
+                ui_buffer[--len] = '\0';
                 tgi_setcolor(TGI_COLOR_BLACK);
                 tgi_bar(x * CHAR_WIDTH, y * CHAR_HEIGHT,
-                        (x + (int)max_digits) * CHAR_WIDTH - 1,
+                        (x + max_digits) * CHAR_WIDTH - 1,
                         y * CHAR_HEIGHT + CHAR_HEIGHT - 1);
                 tgi_setcolor(TGI_COLOR_WHITE);
-                if (len > 0) print(x, y, buffer);
+                if (len > 0) print(x, y, ui_buffer);
             }
         } else if (ch == '\r' || ch == '\n') {
             if (len > 0) {
-                return (unsigned int)atoi(buffer);
+                return (unsigned int)atoi(ui_buffer);
             }
         }
     }
