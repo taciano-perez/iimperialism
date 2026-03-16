@@ -10,7 +10,7 @@ Science research unlocks higher trader capacity and warship firepower over time.
 
 ## Overview
 
-The game requires at least 128KB of memory. It uses a custom memory layout to fit
+The game runs within the Apple II's main 64KB memory map. It uses a custom memory layout to fit
 within the Apple II's constraints:
 
 - Screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`, `TSCR`,
@@ -61,7 +61,6 @@ in the diplomacy screen as text using these ranges:
 | `asm/ovl_trade_expedition_entry.s` | Fixed entry stub for trade expedition market overlay |
 | `asm/ovl_trade_expedition_action_entry.s` | Fixed entry stub for trade expedition action overlay |
 | `asm/ovl_science_entry.s` | Fixed entry stub for science overlay |
-| `asm/ovl_asm.s` | AUX RAM copy and trampoline helpers |
 | `asm/text_hgr.s` | Aligned opaque HGR text blitter used by `print()` |
 | `asm/jmptab.s` | Resident jump table used by overlays |
 | `asm/werner.s` | Reserves HGR segment |
@@ -69,7 +68,7 @@ in the diplomacy screen as text using these ranges:
 | `asm/loader/loader.cfg` | Linker config for loader system file |
 | `include/game.h` | `GameState` and shared declarations |
 | `include/ui_buffers.h` | Shared UI buffer declarations |
-| `include/overlay.h` | Overlay IDs, filenames, trampoline ZP macros |
+| `include/overlay.h` | Overlay IDs, filenames, and loader constants |
 | `config/apple2-hgr.cfg` | Main linker config |
 | `config/apple2-ovl.cfg` | Overlay linker config template |
 | `build/apple2-ovl.cfg` | Generated overlay linker config with current `_state` address |
@@ -208,3 +207,4 @@ overlays are relinked.
 - Decrease the relationship status per turn
 - Adjust the initial money amount
 - Admiralty improvement: increase cost of traders and warships according to science level
+- Attempt to merge overlays when each is less than 1KB to reclaim floppy space

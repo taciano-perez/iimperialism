@@ -45,7 +45,6 @@ C_SOURCES  = \
 ASM_SOURCES = \
 	$(ASM_DIR)/werner.s \
 	$(ASM_DIR)/text_hgr.s \
-	$(ASM_DIR)/ovl_asm.s \
 	$(ASM_DIR)/jmptab.s
 
 MAIN_OBJECTS = \
@@ -64,7 +63,6 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/logic.o \
 	$(BUILD_DIR)/overlay.o \
 	$(BUILD_DIR)/prodos_overlay_load.o \
-	$(BUILD_DIR)/ovl_asm.o \
 	$(BUILD_DIR)/jmptab.o
 
 OVERLAY_OBJECTS = \

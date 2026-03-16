@@ -1,9 +1,6 @@
 #include "game.h"
 #include "overlay.h"
 
-/* Assembly routines from overlay.s */
-extern void install_trampoline(void);
-extern void main_to_aux(unsigned int src, unsigned int dst, unsigned char pages);
 extern unsigned char __fastcall__ prodos_load_overlay(const char* filename);
 extern unsigned int overlay_bytes_read;
 
@@ -56,14 +53,10 @@ static void load_overlay_file(const char* filename) {
     }
 }
 
-/* Install the RAMRD trampoline in the hardware stack page ($0100-$0117).
- * Overlay binaries are now loaded on demand by run_overlay(). */
 void init_overlays(void) {
-    install_trampoline();
 }
 
-/* Load overlay <id> into OVERLAY_SLOT ($8800 in MAIN), mirror it to AUX
- * $8800-$8FFF, copy it back into MAIN via the trampoline, and execute it. */
+/* Load overlay <id> into OVERLAY_SLOT ($8800 in MAIN) and execute it. */
 void run_overlay(unsigned char id) {
     const char* filename;
 
@@ -73,19 +66,6 @@ void run_overlay(unsigned char id) {
     }
 
     load_overlay_file(filename);
-
-    /* Keep a single cached copy in AUX RAM at the same address. */
-    main_to_aux(OVERLAY_SLOT, OVERLAY_SLOT, OVERLAY_PAGES);
-
-    /* Set trampoline ZP parameters for the AUX->MAIN copy. */
-    tramp_src[0]  = (unsigned char)OVERLAY_SLOT;
-    tramp_src[1]  = (unsigned char)(OVERLAY_SLOT >> 8);
-    tramp_dst[0]  = (unsigned char)OVERLAY_SLOT;
-    tramp_dst[1]  = (unsigned char)(OVERLAY_SLOT >> 8);
-    tramp_pages   = OVERLAY_PAGES;
-
-    /* Call trampoline at $0100: copies OVERLAY_PAGES from AUX to MAIN $8800. */
-    ((void(*)(void))0x0100u)();
 
     /* Execute the overlay. Overlays access game state directly via _state. */
     ((void(*)(void))OVERLAY_SLOT)();

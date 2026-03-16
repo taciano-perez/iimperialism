@@ -33,18 +33,10 @@
 #define OVL_FILE_BATTLE "BSCR"
 #define OVL_FILE_SCIENCE "SSCR"
 
-/* Zero-page trampoline parameters ($9A-$9E, outside cc65 ZP range $80-$99).
- * Set by run_overlay before calling the trampoline at $0100. */
-#define tramp_src    ((unsigned char*)0x9A)   /* 2 bytes: AUX source lo/hi */
-#define tramp_dst    ((unsigned char*)0x9C)   /* 2 bytes: MAIN dest  lo/hi */
-#define tramp_pages  (*(unsigned char*)0x9E)  /* page count */
-
-/* Install the RAMRD trampoline in the hardware stack page ($0100).
- * Overlays are loaded on demand by run_overlay(). Call once at startup. */
+/* Overlays are loaded on demand by run_overlay(). */
 void init_overlays(void);
 
-/* Load overlay <id> from disk into OVERLAY_SLOT ($8800), mirror it into
- * AUX RAM at the same address, then execute it, passing &state. */
+/* Load overlay <id> from disk into OVERLAY_SLOT ($8800) and execute it. */
 void run_overlay(unsigned char id);
 
 #endif /* OVERLAY_H */

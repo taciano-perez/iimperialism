@@ -3,9 +3,8 @@
 ## Apple II Memory Map
 
 ```
-$0000-$00FF  Zero Page          (cc65 runtime; $9A-$9E reserved for trampoline params)
-$0100-$0117  RAMRD trampoline   (installed by `install_trampoline()` at startup)
-$0118-$01FF  6502 hardware stack
+$0000-$00FF  Zero Page          (cc65 runtime)
+$0100-$01FF  6502 hardware stack
 $0200-$03FF  System / ProDOS vectors
 $0400-$07FF  Text screen page 1
 $0803-$080E  STARTUP            (cc65 crt0)
@@ -18,10 +17,6 @@ $8800-$8FFF  OVERLAY_SLOT       (2KB execution window in main RAM)
 $8E00-$95FF  C stack            (2KB, downward from HIMEM=$9600)
 $9600-$BEFF  ProDOS system area
 $BF00-$BFFF  ProDOS MLI
-
-AUX RAM (second 64KB bank):
-$8800-$8FFF  OVERLAY_AUX_SLOT   (single 2KB cached overlay copy)
-$9000-$BEFF  Available AUX RAM  (currently unused by loader)
 ```
 
 Current resident note:
@@ -81,11 +76,9 @@ Runtime flow (`run_overlay(id)`):
 2. Call the resident ProDOS loader helper in `asm/prodos_overlay_load.s`.
 3. Use ProDOS MLI `OPEN` / `READ` / `CLOSE` to load exactly 2048 bytes into
    main RAM `OVERLAY_SLOT` (`$8800`).
-4. Copy main RAM `$8800-$8FFF` to AUX RAM at the same address (`main_to_aux`).
-5. Set ZP trampoline parameters (`$9A-$9E`) for AUX -> MAIN copy.
-6. Call trampoline at `$0100` to copy AUX -> MAIN with RAMRD enabled.
-7. Execute overlay entry at `$8800` (no arguments — overlays access `state` directly
-   via the `_state` symbol exported in the generated overlay linker config).
+4. Execute overlay entry at `$8800` (no arguments; overlays access `state`
+   directly via the `_state` symbol exported in the generated overlay linker
+   config).
 
 The runtime overlay path intentionally avoids `fopen()` / `fread()`. Direct
 MLI calls are more robust under the game's current resident memory pressure
@@ -99,20 +92,6 @@ compilation. Current examples:
 - `asm/ovl_trade_expedition_entry.s` -> `render_trade_market()`
 - `asm/ovl_trade_expedition_action_entry.s` -> `handle_screen_trade_expedition()`
 - `asm/ovl_science_entry.s` -> `render_science_screen()`
-
-Why trampoline code is at `$0100`:
-
-- With RAMRD on, instruction fetches in `$0200-$BFFF` come from AUX.
-- Stack page `$0100-$01FF` is not switched by RAMRD, so trampoline code remains
-  executable from main memory during the copy.
-
-## Zero Page Trampoline Parameters
-
-`overlay.h` reserves `$9A-$9E`:
-
-- `$9A/$9B` `tramp_src` (AUX source address)
-- `$9C/$9D` `tramp_dst` (MAIN destination address)
-- `$9E` `tramp_pages` (page count; 8 for 2KB)
 
 ## Resident Jump Table (`$080F`)
 
@@ -167,7 +146,7 @@ offset, producing silent runtime corruption even when the overlay code itself is
 Example: diplomacy overlay as ID `6`, file `DSCR`.
 
 1. Create `src/ovl_diplomacy.c` with entry `void render_diplomacy_screen(void)`.
-   Access game state via the global `state` — no parameter needed.
+   Access game state via the global `state`; no parameter needed.
 2. Add to `include/overlay.h`:
 
 ```c
@@ -229,7 +208,6 @@ at `$0839`.
 | Area | Address | Capacity | Notes |
 |------|---------|----------|-------|
 | LOWCODE | `$0824-$1FFF` | ~3.9KB free (approx) | Most effective for reducing resident pressure |
-| AUX RAM | `$9000-$BEFF` | ~12KB | Available for future cache/expansion |
 | Language Card | `$D400-$DFFF` | 3KB | Separate RAM bank |
 
 Use `make memory-usage` to get the current used/free breakdown for resident
