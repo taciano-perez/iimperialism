@@ -81,7 +81,7 @@ OVERLAY_OBJECTS = \
 # Main compiler
 
 CC      = cl65
-CFLAGS  = -t apple2 -Oirs -I$(INCLUDE_DIR)
+CFLAGS  = -t apple2 -Osr -I$(INCLUDE_DIR)
 LDFLAGS = -t apple2 -C $(CONFIG_DIR)/apple2-hgr.cfg -Oirs
 
 # Overlay linker: raw 2KB binary, no startup, symbols from jump table
