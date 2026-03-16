@@ -218,7 +218,7 @@ void next_turn() {
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;
 
     // update turn number
-    state.turn_number++;
+    ++state.turn_number;
 }
 
  #pragma code-name (pop)

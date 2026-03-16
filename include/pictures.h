@@ -167,7 +167,7 @@ void draw_picture(const unsigned char picture_index, const unsigned char x_byte,
     // Start at index 2 to skip the header bytes
     const unsigned char *data_ptr = &picture_data[2];
 
-    for (i = 0; i < height; i++) {
+    for (i = 0; i < height; ++i) {
         // Calculate screen address for this row
         unsigned int screen_addr = HGR_ROWS[y + i] + x_byte;
 

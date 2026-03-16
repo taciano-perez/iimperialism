@@ -123,7 +123,7 @@ unsigned int scan_uint(int x, int y, unsigned int max_digits) {
             }
         } else if (ch == '\b' || ch == 127) { /* backspace or delete */
             if (len > 0) {
-                len--;
+                --len;
                 buffer[len] = '\0';
                 tgi_setcolor(TGI_COLOR_BLACK);
                 tgi_bar(x * CHAR_WIDTH, y * CHAR_HEIGHT,

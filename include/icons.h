@@ -134,7 +134,7 @@ void draw_custom_icon(int x, int y, const char* text) {
     while (*text) {
         draw_icon_char(x, y, *text);
         x += 7; // 7 pixels
-        text++;
+        ++text;
     }
 }
 

@@ -104,7 +104,7 @@ void render_battle_screen(register GameState *s) {
     print(0, 0, "Haxaco Navy");
     print(0, 1, STR_BATTLE_FIREPOWER);
     render_firepower(0, visible_friendly_ships);
-    for (i = 0; i < visible_friendly_ships; i++) {
+    for (i = 0; i < visible_friendly_ships; ++i) {
         unsigned char x_offset;
         unsigned char y_offset;
 
@@ -116,7 +116,7 @@ void render_battle_screen(register GameState *s) {
     print(23, 0, "Enemy Fleet");
     print(23, 1, STR_BATTLE_FIREPOWER);
     render_firepower(1, visible_enemy_ships);
-    for (i = 0; i < visible_enemy_ships; i++) {
+    for (i = 0; i < visible_enemy_ships; ++i) {
         unsigned char x_offset;
         unsigned char y_offset;
 

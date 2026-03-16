@@ -130,7 +130,7 @@ void draw_custom_text(int x, int y, const char* text) {
     while (*text) {
         draw_char(x, y, *text);
         x += 7; // 7 pixels
-        text++;
+        ++text;
     }
 }
 
