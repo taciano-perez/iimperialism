@@ -204,6 +204,35 @@ Avoid this when:
 - the data becomes large enough to outweigh the code savings
 - the layout is likely to change often
 
+## Use Direct HGR Writes For Aligned Text
+
+For this project, resident UI text is a special case worth handling separately:
+
+- `print()` always receives character-cell coordinates
+- glyphs are 7 pixels wide and 8 pixels tall
+- the hot path does not need transparency
+
+That makes text a good fit for direct HGR byte writes instead of `tgi_setpixel()`.
+
+The current implementation uses a resident assembly blitter in `asm/text_hgr.s`:
+
+- one HGR byte is written per glyph row
+- the blitter scans the string once per row and writes opaque bytes directly
+- a 128-byte lookup table reverses the source glyph bit order into Apple II HGR bit order
+- a 24-entry row-base table avoids recomputing HGR addresses for `y * 8`
+
+This is a good pattern when all of the following are true:
+
+- coordinates are already aligned to HGR byte boundaries
+- overwriting the background is acceptable
+- the path is hot enough that TGI call overhead dominates
+
+This is a bad pattern when:
+
+- text must be transparently composited over arbitrary graphics
+- callers need arbitrary pixel `x` positions
+- exact TGI color semantics matter more than speed
+
 ## Minimize Helper Surface Area
 
 Small helper functions are not always cheaper if they force extra argument setup or

@@ -217,57 +217,37 @@ The script generates:
 - Drawing function: `draw_char(int x, int y, char c)`
 - Text drawing: `draw_custom_text(int x, int y, const char* text)`
 
-## Integration with Apple II TGI
+## Integration with Apple II HGR
 
 ### Font Drawing Functions
 
-The generated `font.h` includes functions to render text.
+The generated `font.h` now exports the glyph table, and the runtime text renderer
+uses a dedicated assembly HGR blitter instead of per-pixel TGI calls.
 
 Current project note:
 
 - the source bitmap layout and `font_data[96][8]` format are unchanged
-- the runtime renderer in `include/font.h` has since been optimized beyond the
-  simple reference implementation shown below
-- text still renders through `tgi_setpixel()` for correctness, but the inner bit
-  tests are specialized to reduce overhead
+- `print()` in `src/ui.c` calls `draw_text_hgr_opaque(text, x, y)`
+- `asm/text_hgr.s` assumes character-grid alignment and writes one HGR byte per
+  glyph row
+- the assembly path reverses the 7-bit glyph row before writing because the
+  source font stores bit 6 as the leftmost pixel while Apple II HGR bytes use the
+  opposite bit order
+- the current fast path is opaque and does not preserve pixels under the text
 
 ```c
-void draw_char(int x, int y, char c) {
-    const unsigned char* data = get_font_data(c);
-    int row, col;
-    for (row = 0; row < 8; ++row) {
-        unsigned char line = data[row];
-        for (col = 0; col < 7; ++col) {
-            if (line & (1 << (6 - col))) {
-                tgi_setpixel(x + col, y + row);
-            }
-        }
-    }
-}
-
-void draw_custom_text(int x, int y, const char* text) {
-    while (*text) {
-        draw_char(x, y, *text);
-        x += 8; // 7 pixels + 1 space
-        text++;
-    }
+void print(unsigned char x, unsigned char y, const char* text) {
+    draw_text_hgr_opaque(text, x, y);
 }
 ```
 
 ### Usage Example
 
 ```c
-#include <tgi.h>
-#include "font.h"
+#include "game.h"
 
 int main(void) {
-    tgi_install(tgi_static_stddrv);
-    tgi_init();
-
-    tgi_setcolor(TGI_COLOR_WHITE);
-    draw_custom_text(10, 20, "Welcome to the World of Taipan!");
-
-    // ... rest of your code
+    print(10, 20, "Welcome to the World of Taipan!");
 }
 ```
 
@@ -397,7 +377,7 @@ def is_pixel_on(pixel):
 
 - `taipan-font.png` - Source font image (14×16 per character)
 - `extract_font.py` - Python script to convert PNG to C code
-- `font.h` - Generated C header with font data and drawing functions
+- `font.h` - Glyph table export and text blitter declaration
 - `T-BEFORE.PNG` - Example: letter 'T' at 14×16 pixels
 - `T-AFTER.PNG` - Example: letter 'T' at 7×8 pixels
 - `FONT.md` - This documentation

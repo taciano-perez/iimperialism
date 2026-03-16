@@ -62,6 +62,7 @@ in the diplomacy screen as text using these ranges:
 | `asm/ovl_trade_expedition_action_entry.s` | Fixed entry stub for trade expedition action overlay |
 | `asm/ovl_science_entry.s` | Fixed entry stub for science overlay |
 | `asm/ovl_asm.s` | AUX RAM copy and trampoline helpers |
+| `asm/text_hgr.s` | Aligned opaque HGR text blitter used by `print()` |
 | `asm/jmptab.s` | Resident jump table used by overlays |
 | `asm/werner.s` | Reserves HGR segment |
 | `asm/loader/loader.s` | Vendored cc65 loader source (patched for fixed target BIN) |
@@ -143,6 +144,8 @@ Overlay note:
 - the build generates `build/apple2-ovl.cfg` from `build/iimperialism.map`
 - overlays are linked against the generated file so `_state` stays in sync with the
   current resident layout
+- resident UI text now uses direct HGR byte writes from `asm/text_hgr.s`, so visual
+  verification in the emulator is still required after text-rendering changes
 
 In your setup (Git Bash on Windows), use:
 

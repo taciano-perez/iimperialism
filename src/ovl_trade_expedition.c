@@ -19,9 +19,9 @@ void render_trade_market(void) {
     print(1, PRICE_BOX_Y1-1, "Local market prices");
     box(0, PRICE_BOX_Y1, 39, PRICE_BOX_Y1+4);
     for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {
-        print_int(0, PRICE_BOX_Y1 + 1 + i, i+1);
-        print(1, PRICE_BOX_Y1 + 1 + i, ")");
-        print(2, PRICE_BOX_Y1 + 1 + i, get_resource_name(state.foreign_nations[nation_index].imports[i]));
+        print_int(1, PRICE_BOX_Y1 + 1 + i, i+1);
+        print(2, PRICE_BOX_Y1 + 1 + i, ")");
+        print(3, PRICE_BOX_Y1 + 1 + i, get_resource_name(state.foreign_nations[nation_index].imports[i]));
         print_int_right_aligned(14, PRICE_BOX_Y1 + 1 + i, state.foreign_nations[nation_index].import_prices[i]);
 
         print_int(19, PRICE_BOX_Y1 + 1 + i, i+4);

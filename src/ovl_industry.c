@@ -36,13 +36,13 @@ void render_industry_screen(void) {
     print((BOX_X1+13), (BOX_Y1+3), "Steel: ");
     print_int_right_aligned((BOX_X1+23), (BOX_Y1+3), state.production_steel);
     print((BOX_X1+25), (BOX_Y1+1), "Furniture: ");
-    print_int_right_aligned((BOX_X1+39), (BOX_Y1+1), state.production_furniture);
+    print_int_right_aligned((BOX_X1+38), (BOX_Y1+1), state.production_furniture);
     print((BOX_X1+25), (BOX_Y1+2), "Clothes: ");
-    print_int_right_aligned((BOX_X1+39), (BOX_Y1+2), state.production_clothes);
+    print_int_right_aligned((BOX_X1+38), (BOX_Y1+2), state.production_clothes);
     print((BOX_X1+25), (BOX_Y1+3), "Tools: ");
-    print_int_right_aligned((BOX_X1+39), (BOX_Y1+3), state.production_tools);
+    print_int_right_aligned((BOX_X1+38), (BOX_Y1+3), state.production_tools);
     print((BOX_X1+25), (BOX_Y1+4), "Guns: ");
-    print_int_right_aligned((BOX_X1+39), (BOX_Y1+4), state.production_guns);
+    print_int_right_aligned((BOX_X1+38), (BOX_Y1+4), state.production_guns);
 
     /* ADVISOR */
     draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);

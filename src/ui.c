@@ -49,14 +49,7 @@ void paint_area(unsigned char x, unsigned char y, unsigned char width, unsigned 
 }
 
 void print (unsigned char x, unsigned char y, const char* text) {
-    int px = x * CHAR_WIDTH;
-    int py = y * CHAR_HEIGHT;
-
-    while (*text) {
-        draw_glyph(px, py, font_data[font_char_index(*text)]);
-        px += CHAR_WIDTH;
-        ++text;
-    }
+    draw_text_hgr_opaque(text, x, y);
 }
 
 void print_right_aligned(unsigned char x, unsigned char y, const char* text) {
@@ -85,10 +78,10 @@ void draw_picture_at(const unsigned char picture_index, const unsigned char x_by
 }
 
 void box (unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2) {
-    tgi_line (x1*CHAR_WIDTH, y1*CHAR_HEIGHT, x1*CHAR_WIDTH, y2*CHAR_HEIGHT);
-    tgi_line (x1*CHAR_WIDTH, y1*CHAR_HEIGHT, x2*CHAR_WIDTH+(CHAR_WIDTH-1), y1*CHAR_HEIGHT);
-    tgi_line (x2*CHAR_WIDTH+(CHAR_WIDTH-1), y1*CHAR_HEIGHT, x2*CHAR_WIDTH+(CHAR_WIDTH-1), y2*CHAR_HEIGHT);
-    tgi_line (x1*CHAR_WIDTH, y2*CHAR_HEIGHT, x2*CHAR_WIDTH+(CHAR_WIDTH-1), y2*CHAR_HEIGHT);
+    tgi_line (x1*CHAR_WIDTH, y1*CHAR_HEIGHT, x1*CHAR_WIDTH, y2*CHAR_HEIGHT); // left
+    tgi_line (x1*CHAR_WIDTH, y1*CHAR_HEIGHT-1, x2*CHAR_WIDTH+(CHAR_WIDTH-1), y1*CHAR_HEIGHT-1); // top
+    tgi_line (x2*CHAR_WIDTH+(CHAR_WIDTH-1), y1*CHAR_HEIGHT, x2*CHAR_WIDTH+(CHAR_WIDTH-1), y2*CHAR_HEIGHT); // right
+    tgi_line (x1*CHAR_WIDTH, y2*CHAR_HEIGHT, x2*CHAR_WIDTH+(CHAR_WIDTH-1), y2*CHAR_HEIGHT); // bottom
 }
 
 /* Read a single character from the keyboard, echoing it at (x, y). */

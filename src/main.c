@@ -35,13 +35,13 @@ void render_warehouse_box() {
     print_int_right_aligned((BOX1_X1+23), (BOX1_Y1+3), state.resources[RESOURCE_STEEL]);
 
     print((BOX1_X1+25), (BOX1_Y1+1), "Furniture:");
-    print_int_right_aligned((BOX1_X1+39), (BOX1_Y1+1), state.resources[RESOURCE_FURNITURE]);
+    print_int_right_aligned((BOX1_X1+38), (BOX1_Y1+1), state.resources[RESOURCE_FURNITURE]);
     print((BOX1_X1+25), (BOX1_Y1+2), "Clothes:");
-    print_int_right_aligned((BOX1_X1+39), (BOX1_Y1+2), state.resources[RESOURCE_CLOTHES]);
+    print_int_right_aligned((BOX1_X1+38), (BOX1_Y1+2), state.resources[RESOURCE_CLOTHES]);
     print((BOX1_X1+25), (BOX1_Y1+3), "Tools:");
-    print_int_right_aligned((BOX1_X1+39), (BOX1_Y1+3), state.resources[RESOURCE_TOOLS]);
+    print_int_right_aligned((BOX1_X1+38), (BOX1_Y1+3), state.resources[RESOURCE_TOOLS]);
     print((BOX1_X1+25), (BOX1_Y1+4), "Guns:");
-    print_int_right_aligned((BOX1_X1+39), (BOX1_Y1+4), state.resources[RESOURCE_GUNS]);
+    print_int_right_aligned((BOX1_X1+38), (BOX1_Y1+4), state.resources[RESOURCE_GUNS]);
 }
 
 void set_selected_trade_nation(unsigned char nation_index) {

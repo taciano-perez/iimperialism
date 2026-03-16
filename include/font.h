@@ -1,15 +1,13 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include <tgi.h>
-
 #define FONT_FIRST_CHAR 32
 #define FONT_LAST_CHAR 127
 #define FONT_GLYPH_WIDTH 7
 #define FONT_GLYPH_HEIGHT 8
 /* Taipan font downscaled to 7x8 pixels */
 /* Each byte is one row of 7 pixels (bits 0-6) */
-static const unsigned char font_data[96][8] = {
+const unsigned char font_data[96][8] = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, //
     {0x08, 0x08, 0x08, 0x08, 0x00, 0x00, 0x08, 0x00}, // !
     {0x36, 0x36, 0x36, 0x00, 0x00, 0x00, 0x00, 0x00}, // "
@@ -108,31 +106,6 @@ static const unsigned char font_data[96][8] = {
     {0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F}, // (full block)
 };
 
-static unsigned char font_char_index(char c) {
-    unsigned char uc = (unsigned char)c;
-    if (uc < FONT_FIRST_CHAR || uc > FONT_LAST_CHAR) {
-        uc = FONT_FIRST_CHAR;
-    }
-    return (unsigned char)(uc - FONT_FIRST_CHAR);
-}
-
-#define FONT_DRAW_ROW(line, px, py)      \
-    do {                                 \
-        if ((line) & 0x40u) tgi_setpixel((px) + 0, (py)); \
-        if ((line) & 0x20u) tgi_setpixel((px) + 1, (py)); \
-        if ((line) & 0x10u) tgi_setpixel((px) + 2, (py)); \
-        if ((line) & 0x08u) tgi_setpixel((px) + 3, (py)); \
-        if ((line) & 0x04u) tgi_setpixel((px) + 4, (py)); \
-        if ((line) & 0x02u) tgi_setpixel((px) + 5, (py)); \
-        if ((line) & 0x01u) tgi_setpixel((px) + 6, (py)); \
-    } while (0)
-
-static void draw_glyph(int x, int y, const unsigned char* glyph) {
-    unsigned char row;
-
-    for (row = 0; row < FONT_GLYPH_HEIGHT; ++row) {
-        FONT_DRAW_ROW(glyph[row], x, y + row);
-    }
-}
+void draw_text_hgr_opaque(const char* text, unsigned char x_byte, unsigned char y_char);
 
 #endif

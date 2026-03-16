@@ -24,6 +24,12 @@ $8800-$8FFF  OVERLAY_AUX_SLOT   (single 2KB cached overlay copy)
 $9000-$BEFF  Available AUX RAM  (currently unused by loader)
 ```
 
+Current resident note:
+
+- `print()` uses the aligned HGR text blitter in `asm/text_hgr.s`, which lives in
+  `LOWCODE` and trades a small amount of resident code and lookup-table data for
+  much faster text rendering
+
 ## Why the Main Binary Is Large
 
 The main binary includes a zero-filled gap between LOWCODE and CODE because:

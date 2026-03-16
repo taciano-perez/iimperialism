@@ -9,7 +9,7 @@ void render_transport_screen(void) {
     clear_screen();
     print(0, 0, "Transport Orders");
     print(34, 0, "Turn:");
-    print_int_right_aligned(39, 0, state.turn_number);
+    print_int_right_aligned(38, 0, state.turn_number);
     render_warehouse_box();
 
     box(BOX_X1, BOX_Y1, BOX_X2, BOX_Y2);
