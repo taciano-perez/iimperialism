@@ -69,7 +69,7 @@ static void handle_ship_hit(unsigned char is_enemy,
         return;
     }
 
-    ship_index = (unsigned char)rand_range(0, *ship_count - 1);
+    ship_index = rand_range(0, *ship_count - 1);
     get_ship_position(is_enemy, ship_index, &x_offset, &y_offset);
 
     animate_ship_hit(is_enemy, x_offset, y_offset);

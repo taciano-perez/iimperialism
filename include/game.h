@@ -138,7 +138,7 @@ extern GameState state;
 void init_game();
 void next_turn();
 void seed_random(unsigned int seed);
-unsigned int rand_range(unsigned int min, unsigned int max);
+unsigned char rand_range(unsigned char min, unsigned char max);
 
 // ui.c
 void ui_init();
@@ -164,7 +164,7 @@ void set_selected_trade_nation(unsigned char nation_index);
 unsigned char get_selected_trade_nation(void);
 unsigned int get_trade_max_quantity(unsigned char mode, unsigned char resource, unsigned int price);
 void apply_trade(unsigned char mode, unsigned char resource, unsigned int quantity, unsigned int price);
-unsigned int rand_range(unsigned int min, unsigned int max);
+unsigned char rand_range(unsigned char min, unsigned char max);
 
 // gamestate.c
 int save_game(const GameState* state);

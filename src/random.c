@@ -7,15 +7,15 @@ void seed_random(unsigned int seed) {
     srand(seed);
 }
 
-unsigned int rand_range(unsigned int min, unsigned int max) {
-    unsigned long span;
+unsigned char rand_range(unsigned char min, unsigned char max) {
+    unsigned char span;
 
     if (min >= max) {
         return min;
     }
 
-    span = (unsigned long)(max - min) + 1UL;
-    return min + ((unsigned long)rand() % span);
+    span = max - min + 1;
+    return min + ((unsigned int)rand() % span);
 }
 
 #pragma code-name (pop)
