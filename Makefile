@@ -86,7 +86,8 @@ LDFLAGS = -t apple2 -C $(CONFIG_DIR)/apple2-hgr.cfg -Oirs
 
 # Overlay linker: raw 2KB binary, no startup, symbols from jump table
 OVL_CC = cl65
-OVL_LDFLAGS = -t apple2 -C $(CONFIG_DIR)/apple2-ovl.cfg -Oirs
+OVL_CFG = $(BUILD_DIR)/apple2-ovl.cfg
+OVL_LDFLAGS = -t apple2 -C $(OVL_CFG) -Oirs
 
 # Disk image tool (AppleCommander)
 AC = java -jar $(TOOLS_DIR)/ac.jar
@@ -134,6 +135,15 @@ overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BU
 iimperialism: $(MAIN_OBJECTS) | $(BUILD_DIR)
 	$(CC) $(LDFLAGS) -o $(BUILD_DIR)/iimperialism -m $(BUILD_DIR)/iimperialism.map $(MAIN_OBJECTS)
 
+$(OVL_CFG): iimperialism $(CONFIG_DIR)/apple2-ovl.cfg | $(BUILD_DIR)
+ifeq ($(OS),Windows_NT)
+	powershell.exe -NoProfile -Command "$$line = (Select-String -Path '$(BUILD_DIR)/iimperialism.map' -Pattern '_state' | Select-Object -First 1).Line; if (-not $$line) { throw 'Could not find _state in map file.' }; $$parts = $$line -split '_state'; if ($$parts.Length -lt 2) { throw 'Could not parse _state address.' }; $$token = ($$parts[1].Trim().Split()[0]); if ($$token.Length -lt 6) { throw 'Could not parse _state address.' }; $$state = $$token.Substring(2).ToUpper(); $$content = Get-Content '$(CONFIG_DIR)/apple2-ovl.cfg'; $$content = $$content | ForEach-Object { if ($$_ -like '*_state:*') { '_state:                    type = export, value = $$' + $$state + ';' } else { $$_ } }; Set-Content '$(OVL_CFG)' $$content"
+else
+	@state_addr=$$(grep -Eo '_state[[:space:]]+00[0-9A-Fa-f]{4}[[:space:]]+RLA' $(BUILD_DIR)/iimperialism.map | head -n 1 | sed -E 's/.*00([0-9A-Fa-f]{4}).*/\1/'); \
+	test -n "$$state_addr"; \
+	sed -E "s/_state:[[:space:]]+type = export, value = \\$[0-9A-Fa-f]{4};/_state:                    type = export, value = \$$$state_addr;/" $(CONFIG_DIR)/apple2-ovl.cfg > $(OVL_CFG)
+endif
+
 $(BUILD_DIR):
 ifeq ($(OS),Windows_NT)
 	powershell.exe -NoProfile -Command "New-Item -ItemType Directory -Force '$(BUILD_DIR)' | Out-Null"
@@ -151,37 +161,37 @@ $(BUILD_DIR)/%.o: $(ASM_DIR)/%.s | $(BUILD_DIR)
 # Overlay binaries: raw 2KB images, zero-padded to exactly 2048 bytes.
 # Must be on the disk alongside the main binary (DOS 3.3 type B).
 # File names: ISCR, PSCR, TSCR  (use 'make disk' to update iimperialism.dsk)
-$(BUILD_DIR)/iscr.bin: $(BUILD_DIR)/ovl_industry.o | $(BUILD_DIR)
+$(BUILD_DIR)/iscr.bin: $(BUILD_DIR)/ovl_industry.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/ovl_industry.o
 
-$(BUILD_DIR)/pscr.bin: $(BUILD_DIR)/ovl_production.o | $(BUILD_DIR)
+$(BUILD_DIR)/pscr.bin: $(BUILD_DIR)/ovl_production.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/ovl_production.o
 
-$(BUILD_DIR)/tscr.bin: $(BUILD_DIR)/ovl_transport.o | $(BUILD_DIR)
+$(BUILD_DIR)/tscr.bin: $(BUILD_DIR)/ovl_transport.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ovl_transport.o
 
-$(BUILD_DIR)/ascr.bin: $(BUILD_DIR)/ovl_admiralty.o | $(BUILD_DIR)
+$(BUILD_DIR)/ascr.bin: $(BUILD_DIR)/ovl_admiralty.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/ovl_admiralty.o
 
-$(BUILD_DIR)/atrd.bin: $(BUILD_DIR)/ovl_admiralty_trader.o | $(BUILD_DIR)
+$(BUILD_DIR)/atrd.bin: $(BUILD_DIR)/ovl_admiralty_trader.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/atrd.bin $(BUILD_DIR)/ovl_admiralty_trader.o
 
-$(BUILD_DIR)/awrs.bin: $(BUILD_DIR)/ovl_admiralty_warship.o | $(BUILD_DIR)
+$(BUILD_DIR)/awrs.bin: $(BUILD_DIR)/ovl_admiralty_warship.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/awrs.bin $(BUILD_DIR)/ovl_admiralty_warship.o
 
-$(BUILD_DIR)/dscr.bin: $(BUILD_DIR)/ovl_diplomacy_entry.o $(BUILD_DIR)/ovl_diplomacy.o | $(BUILD_DIR)
+$(BUILD_DIR)/dscr.bin: $(BUILD_DIR)/ovl_diplomacy_entry.o $(BUILD_DIR)/ovl_diplomacy.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/ovl_diplomacy_entry.o $(BUILD_DIR)/ovl_diplomacy.o
 
-$(BUILD_DIR)/texp.bin: $(BUILD_DIR)/ovl_trade_expedition_entry.o $(BUILD_DIR)/ovl_trade_expedition.o | $(BUILD_DIR)
+$(BUILD_DIR)/texp.bin: $(BUILD_DIR)/ovl_trade_expedition_entry.o $(BUILD_DIR)/ovl_trade_expedition.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/texp.bin $(BUILD_DIR)/ovl_trade_expedition_entry.o $(BUILD_DIR)/ovl_trade_expedition.o
 
-$(BUILD_DIR)/txac.bin: $(BUILD_DIR)/ovl_trade_expedition_action_entry.o $(BUILD_DIR)/ovl_trade_expedition_action.o | $(BUILD_DIR)
+$(BUILD_DIR)/txac.bin: $(BUILD_DIR)/ovl_trade_expedition_action_entry.o $(BUILD_DIR)/ovl_trade_expedition_action.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/txac.bin $(BUILD_DIR)/ovl_trade_expedition_action_entry.o $(BUILD_DIR)/ovl_trade_expedition_action.o
 
-$(BUILD_DIR)/bscr.bin: $(BUILD_DIR)/ovl_battle_entry.o $(BUILD_DIR)/ovl_battle.o | $(BUILD_DIR)
+$(BUILD_DIR)/bscr.bin: $(BUILD_DIR)/ovl_battle_entry.o $(BUILD_DIR)/ovl_battle.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/bscr.bin $(BUILD_DIR)/ovl_battle_entry.o $(BUILD_DIR)/ovl_battle.o
 
-$(BUILD_DIR)/sscr.bin: $(BUILD_DIR)/ovl_science_entry.o $(BUILD_DIR)/ovl_science.o | $(BUILD_DIR)
+$(BUILD_DIR)/sscr.bin: $(BUILD_DIR)/ovl_science_entry.o $(BUILD_DIR)/ovl_science.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/sscr.bin $(BUILD_DIR)/ovl_science_entry.o $(BUILD_DIR)/ovl_science.o
 
 $(BUILD_DIR)/ovl_diplomacy_entry.o: $(ASM_DIR)/ovl_diplomacy_entry.s | $(BUILD_DIR)

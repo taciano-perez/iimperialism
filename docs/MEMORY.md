@@ -79,7 +79,7 @@ Runtime flow (`run_overlay(id)`):
 5. Set ZP trampoline parameters (`$9A-$9E`) for AUX -> MAIN copy.
 6. Call trampoline at `$0100` to copy AUX -> MAIN with RAMRD enabled.
 7. Execute overlay entry at `$8800` (no arguments — overlays access `state` directly
-   via the hardcoded `_state` symbol exported in `apple2-ovl.cfg`).
+   via the `_state` symbol exported in the generated overlay linker config).
 
 The runtime overlay path intentionally avoids `fopen()` / `fread()`. Direct
 MLI calls are more robust under the game's current resident memory pressure
@@ -138,27 +138,24 @@ Rule: never change existing entry addresses. Append only.
 
 ## `_state` Address in Overlay Config
 
-Overlays access `GameState state` directly via `_state`, exported as a fixed address
-in the `SYMBOLS` block of `config/apple2-ovl.cfg`:
+Overlays access `GameState state` directly via `_state`.
 
-```
-_state: type = export, value = $8026;
-```
+`config/apple2-ovl.cfg` is now a template. During the build, `Makefile` generates
+`build/apple2-ovl.cfg` by reading the current `_state` address from
+`build/iimperialism.map` and rewriting the `_state` symbol before linking overlays.
 
-This address is the BSS start, which is determined by the combined size of CODE +
-RODATA + DATA + INIT in the resident binary. **It changes whenever any of those
-segments grow or shrink.**
+This address is still determined by the combined size of resident `CODE + RODATA +
+DATA + INIT`, so any resident-code size change can move it.
 
-After any build that touches resident code, verify the address is still correct:
+Practical rules:
 
-```bash
-grep "_state" build/iimperialism.map
-```
+- do a full rebuild after resident-code changes
+- use `make memory-usage` to confirm the resident layout
+- if overlays show garbage values, compare `_state` in `build/iimperialism.map` and
+  `build/apple2-ovl.cfg`
 
-If the map shows a different address, update `apple2-ovl.cfg` to match before
-running the game. A stale address causes every overlay to read `GameState` fields
-from the wrong offset, producing silent garbage values at runtime with no linker
-error or warning.
+A stale `_state` address causes overlays to read `GameState` fields from the wrong
+offset, producing silent runtime corruption even when the overlay code itself is correct.
 
 ## Adding a New Overlay
 

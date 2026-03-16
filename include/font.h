@@ -3,6 +3,10 @@
 
 #include <tgi.h>
 
+#define FONT_FIRST_CHAR 32
+#define FONT_LAST_CHAR 127
+#define FONT_GLYPH_WIDTH 7
+#define FONT_GLYPH_HEIGHT 8
 /* Taipan font downscaled to 7x8 pixels */
 /* Each byte is one row of 7 pixels (bits 0-6) */
 static const unsigned char font_data[96][8] = {
@@ -104,34 +108,43 @@ static const unsigned char font_data[96][8] = {
     {0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F}, // (full block)
 };
 
-/* Map characters to indices in font_data */
-static const unsigned char* get_font_data(char c) {
+static unsigned char font_char_index(char c) {
     unsigned char uc = (unsigned char)c;
-    if (uc < 32 || uc > 127) {
-        uc = 32; // Default to space for out of range
+    if (uc < FONT_FIRST_CHAR || uc > FONT_LAST_CHAR) {
+        uc = FONT_FIRST_CHAR;
     }
-    return font_data[uc - 32];
+    return (unsigned char)(uc - FONT_FIRST_CHAR);
 }
 
-void draw_char(int x, int y, char c) {
-    const unsigned char* data = get_font_data(c);
-    int row, col;
-    for (row = 0; row < 8; ++row) {
-        unsigned char line = data[row];
-        for (col = 0; col < 7; ++col) {
-            if (line & (1 << (6 - col))) {
-                tgi_setpixel(x + col, y + row);
-            }
-        }
+#define FONT_DRAW_ROW(line, px, py)      \
+    do {                                 \
+        if ((line) & 0x40u) tgi_setpixel((px) + 0, (py)); \
+        if ((line) & 0x20u) tgi_setpixel((px) + 1, (py)); \
+        if ((line) & 0x10u) tgi_setpixel((px) + 2, (py)); \
+        if ((line) & 0x08u) tgi_setpixel((px) + 3, (py)); \
+        if ((line) & 0x04u) tgi_setpixel((px) + 4, (py)); \
+        if ((line) & 0x02u) tgi_setpixel((px) + 5, (py)); \
+        if ((line) & 0x01u) tgi_setpixel((px) + 6, (py)); \
+    } while (0)
+
+static void draw_glyph(int x, int y, const unsigned char* glyph) {
+    unsigned char row;
+
+    for (row = 0; row < FONT_GLYPH_HEIGHT; ++row) {
+        FONT_DRAW_ROW(glyph[row], x, y + row);
     }
 }
 
-void draw_custom_text(int x, int y, const char* text) {
+#define draw_char(x, y, c) draw_glyph((x), (y), font_data[font_char_index(c)])
+
+static void draw_custom_text(int x, int y, const char* text) {
     while (*text) {
         draw_char(x, y, *text);
-        x += 7; // 7 pixels
+        x += FONT_GLYPH_WIDTH;
         ++text;
     }
 }
+
+#undef FONT_DRAW_ROW
 
 #endif

@@ -70,7 +70,8 @@ in the diplomacy screen as text using these ranges:
 | `include/ui_buffers.h` | Shared UI buffer declarations |
 | `include/overlay.h` | Overlay IDs, filenames, trampoline ZP macros |
 | `config/apple2-hgr.cfg` | Main linker config |
-| `config/apple2-ovl.cfg` | Overlay linker config |
+| `config/apple2-ovl.cfg` | Overlay linker config template |
+| `build/apple2-ovl.cfg` | Generated overlay linker config with current `_state` address |
 | `assets/iimperialism.dsk` | ProDOS disk image |
 | `Makefile` | Build rules for main binary, overlay entry stubs, overlays, loader, and disk |
 | `build-run.sh` | Build + disk update + emulator launch helper |
@@ -136,6 +137,13 @@ To inspect resident memory usage and overlay occupancy:
 make memory-usage
 ```
 
+Overlay note:
+
+- `config/apple2-ovl.cfg` is a template
+- the build generates `build/apple2-ovl.cfg` from `build/iimperialism.map`
+- overlays are linked against the generated file so `_state` stays in sync with the
+  current resident layout
+
 In your setup (Git Bash on Windows), use:
 
 ```bash
@@ -173,8 +181,9 @@ BRUN IIMPERIALISM
 This runs a build, updates the disk image, and launches the emulator.
 
 When adding a new screen as an overlay, see `docs/MEMORY.md` under
-"Adding a New Overlay". Note the `_state` address warning in that document — it
-must be re-verified after any change that affects resident code size.
+"Adding a New Overlay". After any resident-code size change, do a full rebuild so
+the generated `build/apple2-ovl.cfg` picks up the current `_state` address before
+overlays are relinked.
 
 ## TODO
 

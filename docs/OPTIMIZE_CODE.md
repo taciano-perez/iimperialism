@@ -278,13 +278,13 @@ Passing a pointer to `GameState` as a parameter to every overlay entry function 
 expensive: the caller pushes the pointer, the overlay function receives it, and every
 field access is indirect through a register.
 
-A better architecture is to export the fixed address of `_state` from the resident linker
+A better architecture is to export the current address of `_state` into the overlay linker
 config so overlays can reference `state` directly as an `extern`:
 
-1. Find `_state`'s address in `iimperialism.map` (it is the first BSS symbol).
-2. Add the export to `config/apple2-ovl.cfg`:
+1. Find `_state`'s address in `build/iimperialism.map` (it is the first BSS symbol).
+2. Generate `build/apple2-ovl.cfg` from `config/apple2-ovl.cfg` with that `_state` export:
    ```
-   _state: type = export, value = $802E;
+   _state: type = export, value = $809F;
    ```
 3. Remove `GameState *s` / `register GameState *s` parameters from all overlay functions.
 4. Remove `#define state (*s)` from each overlay file.
@@ -294,17 +294,18 @@ This was applied to all 11 overlays and saved **~1,017 bytes** of overlay code w
 BSS growth and no change in behavior. It is the highest-value single architectural
 change available in this codebase.
 
-**Critical:** the hardcoded address in `apple2-ovl.cfg` must be re-verified from
-`iimperialism.map` after **any** change that grows or shrinks the resident CODE, RODATA,
-DATA, or INIT segments — because those segments precede BSS, and any size change shifts
-`_state`'s address. If the address is stale, every overlay will read `GameState` fields
-from the wrong offset, silently producing garbage values at runtime.
+**Critical:** overlays must be relinked against a freshly generated
+`build/apple2-ovl.cfg` after **any** change that grows or shrinks the resident CODE,
+RODATA, DATA, or INIT segments — because those segments precede BSS, and any size
+change shifts `_state`'s address. If the generated config is stale, every overlay will
+read `GameState` fields from the wrong offset, silently producing garbage values at runtime.
 
 After each build that touches resident code, run:
 ```
-grep "_state" build/iimperialism.map
+make memory-usage
 ```
-and confirm the address matches the value in `apple2-ovl.cfg`.
+If overlays behave incorrectly after a resident change, compare `_state` in
+`build/iimperialism.map` and `build/apple2-ovl.cfg`.
 
 ## Compiler Flag Pitfalls
 

@@ -221,7 +221,15 @@ The script generates:
 
 ### Font Drawing Functions
 
-The generated `font.h` includes functions to render text:
+The generated `font.h` includes functions to render text.
+
+Current project note:
+
+- the source bitmap layout and `font_data[96][8]` format are unchanged
+- the runtime renderer in `include/font.h` has since been optimized beyond the
+  simple reference implementation shown below
+- text still renders through `tgi_setpixel()` for correctness, but the inner bit
+  tests are specialized to reduce overhead
 
 ```c
 void draw_char(int x, int y, char c) {
