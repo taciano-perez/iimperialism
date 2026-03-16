@@ -135,16 +135,4 @@ static void draw_glyph(int x, int y, const unsigned char* glyph) {
     }
 }
 
-#define draw_char(x, y, c) draw_glyph((x), (y), font_data[font_char_index(c)])
-
-static void draw_custom_text(int x, int y, const char* text) {
-    while (*text) {
-        draw_char(x, y, *text);
-        x += FONT_GLYPH_WIDTH;
-        ++text;
-    }
-}
-
-#undef FONT_DRAW_ROW
-
 #endif

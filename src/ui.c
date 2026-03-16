@@ -49,7 +49,14 @@ void paint_area(unsigned char x, unsigned char y, unsigned char width, unsigned 
 }
 
 void print (unsigned char x, unsigned char y, const char* text) {
-    draw_custom_text (x*CHAR_WIDTH, y*CHAR_HEIGHT, text);
+    int px = x * CHAR_WIDTH;
+    int py = y * CHAR_HEIGHT;
+
+    while (*text) {
+        draw_glyph(px, py, font_data[font_char_index(*text)]);
+        px += CHAR_WIDTH;
+        ++text;
+    }
 }
 
 void print_right_aligned(unsigned char x, unsigned char y, const char* text) {
