@@ -94,7 +94,12 @@ Persistence is handled in `src/gamestate.c` via `GAME.DATA`.
 
 - Main binary is resident code + LOWCODE + shared data.
 - Overlays are 2KB binaries loaded into `$8800` on demand.
-- Overlay calls to resident helpers go through fixed jump table entries (`asm/jmptab.s`).
+- Overlay calls to resident helpers go through jump table entries in
+  `asm/jmptab.s`, with matching symbol addresses exported from
+  `config/apple2-ovl.cfg`.
+- After changing the jump table or resident layout, rebuild overlays so the
+  generated `build/apple2-ovl.cfg` picks up the current `_state` address and
+  resident helper entry points.
 
 See `docs/MEMORY.md` for exact map and loader flow.
 

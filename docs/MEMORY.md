@@ -9,7 +9,7 @@ $0118-$01FF  6502 hardware stack
 $0200-$03FF  System / ProDOS vectors
 $0400-$07FF  Text screen page 1
 $0803-$080E  STARTUP            (cc65 crt0)
-$080F-$083B  JMPTAB             (resident jump table used by overlays)
+$080F-$0841  JMPTAB             (resident jump table used by overlays)
 $0824-$1FFF  LOWCODE            (resident UI + core logic)
 $2000-$3FFF  HGR page 1         (graphics memory; no code here)
 $4000-...    CODE/RODATA/DATA   (main resident code + data)
@@ -134,13 +134,12 @@ $0830  JMP _get_relation_name
 $0833  JMP _set_selected_trade_nation
 $0836  JMP _get_selected_trade_nation
 $0839  JMP _clear_area
-$083C  JMP _get_trade_max_quantity
-$083F  JMP _apply_trade
-$0842  JMP _paint_area
-$0845  JMP _rand_range
+$083C  JMP _paint_area
+$083F  JMP _rand_range
 ```
 
-Rule: never change existing entry addresses. Append only.
+Rule: keep `asm/jmptab.s` and `config/apple2-ovl.cfg` in sync. Rebuild overlays
+after any jump-table change so they relink against the new addresses.
 
 ## `_state` Address in Overlay Config
 
@@ -223,8 +222,7 @@ $(AC) -p $(DISK) DSCR BIN 0x8800 < $(BUILD_DIR)/dscr.bin
 If the overlay needs a resident function not in JMPTAB, append a new JMP entry in
 `asm/jmptab.s`, export it from `config/apple2-ovl.cfg`, and declare it in
 `include/game.h`. Current examples include `clear_area(int x, int y, int width, int height)`
-at `$0839` and the resident trade helpers `get_trade_max_quantity()` / `apply_trade()`
-at `$083C` and `$083F`.
+at `$0839`.
 
 ## Expansion Areas
 

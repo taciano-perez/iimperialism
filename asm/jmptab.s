@@ -17,10 +17,8 @@
 ;  $0833  JMP _set_selected_trade_nation
 ;  $0836  JMP _get_selected_trade_nation
 ;  $0839  JMP _clear_area
-;  $083C  JMP _get_trade_max_quantity
-;  $083F  JMP _apply_trade
-;  $0842  JMP _paint_area
-;  $0845  JMP _rand_range
+;  $083C  JMP _paint_area
+;  $083F  JMP _rand_range
 
     .import _clear_screen
     .import _clear_input_area
@@ -37,8 +35,6 @@
     .import _set_selected_trade_nation
     .import _get_selected_trade_nation
     .import _clear_area
-    .import _get_trade_max_quantity
-    .import _apply_trade
     .import _paint_area
     .import _rand_range
 
@@ -59,7 +55,5 @@
     jmp _set_selected_trade_nation  ; $0833
     jmp _get_selected_trade_nation  ; $0836
     jmp _clear_area                 ; $0839
-    jmp _get_trade_max_quantity     ; $083C
-    jmp _apply_trade                ; $083F
-    jmp _paint_area                 ; $0842
-    jmp _rand_range                 ; $0845
+    jmp _paint_area                 ; $083C
+    jmp _rand_range                 ; $083F

@@ -79,10 +79,11 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
                 resource = trade_list[i];
                 if (mode == TRADE_MODE_BUY) {
                     price = state.foreign_nations[nation_index].export_prices[i];
+                    max_quantity = MIN(state.remaining_turn_capacity, state.money / price);
                 } else {
                     price = state.foreign_nations[nation_index].import_prices[i];
+                    max_quantity = MIN(state.remaining_turn_capacity, state.resources[resource]);
                 }
-                max_quantity = get_trade_max_quantity(mode, resource, price);
 
                 while (1) {
                     clear_area(28, 22, 3, 1);
@@ -90,7 +91,14 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
                     print_int_right_aligned(23, 22, max_quantity);
                     quantity = scan_uint(28, 22, 3);
                     if (quantity <= max_quantity) {
-                        apply_trade(mode, resource, quantity, price);
+                        state.remaining_turn_capacity -= quantity;
+                        if (mode == TRADE_MODE_BUY) {
+                            state.resources[resource] += quantity;
+                            state.money -= quantity * price;
+                        } else {
+                            state.resources[resource] -= quantity;
+                            state.money += quantity * price;
+                        }
                         return;
                     }
                 }

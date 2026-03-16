@@ -198,7 +198,6 @@ overlays are relinked.
   - add sound effects
 - Expand the science tree with wagon capacity improvements
 - Refactor for saving memory
-  - reuse buffers in ui.c
   - Unless we need it for country name, remove cgetc_at from ui.c
 - Add main menu
 - Add save/load/quit screen

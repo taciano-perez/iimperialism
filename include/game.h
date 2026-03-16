@@ -163,8 +163,6 @@ const char* get_resource_name(unsigned char resource);
 const char* get_relation_name(unsigned char relation);
 void set_selected_trade_nation(unsigned char nation_index);
 unsigned char get_selected_trade_nation(void);
-unsigned int get_trade_max_quantity(unsigned char mode, unsigned char resource, unsigned int price);
-void apply_trade(unsigned char mode, unsigned char resource, unsigned int quantity, unsigned int price);
 unsigned char rand_range(unsigned char min, unsigned char max);
 
 // gamestate.c
