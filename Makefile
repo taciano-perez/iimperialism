@@ -60,7 +60,6 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/logic.o \
 	$(BUILD_DIR)/overlay.o \
 	$(BUILD_DIR)/prodos_overlay_load.o \
-	$(BUILD_DIR)/prodos_gamestate_io.o \
 	$(BUILD_DIR)/jmptab.o
 
 OVERLAY_OBJECTS = \
@@ -183,8 +182,8 @@ $(BUILD_DIR)/bscr.bin: $(BUILD_DIR)/ovl_battle_entry.o $(BUILD_DIR)/ovl_battle.o
 $(BUILD_DIR)/sscr.bin: $(BUILD_DIR)/ovl_science_entry.o $(BUILD_DIR)/ovl_science.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/sscr.bin $(BUILD_DIR)/ovl_science_entry.o $(BUILD_DIR)/ovl_science.o
 
-$(BUILD_DIR)/menu.bin: $(BUILD_DIR)/ovl_game_menu.o $(OVL_CFG) | $(BUILD_DIR)
-	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/menu.bin $(BUILD_DIR)/ovl_game_menu.o
+$(BUILD_DIR)/menu.bin: $(BUILD_DIR)/ovl_game_menu_entry.o $(BUILD_DIR)/ovl_game_menu.o $(BUILD_DIR)/prodos_gamestate_io.o $(OVL_CFG) | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/menu.bin $(BUILD_DIR)/ovl_game_menu_entry.o $(BUILD_DIR)/ovl_game_menu.o $(BUILD_DIR)/prodos_gamestate_io.o
 
 $(BUILD_DIR)/ovl_diplomacy_entry.o: $(ASM_DIR)/ovl_diplomacy_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_diplomacy_entry.s -o $(BUILD_DIR)/ovl_diplomacy_entry.o
@@ -200,6 +199,9 @@ $(BUILD_DIR)/ovl_battle_entry.o: $(ASM_DIR)/ovl_battle_entry.s | $(BUILD_DIR)
 
 $(BUILD_DIR)/ovl_science_entry.o: $(ASM_DIR)/ovl_science_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_science_entry.s -o $(BUILD_DIR)/ovl_science_entry.o
+
+$(BUILD_DIR)/ovl_game_menu_entry.o: $(ASM_DIR)/ovl_game_menu_entry.s | $(BUILD_DIR)
+	ca65 $(ASM_DIR)/ovl_game_menu_entry.s -o $(BUILD_DIR)/ovl_game_menu_entry.o
 
 $(BUILD_DIR)/loader.o: $(LOADER_DIR)/loader.s | $(BUILD_DIR)
 	ca65 $(LOADER_DIR)/loader.s -o $(BUILD_DIR)/loader.o

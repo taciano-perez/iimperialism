@@ -28,4 +28,7 @@ The `Makefile` writes outputs to `build/`:
 Current overlay binaries include `iscr.bin`, `pscr.bin`, `tscr.bin`, `ascr.bin`,
 `dscr.bin`, `texp.bin`, `txac.bin`, `bscr.bin`, `sscr.bin`, and `menu.bin`.
 
+The menu overlay now owns its save/load flow internally, including its ProDOS
+MLI helper and fixed overlay entry stub.
+
 Use `make disk` to update `assets/iimperialism.dsk` with current binaries.

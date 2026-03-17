@@ -20,8 +20,6 @@
 ;  $083C  JMP _paint_area
 ;  $083F  JMP _rand_range
 ;  $0842  JMP _init_game
-;  $0845  JMP _save_game
-;  $0848  JMP _load_game
 
     .import _clear_screen
     .import _clear_input_area
@@ -41,8 +39,6 @@
     .import _paint_area
     .import _rand_range
     .import _init_game
-    .import _save_game
-    .import _load_game
 
     .segment "JMPTAB"
 
@@ -64,5 +60,3 @@
     jmp _paint_area                 ; $083C
     jmp _rand_range                 ; $083F
     jmp _init_game                  ; $0842
-    jmp _save_game                  ; $0845
-    jmp _load_game                  ; $0848

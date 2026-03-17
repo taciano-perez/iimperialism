@@ -19,6 +19,7 @@ within the Apple II's constraints:
   `CLOSE` calls instead of `stdio`.
 - Save/load also use direct ProDOS MLI calls instead of `fopen()` / `fread()` /
   `fwrite()`.
+- Pressing `ESC` opens the `MENU` overlay for new/load/save actions.
 - UI primitives and core game logic are kept in **LOWCODE** (`$0824-$1FFF`) below
   the HGR screen to preserve resident code space.
 - Disk autoboot uses ProDOS `SYS` loader `IIMP.SYSTEM` to launch `IIMPERIALISM`
@@ -46,7 +47,7 @@ in the diplomacy screen as text using these ranges:
 | `src/ui.c` | UI primitives (`print`, `box`, `clear_screen`, etc.) |
 | `src/ui_buffers.c` | Shared scratch UI buffer storage |
 | `src/logic.c` | `init_game()`, `next_turn()` |
-| `src/gamestate.c` | Save/load wrappers for `GAME.DATA` |
+| `src/gamestate.c` | Shared `GameState` declarations |
 | `src/overlay.c` | `init_overlays()`, `run_overlay()` |
 | `src/ovl_industry.c` | Industry screen overlay (`iscr.bin`) |
 | `src/ovl_production.c` | Production screen overlay (`pscr.bin`) |
@@ -56,13 +57,14 @@ in the diplomacy screen as text using these ranges:
 | `src/ovl_trade_expedition.c` | Diplomacy trade expedition market overlay (`texp.bin`) |
 | `src/ovl_trade_expedition_action.c` | Diplomacy trade expedition action overlay (`txac.bin`) |
 | `src/ovl_science.c` | Science screen overlay (`sscr.bin`) |
-| `src/ovl_game_menu.c` | Game menu overlay (`menu.bin`) |
+| `src/ovl_game_menu.c` | Game menu overlay and save/load flow (`menu.bin`) |
 | `asm/prodos_overlay_load.s` | Resident ProDOS MLI overlay loader (`OPEN` / `READ` / `CLOSE`) |
-| `asm/prodos_gamestate_io.s` | Resident ProDOS MLI save/load helper for `GAME.DATA` |
+| `asm/prodos_gamestate_io.s` | Menu-overlay ProDOS MLI save/load helper for `GAME.DATA` |
 | `asm/ovl_diplomacy_entry.s` | Fixed entry stub for diplomacy overlay |
 | `asm/ovl_trade_expedition_entry.s` | Fixed entry stub for trade expedition market overlay |
 | `asm/ovl_trade_expedition_action_entry.s` | Fixed entry stub for trade expedition action overlay |
 | `asm/ovl_science_entry.s` | Fixed entry stub for science overlay |
+| `asm/ovl_game_menu_entry.s` | Fixed entry stub for game menu overlay |
 | `asm/text_hgr.s` | Aligned opaque HGR text blitter used by `print()` |
 | `asm/jmptab.s` | Resident jump table used by overlays |
 | `asm/werner.s` | Reserves HGR segment |

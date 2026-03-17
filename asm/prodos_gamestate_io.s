@@ -98,7 +98,7 @@ SAVE_PATH:
     .byte   .strlen("GAME.DATA")
     .byte   "GAME.DATA"
 
-    .segment "LOWCODE"
+    .segment "CODE"
 
 _prodos_save_game:
     ; __fastcall__ passes the pointer argument in A/X.

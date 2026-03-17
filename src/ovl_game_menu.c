@@ -1,6 +1,19 @@
 #include <conio.h>
 #include "game.h"
 
+/* Low-level ProDOS helper linked into this overlay. */
+extern unsigned char __fastcall__ prodos_save_game(const GameState* state);
+extern unsigned char __fastcall__ prodos_load_game(GameState* state);
+const unsigned int game_state_size = sizeof(GameState);
+
+static int save_game(const GameState* game_state) {
+    return prodos_save_game(game_state) == 0 ? 0 : -1;
+}
+
+static int load_game(GameState* game_state) {
+    return prodos_load_game(game_state) == 0 ? 0 : -1;
+}
+
 void render_game_menu_screen(void) {
     while (1) {
         char key;

@@ -165,8 +165,4 @@ void set_selected_trade_nation(unsigned char nation_index);
 unsigned char get_selected_trade_nation(void);
 unsigned char rand_range(unsigned char min, unsigned char max);
 
-// gamestate.c
-int save_game(const GameState* state);
-int load_game(GameState* state);
-
 #endif // GAME_H

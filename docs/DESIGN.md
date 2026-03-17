@@ -58,6 +58,9 @@ Resident main loop (`src/main.c`) dispatches by `state.current_screen`:
 - `SCREEN_ADMIRALTY` -> `OVL_ADMIRALTY` (`ASCR`)
 - `SCREEN_SCIENCE` -> `OVL_SCIENCE` (`SSCR`)
 
+`ESC` opens the game menu overlay as a transient flow and then returns to the
+current screen unless the menu action changes game state.
+
 Sub-flows are also overlays:
 
 - `OVL_GAME_MENU` (`MENU`) for new/load/save actions from `ESC`
@@ -70,6 +73,7 @@ Sub-flows are also overlays:
 - `src/transport.c`: edit transport orders, build wagons, return
 - `src/production.c`: edit production orders, train workers, return
 - `src/ovl_admiralty.c`: render admiralty and handle trader/warship builds
+- `src/ovl_game_menu.c`: handle `ESC` menu actions (new/load/save, return)
 - `src/diplomacy.c`: launch trade expedition flow, return
 
 ## Data Model
@@ -87,8 +91,8 @@ Global `GameState state` (see `include/game.h`) includes:
 - metadata (`turn_number`, `nation_name`, `current_screen`)
 - turn-specific trade state (`remaining_turn_capacity`)
 
-Persistence is handled in `src/gamestate.c` via `GAME.DATA`, using a resident
-direct-ProDOS MLI helper rather than `stdio`.
+Persistence is owned entirely by the game menu overlay and uses a local
+direct-ProDOS MLI helper for `GAME.DATA` rather than `stdio`.
 
 ## Runtime Architecture
 
