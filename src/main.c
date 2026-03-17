@@ -68,6 +68,7 @@ int main(void) {
             run_overlay(OVL_PRODUCTION);
         } else if (state.current_screen == SCREEN_ADMIRALTY) {
             run_overlay(OVL_ADMIRALTY);
+            continue;
         } else if (state.current_screen == SCREEN_DIPLOMACY) {
             run_overlay(OVL_DIPLOMACY);
             continue; // skip input handling and go directly to next screen
@@ -99,8 +100,6 @@ int main(void) {
                     handle_screen_input_transport(key);
                 } else if (state.current_screen == SCREEN_PRODUCTION) {
                     handle_screen_input_production(key);
-                } else if (state.current_screen == SCREEN_ADMIRALTY) {
-                    handle_screen_input_admiralty(key);
                 }
                 break;
         }

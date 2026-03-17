@@ -60,8 +60,6 @@ Resident main loop (`src/main.c`) dispatches by `state.current_screen`:
 
 Sub-flows are also overlays:
 
-- `OVL_ADMIRALTY_TRADER` (`ATRD`) for trader construction
-- `OVL_ADMIRALTY_WARSHIP` (`AWRS`) for frigate construction
 - `OVL_TRADE_EXPEDITION` (`TEXP`) for the trade expedition market screen
 - `OVL_TRADE_EXPEDITION_ACTION` (`TXAC`) for trade expedition input/actions
 
@@ -70,7 +68,7 @@ Sub-flows are also overlays:
 - `src/industry.c`: switch to transport/production/admiralty, or end turn
 - `src/transport.c`: edit transport orders, build wagons, return
 - `src/production.c`: edit production orders, train workers, return
-- `src/admiralty.c`: build traders/warships, return
+- `src/ovl_admiralty.c`: render admiralty and handle trader/warship builds
 - `src/diplomacy.c`: launch trade expedition flow, return
 
 ## Data Model

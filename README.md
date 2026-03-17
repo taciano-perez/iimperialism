@@ -14,7 +14,7 @@ The game runs within the Apple II's main 64KB memory map. It uses a custom memor
 within the Apple II's constraints:
 
 - Screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`, `TSCR`,
-  `ASCR`, `ATRD`, `AWRS`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`) loaded on demand.
+  `ASCR`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`) loaded on demand.
 - Overlay binaries are loaded at runtime with direct ProDOS MLI `OPEN` / `READ` /
   `CLOSE` calls instead of `stdio`.
 - UI primitives and core game logic are kept in **LOWCODE** (`$0824-$1FFF`) below
@@ -49,9 +49,7 @@ in the diplomacy screen as text using these ranges:
 | `src/ovl_industry.c` | Industry screen overlay (`iscr.bin`) |
 | `src/ovl_production.c` | Production screen overlay (`pscr.bin`) |
 | `src/ovl_transport.c` | Transport screen overlay (`tscr.bin`) |
-| `src/ovl_admiralty.c` | Admiralty screen overlay (`ascr.bin`) |
-| `src/ovl_admiralty_trader.c` | Admiralty trader flow overlay (`atrd.bin`) |
-| `src/ovl_admiralty_warship.c` | Admiralty warship flow overlay (`awrs.bin`) |
+| `src/ovl_admiralty.c` | Admiralty screen and build flow overlay (`ascr.bin`) |
 | `src/ovl_diplomacy.c` | Diplomacy screen overlay (`dscr.bin`) |
 | `src/ovl_trade_expedition.c` | Diplomacy trade expedition market overlay (`texp.bin`) |
 | `src/ovl_trade_expedition_action.c` | Diplomacy trade expedition action overlay (`txac.bin`) |

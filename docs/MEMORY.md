@@ -45,9 +45,7 @@ Current overlay files:
 - `ISCR` industry screen
 - `PSCR` production screen
 - `TSCR` transport screen
-- `ASCR` admiralty screen
-- `ATRD` admiralty build-trader flow
-- `AWRS` admiralty build-warship flow
+- `ASCR` admiralty screen and build flow
 - `DSCR` diplomacy screen
 - `TEXP` diplomacy trade expedition market screen
 - `TXAC` diplomacy trade expedition action flow

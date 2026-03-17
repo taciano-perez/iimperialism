@@ -18,8 +18,6 @@ Current catalog (from `ac -l`) includes:
 - `PSCR` (`BIN`, `A=$9000`) - production overlay.
 - `TSCR` (`BIN`, `A=$9800`) - transport overlay.
 - `ASCR` (`BIN`, `A=$A000`) - admiralty overlay.
-- `ATRD` (`BIN`, `A=$8800`) - admiralty trader overlay.
-- `AWRS` (`BIN`, `A=$8800`) - admiralty warship overlay.
 - `DSCR` (`BIN`, `A=$8800`) - diplomacy overlay.
 - `TEXP` (`BIN`, `A=$8800`) - diplomacy trade expedition market overlay.
 - `TXAC` (`BIN`, `A=$8800`) - diplomacy trade expedition action overlay.
