@@ -60,6 +60,7 @@ Resident main loop (`src/main.c`) dispatches by `state.current_screen`:
 
 Sub-flows are also overlays:
 
+- `OVL_GAME_MENU` (`MENU`) for new/load/save actions from `ESC`
 - `OVL_TRADE_EXPEDITION` (`TEXP`) for the trade expedition market screen
 - `OVL_TRADE_EXPEDITION_ACTION` (`TXAC`) for trade expedition input/actions
 

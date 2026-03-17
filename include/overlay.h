@@ -17,6 +17,7 @@
 #define OVL_TRADE_EXPEDITION_ACTION 6
 #define OVL_BATTLE 7
 #define OVL_SCIENCE 8
+#define OVL_GAME_MENU 9
 
 /* Disk file names for the overlay binaries (ProDOS, uppercase, no extension) */
 #define OVL_FILE_INDUSTRY   "ISCR"
@@ -28,6 +29,7 @@
 #define OVL_FILE_TRADE_EXPEDITION_ACTION "TXAC"
 #define OVL_FILE_BATTLE "BSCR"
 #define OVL_FILE_SCIENCE "SSCR"
+#define OVL_FILE_GAME_MENU "MENU"
 
 /* Overlays are loaded on demand by run_overlay(). */
 void init_overlays(void);

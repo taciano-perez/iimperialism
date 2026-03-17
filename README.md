@@ -14,7 +14,7 @@ The game runs within the Apple II's main 64KB memory map. It uses a custom memor
 within the Apple II's constraints:
 
 - Screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`, `TSCR`,
-  `ASCR`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`) loaded on demand.
+  `ASCR`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`, `MENU`) loaded on demand.
 - Overlay binaries are loaded at runtime with direct ProDOS MLI `OPEN` / `READ` /
   `CLOSE` calls instead of `stdio`.
 - UI primitives and core game logic are kept in **LOWCODE** (`$0824-$1FFF`) below
@@ -54,6 +54,7 @@ in the diplomacy screen as text using these ranges:
 | `src/ovl_trade_expedition.c` | Diplomacy trade expedition market overlay (`texp.bin`) |
 | `src/ovl_trade_expedition_action.c` | Diplomacy trade expedition action overlay (`txac.bin`) |
 | `src/ovl_science.c` | Science screen overlay (`sscr.bin`) |
+| `src/ovl_game_menu.c` | Game menu overlay (`menu.bin`) |
 | `asm/prodos_overlay_load.s` | Resident ProDOS MLI overlay loader (`OPEN` / `READ` / `CLOSE`) |
 | `asm/ovl_diplomacy_entry.s` | Fixed entry stub for diplomacy overlay |
 | `asm/ovl_trade_expedition_entry.s` | Fixed entry stub for trade expedition market overlay |
@@ -197,7 +198,6 @@ overlays are relinked.
 - Refactor for saving memory
   - Unless we need it for country name, remove cgetc_at from ui.c
 - Add main menu
-- Add save/load/quit screen
 - Add retirement/end screen
 - Add splash screen at startup and seed random number gen
 - Randomize country names and their exports/imports
@@ -206,3 +206,4 @@ overlays are relinked.
 - Adjust the initial money amount
 - Admiralty improvement: increase cost of traders and warships according to science level
 - Attempt to merge overlays when each is less than 1KB to reclaim floppy space
+- Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed

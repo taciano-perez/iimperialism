@@ -23,6 +23,7 @@ Current catalog (from `ac -l`) includes:
 - `TXAC` (`BIN`, `A=$8800`) - diplomacy trade expedition action overlay.
 - `BSCR` (`BIN`, `A=$8800`) - battle overlay.
 - `SSCR` (`BIN`, `A=$8800`) - science overlay.
+- `MENU` (`BIN`, `A=$8800`) - game menu overlay.
 
 Not present on the game disk:
 

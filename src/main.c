@@ -90,9 +90,8 @@ int main(void) {
 
         switch (key) {
             case 27: // ESC key
-                print(0, 15, "Exiting game");
-                ui_exit();
-                return 0;
+                run_overlay(OVL_GAME_MENU);
+                continue;
             default:
                 if (state.current_screen == SCREEN_INDUSTRY) {
                     handle_screen_input_industry(key);

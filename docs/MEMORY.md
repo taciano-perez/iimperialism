@@ -51,6 +51,7 @@ Current overlay files:
 - `TXAC` diplomacy trade expedition action flow
 - `BSCR` battle screen
 - `SSCR` science screen
+- `MENU` game menu screen
 
 To inspect current resident segment usage plus overlay occupancy from build
 artifacts, run:
@@ -113,6 +114,9 @@ $0836  JMP _get_selected_trade_nation
 $0839  JMP _clear_area
 $083C  JMP _paint_area
 $083F  JMP _rand_range
+$0842  JMP _init_game
+$0845  JMP _save_game
+$0848  JMP _load_game
 ```
 
 Rule: keep `asm/jmptab.s` and `config/apple2-ovl.cfg` in sync. Rebuild overlays
