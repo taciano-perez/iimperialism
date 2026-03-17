@@ -8,7 +8,7 @@ $0100-$01FF  6502 hardware stack
 $0200-$03FF  System / ProDOS vectors
 $0400-$07FF  Text screen page 1
 $0803-$080E  STARTUP            (cc65 crt0)
-$080F-$0841  JMPTAB             (resident jump table used by overlays)
+$080F-$084A  JMPTAB             (resident jump table used by overlays)
 $0824-$1FFF  LOWCODE            (resident UI + core logic)
 $2000-$3FFF  HGR page 1         (graphics memory; no code here)
 $4000-...    CODE/RODATA/DATA   (main resident code + data)
@@ -82,6 +82,11 @@ Runtime flow (`run_overlay(id)`):
 The runtime overlay path intentionally avoids `fopen()` / `fread()`. Direct
 MLI calls are more robust under the game's current resident memory pressure
 than the Apple II `stdio` path.
+
+Game-state persistence now follows the same rule. `save_game()` / `load_game()`
+dispatch to a resident ProDOS helper in `asm/prodos_gamestate_io.s`, which uses
+direct MLI `CREATE` / `OPEN` / `READ` / `WRITE` / `CLOSE` calls for `GAME.DATA`
+instead of linking the heavier `stdio` file I/O path into resident code.
 
 For overlays with helper functions, use an explicit assembly entry stub so the
 intended entry point stays at `$8800` even if function ordering changes during

@@ -17,6 +17,8 @@ within the Apple II's constraints:
   `ASCR`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`, `MENU`) loaded on demand.
 - Overlay binaries are loaded at runtime with direct ProDOS MLI `OPEN` / `READ` /
   `CLOSE` calls instead of `stdio`.
+- Save/load also use direct ProDOS MLI calls instead of `fopen()` / `fread()` /
+  `fwrite()`.
 - UI primitives and core game logic are kept in **LOWCODE** (`$0824-$1FFF`) below
   the HGR screen to preserve resident code space.
 - Disk autoboot uses ProDOS `SYS` loader `IIMP.SYSTEM` to launch `IIMPERIALISM`
@@ -44,7 +46,7 @@ in the diplomacy screen as text using these ranges:
 | `src/ui.c` | UI primitives (`print`, `box`, `clear_screen`, etc.) |
 | `src/ui_buffers.c` | Shared scratch UI buffer storage |
 | `src/logic.c` | `init_game()`, `next_turn()` |
-| `src/gamestate.c` | Save/load game state (`GAME.DATA`) |
+| `src/gamestate.c` | Save/load wrappers for `GAME.DATA` |
 | `src/overlay.c` | `init_overlays()`, `run_overlay()` |
 | `src/ovl_industry.c` | Industry screen overlay (`iscr.bin`) |
 | `src/ovl_production.c` | Production screen overlay (`pscr.bin`) |
@@ -56,6 +58,7 @@ in the diplomacy screen as text using these ranges:
 | `src/ovl_science.c` | Science screen overlay (`sscr.bin`) |
 | `src/ovl_game_menu.c` | Game menu overlay (`menu.bin`) |
 | `asm/prodos_overlay_load.s` | Resident ProDOS MLI overlay loader (`OPEN` / `READ` / `CLOSE`) |
+| `asm/prodos_gamestate_io.s` | Resident ProDOS MLI save/load helper for `GAME.DATA` |
 | `asm/ovl_diplomacy_entry.s` | Fixed entry stub for diplomacy overlay |
 | `asm/ovl_trade_expedition_entry.s` | Fixed entry stub for trade expedition market overlay |
 | `asm/ovl_trade_expedition_action_entry.s` | Fixed entry stub for trade expedition action overlay |

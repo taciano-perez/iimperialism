@@ -87,7 +87,8 @@ Global `GameState state` (see `include/game.h`) includes:
 - metadata (`turn_number`, `nation_name`, `current_screen`)
 - turn-specific trade state (`remaining_turn_capacity`)
 
-Persistence is handled in `src/gamestate.c` via `GAME.DATA`.
+Persistence is handled in `src/gamestate.c` via `GAME.DATA`, using a resident
+direct-ProDOS MLI helper rather than `stdio`.
 
 ## Runtime Architecture
 

@@ -60,6 +60,7 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/logic.o \
 	$(BUILD_DIR)/overlay.o \
 	$(BUILD_DIR)/prodos_overlay_load.o \
+	$(BUILD_DIR)/prodos_gamestate_io.o \
 	$(BUILD_DIR)/jmptab.o
 
 OVERLAY_OBJECTS = \
@@ -131,7 +132,7 @@ iimperialism: $(MAIN_OBJECTS) | $(BUILD_DIR)
 
 $(OVL_CFG): iimperialism $(CONFIG_DIR)/apple2-ovl.cfg | $(BUILD_DIR)
 ifeq ($(OS),Windows_NT)
-	powershell.exe -NoProfile -Command "$$line = (Select-String -Path '$(BUILD_DIR)/iimperialism.map' -Pattern '_state' | Select-Object -First 1).Line; if (-not $$line) { throw 'Could not find _state in map file.' }; $$parts = $$line -split '_state'; if ($$parts.Length -lt 2) { throw 'Could not parse _state address.' }; $$token = ($$parts[1].Trim().Split()[0]); if ($$token.Length -lt 6) { throw 'Could not parse _state address.' }; $$state = $$token.Substring(2).ToUpper(); $$content = Get-Content '$(CONFIG_DIR)/apple2-ovl.cfg'; $$content = $$content | ForEach-Object { if ($$_ -like '*_state:*') { '_state:                    type = export, value = $$' + $$state + ';' } else { $$_ } }; Set-Content '$(OVL_CFG)' $$content"
+	powershell.exe -NoProfile -Command "$$match = Select-String -Path '$(BUILD_DIR)/iimperialism.map' -Pattern '_state\s+([0-9A-Fa-f]{6})\s+RLA' | Select-Object -First 1; if (-not $$match) { throw 'Could not find _state in map file.' }; $$token = $$match.Matches[0].Groups[1].Value; $$state = $$token.Substring($$token.Length - 4).ToUpper(); $$content = Get-Content '$(CONFIG_DIR)/apple2-ovl.cfg'; $$content = $$content | ForEach-Object { if ($$_ -like '*_state:*') { '_state:                    type = export, value = $$' + $$state + ';' } else { $$_ } }; Set-Content '$(OVL_CFG)' $$content"
 else
 	@state_addr=$$(grep -Eo '_state[[:space:]]+00[0-9A-Fa-f]{4}[[:space:]]+RLA' $(BUILD_DIR)/iimperialism.map | head -n 1 | sed -E 's/.*00([0-9A-Fa-f]{4}).*/\1/'); \
 	test -n "$$state_addr"; \

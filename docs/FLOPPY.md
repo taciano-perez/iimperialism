@@ -38,6 +38,7 @@ Boot sequence:
 2. `IIMP.SYSTEM` loads `IIMPERIALISM` (BIN) and jumps to its load address.
 3. `IIMPERIALISM` initializes game state and later loads screen overlays from disk
    with direct ProDOS MLI reads.
+4. Save/load of `GAME.DATA` also uses direct ProDOS MLI calls at runtime.
 
 ## Loader Implementation
 
