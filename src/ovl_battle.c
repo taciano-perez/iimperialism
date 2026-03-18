@@ -45,10 +45,10 @@ static void get_ship_position(unsigned char is_enemy,
         0, 6, 12
     };
     static const unsigned char ship_y_offsets[MAX_VISIBLE_SHIPS] = {
-        2, 2, 2,
-        6, 6, 6,
-        10, 10, 10,
-        14, 14, 14
+        3, 3, 3,
+        7, 7, 7,
+        11, 11, 11,
+        15, 15, 15
     };
 
     *x_offset = ship_x_offsets[ship_index];
@@ -113,10 +113,12 @@ static void handle_enemy_trader_hit(void) {
     }
 
     if (state.traders > 0U && rand_range(1U, 100U) <= BATTLE_TRADER_HIT_CHANCE_PERCENT) {
-        --state.traders;
         print(5, 22, STR_TRADER_LOSS);
+        --state.traders;
+        clear_area(10, 2, 15, 1);
+        print_int_right_aligned(15, 2, state.traders);
         cgetc();
-        clear_area(5, 22, 31, 22);
+        clear_area(5, 22, 31, 1);
         print(5, 22, STR_FIGHT);
     }
 }
@@ -136,7 +138,9 @@ void render_battle_screen(void) {
     // Render player's navy
     print(0, 0, "Haxaco Navy");
     print(0, 1, STR_BATTLE_FIREPOWER);
+    print(0, 2, "Traders:");
     render_firepower(0, visible_friendly_ships);
+    print_int_right_aligned(15, 2, state.traders);
     for (i = 0; i < visible_friendly_ships; ++i) {
         unsigned char x_offset;
         unsigned char y_offset;
@@ -160,7 +164,7 @@ void render_battle_screen(void) {
     while (1) {
         unsigned char key;
         unsigned char previous_friendly_ships;
-        clear_area(5, 21, 22, 22);
+        clear_area(5, 21, 22, 2);
         print(5, 21, "Fight or Run?");
         key = cgetc();
         switch (key) {

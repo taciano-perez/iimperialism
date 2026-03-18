@@ -27,9 +27,7 @@ void clear_screen() {
 }
 
 void clear_input_area() {
-    tgi_setcolor (TGI_COLOR_BLACK);
-    tgi_bar(5*CHAR_WIDTH, 20*CHAR_HEIGHT, 40*CHAR_WIDTH, 23*CHAR_HEIGHT);
-    tgi_setcolor (TGI_COLOR_WHITE);
+    clear_area(5, 20, 34, 3);
 }
 
 void clear_area(unsigned char x, unsigned char y, unsigned char width, unsigned char height) {
