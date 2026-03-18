@@ -194,7 +194,6 @@ overlays are relinked.
 ## TODO
 
 - Finish battle screen 
-  - 5% chance of enemy hitting traders
   - capture booty
   - introduce enemy powers and not only pirates
   - add sound effects

@@ -6,6 +6,8 @@
 
 
 static const char STR_BATTLE_FIREPOWER[] = "Firepower:";
+static const char STR_TRADER_LOSS[] = "The buggers sunk a trader!";
+static const char STR_FIGHT[] = "Aye, we'll fight!";
 static unsigned char current_guns_per_frigate;
 
 static unsigned char get_enemy_fleet_size(void) {
@@ -105,6 +107,20 @@ static void handle_ship_hit(unsigned char is_enemy,
     }
 }
 
+static void handle_enemy_trader_hit(void) {
+    if (state.traders == 0U) {
+        return;
+    }
+
+    if (state.traders > 0U && rand_range(1U, 100U) <= BATTLE_TRADER_HIT_CHANCE_PERCENT) {
+        --state.traders;
+        print(5, 22, STR_TRADER_LOSS);
+        cgetc();
+        clear_area(5, 22, 31, 22);
+        print(5, 22, STR_FIGHT);
+    }
+}
+
 void render_battle_screen(void) {
     unsigned char enemy_ships;
     unsigned char i;
@@ -150,7 +166,7 @@ void render_battle_screen(void) {
         switch (key) {
             case 'F':
             case 'f':
-                print(5, 22, "Aye, we'll fight!");
+                print(5, 22, STR_FIGHT);
                 for (i = 0; i < visible_friendly_ships; ++i) {
                     handle_ship_hit(1, &visible_enemy_ships, visible_friendly_ships);
                     if (visible_enemy_ships == 0) {
@@ -161,6 +177,7 @@ void render_battle_screen(void) {
                     }
                     previous_friendly_ships = visible_friendly_ships;
                     handle_ship_hit(0, &visible_friendly_ships, visible_enemy_ships);
+                    handle_enemy_trader_hit();
                     if (visible_friendly_ships != previous_friendly_ships) {
                         --state.frigates;
                     }

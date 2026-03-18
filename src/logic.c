@@ -152,7 +152,7 @@ void init_game() {
     state.available_workers = 6;
 
     state.traders = 2;
-    state.frigates = 2;
+    state.frigates = 10;
     state.capacity_per_trader = CAPACITY_PER_TRADER_BASE;
     state.guns_per_frigate = GUNS_PER_FRIGATE_BASE;
     state.money = 21000;
@@ -173,7 +173,7 @@ void init_game() {
 
     update_foreign_market_prices();
 
-    state.turn_number = 1;
+    state.turn_number = 100;
     snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
     state.current_screen = SCREEN_INDUSTRY;
     

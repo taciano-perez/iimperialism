@@ -100,7 +100,7 @@ static void trade_expedition(void) {
         print(33, 22, state.foreign_nations[nation_index].name);
         cgetc();
         set_selected_trade_nation(nation_index);
-        if (rand_range(0, 1) == 0) {
+        if (rand_range(1U, 100U) <= TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT) {
             state.current_screen = SCREEN_BATTLE;
         } else {
             state.current_screen = SCREEN_TRADE_EXPEDITION;
