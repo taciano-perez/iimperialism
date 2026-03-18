@@ -194,7 +194,7 @@ overlays are relinked.
 ## TODO
 
 - Finish battle screen 
-  - capture booty
+  - Trade expedition requires warships
   - introduce enemy powers and not only pirates
   - add sound effects
 - Expand the science tree with wagon capacity improvements
