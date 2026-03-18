@@ -152,7 +152,7 @@ void init_game() {
     state.available_workers = 6;
 
     state.traders = 2;
-    state.frigates = 14;
+    state.frigates = 2;
     state.capacity_per_trader = CAPACITY_PER_TRADER_BASE;
     state.guns_per_frigate = GUNS_PER_FRIGATE_BASE;
     state.money = 21000;

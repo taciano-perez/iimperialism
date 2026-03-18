@@ -9,7 +9,7 @@ void render_industry_screen(void) {
     clear_screen();
 
     print(0,  0, "Ministry of Industry");
-    print(34, 0, "Turn:");
+    print(30, 0, "Turn:");
     print_int_right_aligned(39, 0, state.turn_number);
 
     render_warehouse_box();

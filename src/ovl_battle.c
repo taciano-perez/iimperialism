@@ -8,6 +8,22 @@
 static const char STR_BATTLE_FIREPOWER[] = "Firepower:";
 static unsigned char current_guns_per_frigate;
 
+static unsigned char get_enemy_fleet_size(void) {
+    unsigned char base_ships;
+    unsigned char min_ships;
+    unsigned char max_ships;
+
+    base_ships = 1U + ((state.turn_number - 1U) / 10U);
+    min_ships = (base_ships + 1U) / 2U;
+    max_ships = base_ships + (base_ships / 2U);
+
+    if (max_ships < min_ships) {
+        max_ships = min_ships;
+    }
+
+    return rand_range(min_ships, max_ships);
+}
+
 static void render_firepower(unsigned char is_enemy, unsigned char ship_count) {
     unsigned char clear_x;
 
@@ -90,14 +106,16 @@ static void handle_ship_hit(unsigned char is_enemy,
 }
 
 void render_battle_screen(void) {
+    unsigned char enemy_ships;
     unsigned char i;
     unsigned char visible_friendly_ships;
     unsigned char visible_enemy_ships;
 
     current_guns_per_frigate = state.guns_per_frigate;
+    enemy_ships = get_enemy_fleet_size();
 
     visible_friendly_ships = MIN(state.frigates, MAX_VISIBLE_SHIPS);
-    visible_enemy_ships = MIN(state.frigates, MAX_VISIBLE_SHIPS);
+    visible_enemy_ships = MIN(enemy_ships, MAX_VISIBLE_SHIPS);
 
     // Render player's navy
     print(0, 0, "Haxaco Navy");

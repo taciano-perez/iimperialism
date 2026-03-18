@@ -25,7 +25,7 @@ void render_diplomacy_screen(void) {
 
     clear_screen();
     print(0, 0, "Foreign Office");
-    print(34, 0, "Turn:");
+    print(30, 0, "Turn:");
     print_int_right_aligned(39, 0, state.turn_number);
 
     print(NATION_X, 2, "Nation");

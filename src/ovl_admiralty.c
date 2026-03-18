@@ -15,7 +15,7 @@ void render_admiralty_screen(void) {
         clear_screen();
 
         print(0,  0, "Admiralty Headquarters");
-        print(34, 0, "Turn:");
+        print(30, 0, "Turn:");
         print_int_right_aligned(39, 0, state.turn_number);
 
         render_warehouse_box();
