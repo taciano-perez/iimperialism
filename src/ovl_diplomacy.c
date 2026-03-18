@@ -46,6 +46,11 @@ void render_diplomacy_screen(void) {
         switch (key) {
             case 't':
             case 'T':
+                if (state.frigates == 0) {
+                    print(5, 22, "We must build warships first!");
+                    cgetc();
+                    return;
+                }
                 trade_expedition();
                 return;
             case 'q':
