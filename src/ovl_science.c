@@ -32,7 +32,7 @@ static void render_technology_row(unsigned char level, unsigned char row, unsign
     if (patented) {
         print(30, row, STR_PATENTED);
     } else {
-        print_int_right_aligned(38, row, (unsigned int) level * SCIENCE_RESEARCH_COST_MULTIPLIER);
+        print_int_right_aligned_currency(38, row, (unsigned int) level * SCIENCE_RESEARCH_COST_MULTIPLIER);
     }
     print(15, row + 1, TECH_DESCRIPTIONS[level - 1]);
 }
@@ -44,9 +44,8 @@ void render_science_screen(void) {
 
         clear_screen();
         print(0, 0, "Patent Office");
-        print(27, 0, "Money:");
-        print_int_right_aligned(39, 0, state.money);
-
+        render_turn_funds_header();
+        
         print(1, 3, "Research");
         print(35, 3, "Cost");
         box(0, 4, 39, 16);

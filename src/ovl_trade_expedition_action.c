@@ -14,8 +14,8 @@ void handle_screen_trade_expedition(void) {
 
     while (1) {
 
-        clear_area(32, 0, 5, 1);
-        print_int_right_aligned(39, 0, state.money);
+        clear_area(32, 1, 5, 1);
+        print_int_right_aligned_currency(39, 1, state.money);
 
         clear_area(29, 15, 5, 1);
         print_int_right_aligned(29, 15, state.remaining_turn_capacity);

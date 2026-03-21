@@ -194,7 +194,6 @@ overlays are relinked.
 ## TODO
 
 - Finish battle screen 
-  - Trade expedition requires warships
   - introduce enemy powers and not only pirates
   - add sound effects
 - Expand the science tree with wagon capacity improvements
@@ -204,9 +203,9 @@ overlays are relinked.
 - Add retirement/end screen
 - Add splash screen at startup and seed random number gen
 - Randomize country names and their exports/imports
-- On ovl_diplomacy, lower the chance of a battle (currently at 50% for testing)
 - Decrease the relationship status per turn
 - Adjust the initial money amount
 - Admiralty improvement: increase cost of traders and warships according to science level
 - Attempt to merge overlays when each is less than 1KB to reclaim floppy space
 - Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed
+- Handle overflows of numerical fields when increasing values

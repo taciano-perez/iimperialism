@@ -66,6 +66,17 @@ void print_int_right_aligned(unsigned char x, unsigned char y, unsigned int valu
     print_right_aligned(x, y, ui_buffer);
 }
 
+void print_int_right_aligned_currency(unsigned char x, unsigned char y, unsigned long value) {
+    if (value >= 1000000UL) {
+        unsigned long whole = value / 1000000UL;
+        unsigned char fractional = (unsigned char)(((value % 1000000UL) * 100UL) / 1000000UL);
+        sprintf(ui_buffer, "$%lu.%02uM", whole, fractional);
+    } else {
+        sprintf(ui_buffer, "$%lu", value);
+    }
+    print_right_aligned(x, y, ui_buffer);
+}
+
 void print_int(unsigned char x, unsigned char y, unsigned int value) {
     sprintf(ui_buffer, "%u", value);
     print(x, y, ui_buffer);

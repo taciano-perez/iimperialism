@@ -20,6 +20,8 @@
 ;  $083C  JMP _paint_area
 ;  $083F  JMP _rand_range
 ;  $0842  JMP _init_game
+;  $0845  JMP _print_int_right_aligned_currency
+;  $0848  JMP _render_turn_funds_header
 
     .import _clear_screen
     .import _clear_input_area
@@ -39,6 +41,8 @@
     .import _paint_area
     .import _rand_range
     .import _init_game
+    .import _print_int_right_aligned_currency
+    .import _render_turn_funds_header
 
     .segment "JMPTAB"
 
@@ -60,3 +64,5 @@
     jmp _paint_area                 ; $083C
     jmp _rand_range                 ; $083F
     jmp _init_game                  ; $0842
+    jmp _print_int_right_aligned_currency ; $0845
+    jmp _render_turn_funds_header   ; $0848
