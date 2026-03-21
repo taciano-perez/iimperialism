@@ -173,7 +173,7 @@ void init_game() {
 
     update_foreign_market_prices();
 
-    state.turn_number = 100;
+    state.turn_number = 99;
     snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
     state.current_screen = SCREEN_INDUSTRY;
     
@@ -219,6 +219,12 @@ void next_turn() {
 
     // update turn number
     ++state.turn_number;
+
+    if ((state.turn_number % 10U) == 0U) {
+        state.current_screen = SCREEN_COUNCIL_NATIONS;
+    } else {
+        state.current_screen = SCREEN_INDUSTRY;
+    }
 }
 
  #pragma code-name (pop)

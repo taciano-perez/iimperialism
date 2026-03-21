@@ -91,6 +91,9 @@ int main(void) {
         } else if (state.current_screen == SCREEN_SCIENCE) {
             run_overlay(OVL_SCIENCE);
             continue;
+        } else if (state.current_screen == SCREEN_COUNCIL_NATIONS) {
+            run_overlay(OVL_COUNCIL_NATIONS);
+            continue;
         }
 
         key = cgetc();

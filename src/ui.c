@@ -46,7 +46,7 @@ void paint_area(unsigned char x, unsigned char y, unsigned char width, unsigned 
     tgi_setcolor (TGI_COLOR_WHITE);
 }
 
-void print (unsigned char x, unsigned char y, const char* text) {
+void print(unsigned char x, unsigned char y, const char* text) {
     draw_text_hgr_opaque(text, x, y);
 }
 
@@ -86,7 +86,7 @@ void draw_picture_at(const unsigned char picture_index, const unsigned char x_by
     draw_picture(picture_index, x_byte, y*CHAR_HEIGHT);
 }
 
-void box (unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2) {
+void box(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2) {
     tgi_line (x1*CHAR_WIDTH, y1*CHAR_HEIGHT, x1*CHAR_WIDTH, y2*CHAR_HEIGHT); // left
     tgi_line (x1*CHAR_WIDTH, y1*CHAR_HEIGHT-1, x2*CHAR_WIDTH+(CHAR_WIDTH-1), y1*CHAR_HEIGHT-1); // top
     tgi_line (x2*CHAR_WIDTH+(CHAR_WIDTH-1), y1*CHAR_HEIGHT, x2*CHAR_WIDTH+(CHAR_WIDTH-1), y2*CHAR_HEIGHT); // right

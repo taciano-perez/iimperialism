@@ -38,7 +38,8 @@ C_SOURCES  = \
 	$(SRC_DIR)/ovl_trade_expedition_action.c \
 	$(SRC_DIR)/ovl_battle.c \
 	$(SRC_DIR)/ovl_science.c \
-	$(SRC_DIR)/ovl_game_menu.c
+	$(SRC_DIR)/ovl_game_menu.c \
+	$(SRC_DIR)/ovl_council_nations.c
 
 ASM_SOURCES = \
 	$(ASM_DIR)/werner.s \
@@ -72,7 +73,8 @@ OVERLAY_OBJECTS = \
 	$(BUILD_DIR)/ovl_trade_expedition_action.o \
 	$(BUILD_DIR)/ovl_battle.o \
 	$(BUILD_DIR)/ovl_science.o \
-	$(BUILD_DIR)/ovl_game_menu.o
+	$(BUILD_DIR)/ovl_game_menu.o \
+	$(BUILD_DIR)/ovl_council_nations.o
 
 # Main compiler
 
@@ -122,9 +124,11 @@ disk: iimperialism overlays $(BUILD_DIR)/loader.system
 	$(AC) -p $(DISK) SSCR BIN 0x8800 < $(BUILD_DIR)/sscr.bin
 	-$(AC) -d $(DISK) MENU
 	$(AC) -p $(DISK) MENU BIN 0x8800 < $(BUILD_DIR)/menu.bin
+	-$(AC) -d $(DISK) CNSL
+	$(AC) -p $(DISK) CNSL BIN 0x8800 < $(BUILD_DIR)/cnsl.bin
 	$(AC) -l $(DISK)
 
-overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/texp.bin $(BUILD_DIR)/txac.bin $(BUILD_DIR)/bscr.bin $(BUILD_DIR)/sscr.bin $(BUILD_DIR)/menu.bin
+overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/texp.bin $(BUILD_DIR)/txac.bin $(BUILD_DIR)/bscr.bin $(BUILD_DIR)/sscr.bin $(BUILD_DIR)/menu.bin $(BUILD_DIR)/cnsl.bin
 
 iimperialism: $(MAIN_OBJECTS) | $(BUILD_DIR)
 	$(CC) $(LDFLAGS) -o $(BUILD_DIR)/iimperialism -m $(BUILD_DIR)/iimperialism.map $(MAIN_OBJECTS)
@@ -185,6 +189,9 @@ $(BUILD_DIR)/sscr.bin: $(BUILD_DIR)/ovl_science_entry.o $(BUILD_DIR)/ovl_science
 $(BUILD_DIR)/menu.bin: $(BUILD_DIR)/ovl_game_menu_entry.o $(BUILD_DIR)/ovl_game_menu.o $(BUILD_DIR)/prodos_gamestate_io.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/menu.bin $(BUILD_DIR)/ovl_game_menu_entry.o $(BUILD_DIR)/ovl_game_menu.o $(BUILD_DIR)/prodos_gamestate_io.o
 
+$(BUILD_DIR)/cnsl.bin: $(BUILD_DIR)/ovl_council_nations_entry.o $(BUILD_DIR)/ovl_council_nations.o $(OVL_CFG) | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/cnsl.bin $(BUILD_DIR)/ovl_council_nations_entry.o $(BUILD_DIR)/ovl_council_nations.o
+
 $(BUILD_DIR)/ovl_diplomacy_entry.o: $(ASM_DIR)/ovl_diplomacy_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_diplomacy_entry.s -o $(BUILD_DIR)/ovl_diplomacy_entry.o
 
@@ -202,6 +209,9 @@ $(BUILD_DIR)/ovl_science_entry.o: $(ASM_DIR)/ovl_science_entry.s | $(BUILD_DIR)
 
 $(BUILD_DIR)/ovl_game_menu_entry.o: $(ASM_DIR)/ovl_game_menu_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_game_menu_entry.s -o $(BUILD_DIR)/ovl_game_menu_entry.o
+
+$(BUILD_DIR)/ovl_council_nations_entry.o: $(ASM_DIR)/ovl_council_nations_entry.s | $(BUILD_DIR)
+	ca65 $(ASM_DIR)/ovl_council_nations_entry.s -o $(BUILD_DIR)/ovl_council_nations_entry.o
 
 $(BUILD_DIR)/loader.o: $(LOADER_DIR)/loader.s | $(BUILD_DIR)
 	ca65 $(LOADER_DIR)/loader.s -o $(BUILD_DIR)/loader.o

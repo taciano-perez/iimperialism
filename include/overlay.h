@@ -18,6 +18,7 @@
 #define OVL_BATTLE 7
 #define OVL_SCIENCE 8
 #define OVL_GAME_MENU 9
+#define OVL_COUNCIL_NATIONS 10
 
 /* Disk file names for the overlay binaries (ProDOS, uppercase, no extension) */
 #define OVL_FILE_INDUSTRY   "ISCR"
@@ -30,6 +31,7 @@
 #define OVL_FILE_BATTLE "BSCR"
 #define OVL_FILE_SCIENCE "SSCR"
 #define OVL_FILE_GAME_MENU "MENU"
+#define OVL_FILE_COUNCIL_NATIONS "CNSL"
 
 /* Overlays are loaded on demand by run_overlay(). */
 void init_overlays(void);

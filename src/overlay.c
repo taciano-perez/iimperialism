@@ -18,6 +18,7 @@ static const char* overlay_filename(unsigned char id) {
         case OVL_BATTLE: return OVL_FILE_BATTLE;
         case OVL_SCIENCE: return OVL_FILE_SCIENCE;
         case OVL_GAME_MENU: return OVL_FILE_GAME_MENU;
+        case OVL_COUNCIL_NATIONS: return OVL_FILE_COUNCIL_NATIONS;
         default:             return 0;
     }
 }

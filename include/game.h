@@ -14,6 +14,9 @@
 #define SCIENCE_PORTRAIT 3
 #define SHIP_PIRATE 4
 #define SHIP 5
+#define COUNTRY1 6
+#define COUNTRY2 7
+#define COMPASS 8
 
 /* Add more picture indices here as you add pictures */
 
@@ -30,6 +33,7 @@
 #define SCREEN_TRADE_EXPEDITION 6
 #define SCREEN_BATTLE 7
 #define SCREEN_SCIENCE 8
+#define SCREEN_COUNCIL_NATIONS 9
 
 /* ============================================================================
  * Resource Constants
