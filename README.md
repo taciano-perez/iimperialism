@@ -200,7 +200,6 @@ overlays are relinked.
 - Refactor for saving memory
   - Unless we need it for country name, remove cgetc_at from ui.c
 - Add main menu
-- Add retirement/end screen
 - Add splash screen at startup and seed random number gen
 - Randomize country names and their exports/imports
 - Decrease the relationship status per turn
@@ -209,3 +208,5 @@ overlays are relinked.
 - Attempt to merge overlays when each is less than 1KB to reclaim floppy space
 - Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed
 - Handle overflows of numerical fields when increasing values
+- Improve victory screen
+- Consider adding map screen

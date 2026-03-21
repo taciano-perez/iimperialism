@@ -2,26 +2,115 @@
 #include "game.h"
 
 static const char STR_TITLE[] = "Council of Nations";
-static const char STR_PROMPT[] = "Press any key to continue";
+static const char STR_NATION[] = "Nation";
+static const char STR_PROVINCES[] = "Provinces";
+static const char STR_VOTED_FOR[] = "Voted for";
+static const char STR_ABSTAINED[] = "Abstained";
+static const char STR_VOTES_FOR[] = "Votes for Haxaco:";
+static const char STR_VICTORY_CONDITION[] = "Victory Condition:";
+static const char STR_VICTORY_TARGET[] = "24 votes";
+static const char STR_WIN[] = "You have won the game!";
+static const char STR_ADVICE_1[] = "Keep trading to improve relations";
+static const char STR_ADVICE_2[] = "and win the council's favor.";
+static const unsigned char COUNCIL_NATION_COUNT = 6U;
+static const unsigned char COUNCIL_VICTORY_VOTES = 24U;
+
+static const char* get_council_nation_name(unsigned char nation_index);
+static unsigned char get_council_provinces(unsigned char nation_index);
+static const char* get_council_vote_target(unsigned char nation_index);
+static unsigned char council_votes_for_haxaco(void);
+static unsigned char council_victory_achieved(unsigned char votes_for_haxaco);
+
+static const char* get_council_nation_name(unsigned char nation_index) {
+    if (nation_index == 0U) {
+        return state.nation_name;
+    }
+
+    return state.foreign_nations[nation_index - 1U].name;
+}
+
+static unsigned char get_council_provinces(unsigned char nation_index) {
+    if (nation_index < 3U) {
+        return 8U;
+    }
+
+    return 4U;
+}
+
+static const char* get_council_vote_target(unsigned char nation_index) {
+    if (nation_index == 0U) {
+        return state.nation_name;
+    }
+
+    if (state.foreign_nations[nation_index - 1U].relations > RELATION_EXCELLENT) {
+        return state.nation_name;
+    }
+
+    if (nation_index < 3U) {
+        return get_council_nation_name(nation_index);
+    }
+
+    return STR_ABSTAINED;
+}
+
+static unsigned char council_votes_for_haxaco(void) {
+    unsigned char nation_index;
+    unsigned char votes_for_haxaco;
+
+    votes_for_haxaco = 0U;
+    for (nation_index = 0U; nation_index < COUNCIL_NATION_COUNT; ++nation_index) {
+        if (get_council_vote_target(nation_index) == state.nation_name) {
+            votes_for_haxaco = (unsigned char)(votes_for_haxaco + get_council_provinces(nation_index));
+        }
+    }
+
+    return votes_for_haxaco;
+}
+
+static unsigned char council_victory_achieved(unsigned char votes_for_haxaco) {
+    return votes_for_haxaco >= COUNCIL_VICTORY_VOTES;
+}
 
 void render_council_nations_screen(void) {
+    unsigned char nation_index;
+    unsigned char votes_for_haxaco;
+    unsigned char victory_achieved;
+
     clear_screen();
     print(11, 0, STR_TITLE);
 
-    print(0, 4, "Loke");
-    draw_picture_at(COUNTRY1, 5, 4);
-    
-    draw_picture_at(COUNTRY2, 10, 6);
-    print(14, 9, "Kathay");
+    box(0, 2, 39, 10);
+    print(2, 2, STR_NATION);
+    print(12, 2, STR_PROVINCES);
+    print(25, 2, STR_VOTED_FOR);
 
-    print(36, 1, "N");
-    print(34, 3, "W");
-    draw_picture_at(COMPASS, 34, 2);
-    print(38, 3, "E");
-    print(36, 5, "S");
+    for (nation_index = 0U; nation_index < COUNCIL_NATION_COUNT; ++nation_index) {
+        unsigned char row_y;
 
+        row_y = (unsigned char)(4U + nation_index * 1U);
 
-    print(9, 22, STR_PROMPT);
-    cgetc();
-    state.current_screen = SCREEN_INDUSTRY;
+        print(2, row_y, get_council_nation_name(nation_index));
+        print_int_right_aligned(20, row_y, get_council_provinces(nation_index));
+        print(26, row_y, get_council_vote_target(nation_index));
+    }
+
+    votes_for_haxaco = council_votes_for_haxaco();
+    victory_achieved = council_victory_achieved(votes_for_haxaco);
+
+    print(5, 12, STR_VOTES_FOR);
+    print_int_right_aligned(25, 12, votes_for_haxaco);
+    print(5, 13, STR_VICTORY_CONDITION);
+    print(24, 13, STR_VICTORY_TARGET);
+
+    draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
+    if (victory_achieved) {
+        print(5, 20, STR_WIN);
+        cgetc();
+    } else {
+        print(5, 20, STR_ADVICE_1);
+        print(5, 21, STR_ADVICE_2);
+        print(5, 22, "Press any key to continue.");
+        cgetc();
+        state.current_screen = SCREEN_INDUSTRY;
+    }
 }

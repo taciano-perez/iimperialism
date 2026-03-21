@@ -16,7 +16,8 @@
 #define SHIP 5
 #define COUNTRY1 6
 #define COUNTRY2 7
-#define COMPASS 8
+#define COUNTRY3 8
+#define COMPASS 9
 
 /* Add more picture indices here as you add pictures */
 
