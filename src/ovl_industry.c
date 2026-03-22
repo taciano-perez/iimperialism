@@ -8,7 +8,9 @@
 void render_industry_screen(void) {
     clear_screen();
 
-    print_bold(0,  0, "Ministry of Industry");
+    print(0, 0, "Nation of");
+    print_bold(10,  0, state.nation_name);
+    print(0, 1, "Ministry of Industry");
     render_turn_funds_header();
 
     render_warehouse_box();

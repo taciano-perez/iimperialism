@@ -66,6 +66,29 @@ int main(void) {
     ui_init();
     seed_random(1);
     init_game();
+
+    // splash screen
+    clear_screen();
+    print_bold(1, 1, "I I M P E R I A L I S M !");
+    print(1, 2, "-------------------------");
+    print(0, 3, "A game based on the European");
+    print(2, 4, "expansion of the 1900's");
+    draw_picture_at(SHIP_SPLASH, 1, 10);
+    print(28, 6, "Created By:");
+    print(29, 7, "Taciano");
+    print(29, 8, "Dreckmann");
+    print(29, 9, "Perez");
+    print_bold(28, 11, "===========");
+    print(29, 13, "Copyright");
+    print(31, 14, "2026");
+    print_bold(28, 16, "===========");
+    print(29, 17, "Press the");
+    print_bold(29, 18, "`ESC`");
+    print(34, 18, "key");
+    print(29, 19, "to start.");
+
+    cgetc();
+
     while (1) { // main game loop
         if (state.current_screen == SCREEN_INDUSTRY) {
             run_overlay(OVL_INDUSTRY);
