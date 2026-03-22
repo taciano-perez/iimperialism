@@ -8,7 +8,7 @@
 void render_industry_screen(void) {
     clear_screen();
 
-    print(0,  0, "Ministry of Industry");
+    print_bold(0,  0, "Ministry of Industry");
     render_turn_funds_header();
 
     render_warehouse_box();

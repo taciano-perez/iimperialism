@@ -50,6 +50,10 @@ void print(unsigned char x, unsigned char y, const char* text) {
     draw_text_hgr_opaque(text, x, y);
 }
 
+void print_bold(unsigned char x, unsigned char y, const char* text) {
+    draw_text_hgr_opaque_bold(text, x, y);
+}
+
 void print_right_aligned(unsigned char x, unsigned char y, const char* text) {
     unsigned char text_length;
     int pos_x;

@@ -8,7 +8,7 @@ $0100-$01FF  6502 hardware stack
 $0200-$03FF  System / ProDOS vectors
 $0400-$07FF  Text screen page 1
 $0803-$080E  STARTUP            (cc65 crt0)
-$080F-$0844  JMPTAB             (resident jump table used by overlays)
+$080F-$084D  JMPTAB             (resident jump table used by overlays)
 $0824-$1FFF  LOWCODE            (resident UI + core logic)
 $2000-$3FFF  HGR page 1         (graphics memory; no code here)
 $4000-...    CODE/RODATA/DATA   (main resident code + data)
@@ -21,9 +21,9 @@ $BF00-$BFFF  ProDOS MLI
 
 Current resident note:
 
-- `print()` uses the aligned HGR text blitter in `asm/text_hgr.s`, which lives in
-  `LOWCODE` and trades a small amount of resident code and lookup-table data for
-  much faster text rendering
+- `print()` and `print_bold()` use aligned HGR text blitters in `asm/text_hgr.s`,
+  which live in `LOWCODE` and trade a small amount of resident code and lookup-table
+  data for much faster text rendering
 
 ## Why the Main Binary Is Large
 
@@ -122,6 +122,9 @@ $0839  JMP _clear_area
 $083C  JMP _paint_area
 $083F  JMP _rand_range
 $0842  JMP _init_game
+$0845  JMP _print_int_right_aligned_currency
+$0848  JMP _render_turn_funds_header
+$084B  JMP _print_bold
 ```
 
 Rule: keep `asm/jmptab.s` and `config/apple2-ovl.cfg` in sync. Rebuild overlays
@@ -208,7 +211,8 @@ $(AC) -p $(DISK) DSCR BIN 0x8800 < $(BUILD_DIR)/dscr.bin
 If the overlay needs a resident function not in JMPTAB, append a new JMP entry in
 `asm/jmptab.s`, export it from `config/apple2-ovl.cfg`, and declare it in
 `include/game.h`. Current examples include `clear_area(int x, int y, int width, int height)`
-at `$0839`.
+at `$0839` and `print_bold(unsigned char x, unsigned char y, const char* text)`
+at `$084B`.
 
 ## Expansion Areas
 

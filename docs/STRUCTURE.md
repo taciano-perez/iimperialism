@@ -12,7 +12,7 @@ artifacts separated.
 - `config/` - cc65 linker configs.
 - `assets/` - disk images and other game assets.
 - `docs/` - design and technical documentation.
-- `tools/` - external build tools (AppleCommander).
+- `tools/` - build and support tools, including AppleCommander and font extraction scripts.
 - `build/` - build output (objects, binaries, maps, loader).
 
 ## Build Outputs

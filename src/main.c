@@ -16,7 +16,7 @@ static unsigned char selected_trade_nation;
 
 void render_warehouse_box() {
     box(BOX1_X1, BOX1_Y1, BOX1_X2, BOX1_Y2);
-    print ((BOX1_X1+1), BOX1_Y1, "Warehouse");
+    print((BOX1_X1+1), BOX1_Y1, "Warehouse");
 
     print((BOX1_X1+1), (BOX1_Y1+1), "Timber:");
     print_int_right_aligned((BOX1_X1+11), (BOX1_Y1+1), state.resources[RESOURCE_TIMBER]);
@@ -45,7 +45,7 @@ void render_warehouse_box() {
 }
 
 void render_turn_funds_header(void) {
-    print(30, 0, "Turn:");
+    print(28, 0, "Turn:");
     print_int_right_aligned(39, 0, state.turn_number);
     print(27, 1, "Funds:");
     print_int_right_aligned_currency(39, 1, state.money);

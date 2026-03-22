@@ -22,6 +22,7 @@
 ;  $0842  JMP _init_game
 ;  $0845  JMP _print_int_right_aligned_currency
 ;  $0848  JMP _render_turn_funds_header
+;  $084B  JMP _print_bold
 
     .import _clear_screen
     .import _clear_input_area
@@ -43,6 +44,7 @@
     .import _init_game
     .import _print_int_right_aligned_currency
     .import _render_turn_funds_header
+    .import _print_bold
 
     .segment "JMPTAB"
 
@@ -66,3 +68,4 @@
     jmp _init_game                  ; $0842
     jmp _print_int_right_aligned_currency ; $0845
     jmp _render_turn_funds_header   ; $0848
+    jmp _print_bold                 ; $084B

@@ -157,6 +157,7 @@ void clear_input_area();
 void clear_area(unsigned char x, unsigned char y, unsigned char width, unsigned char height);
 void paint_area(unsigned char x, unsigned char y, unsigned char width, unsigned char height, unsigned char color);
 void print (unsigned char x, unsigned char y, const char* text);
+void print_bold(unsigned char x, unsigned char y, const char* text);
 void print_right_aligned(unsigned char x, unsigned char y, const char* text);
 void print_int_right_aligned(unsigned char x, unsigned char y, unsigned int value);
 void print_int_right_aligned_currency(unsigned char x, unsigned char y, unsigned long value);

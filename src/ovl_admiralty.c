@@ -14,7 +14,7 @@ void render_admiralty_screen(void) {
     while (1) {
         clear_screen();
 
-        print(0,  0, "Admiralty Headquarters");
+        print_bold(0,  0, "Admiralty Headquarters");
         render_turn_funds_header();
 
         render_warehouse_box();

@@ -61,3 +61,6 @@ dkms.conf
 
 # LLM configuration files
 .claude
+
+# Python cache files
+__pycache__/
