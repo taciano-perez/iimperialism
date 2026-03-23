@@ -174,7 +174,7 @@ void init_game() {
     update_foreign_market_prices();
 
     state.turn_number = 99;
-    snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
+    // snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
     state.current_screen = SCREEN_INDUSTRY;
     
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;

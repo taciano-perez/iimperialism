@@ -97,15 +97,6 @@ void box(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2)
     tgi_line (x1*CHAR_WIDTH, y2*CHAR_HEIGHT, x2*CHAR_WIDTH+(CHAR_WIDTH-1), y2*CHAR_HEIGHT); // bottom
 }
 
-/* Read a single character from the keyboard, echoing it at (x, y). */
-char cgetc_at(unsigned char x, unsigned char y) {
-    char ch;
-    ui_buffer[0] = ch = cgetc();
-    ui_buffer[1] = '\0';
-    print(x, y, ui_buffer);
-    return ch;
-}
-
 /* Read an unsigned integer from the keyboard, echoing digits at (x, y).
  * max_digits limits input length (1-10). Press Enter to confirm. */
 unsigned int scan_uint(unsigned char x, unsigned char y, unsigned char max_digits) {
@@ -122,27 +113,63 @@ unsigned int scan_uint(unsigned char x, unsigned char y, unsigned char max_digit
             if (len < max_digits) {
                 ui_buffer[len++] = ch;
                 ui_buffer[len] = '\0';
-                /* Clear field then redraw */
-                tgi_setcolor(TGI_COLOR_BLACK);
-                tgi_bar(x * CHAR_WIDTH, y * CHAR_HEIGHT,
-                        (x + max_digits) * CHAR_WIDTH - 1,
-                        y * CHAR_HEIGHT + CHAR_HEIGHT - 1);
-                tgi_setcolor(TGI_COLOR_WHITE);
+                clear_area(x, y, max_digits, 1);
                 print(x, y, ui_buffer);
             }
         } else if (ch == '\b' || ch == 127) { /* backspace or delete */
             if (len > 0) {
                 ui_buffer[--len] = '\0';
-                tgi_setcolor(TGI_COLOR_BLACK);
-                tgi_bar(x * CHAR_WIDTH, y * CHAR_HEIGHT,
-                        (x + max_digits) * CHAR_WIDTH - 1,
-                        y * CHAR_HEIGHT + CHAR_HEIGHT - 1);
-                tgi_setcolor(TGI_COLOR_WHITE);
-                if (len > 0) print(x, y, ui_buffer);
+                clear_area(x, y, max_digits, 1);
+                if (len > 0) {
+                    print(x, y, ui_buffer);
+                }
             }
         } else if (ch == '\r' || ch == '\n') {
             if (len > 0) {
                 return (unsigned int)atoi(ui_buffer);
+            }
+        }
+    }
+}
+
+void scan_text(unsigned char x, unsigned char y, char* buffer, unsigned char max_length) {
+    unsigned char len = 0;
+    char ch;
+
+    if (max_length == 0U) {
+        if (buffer != 0) {
+            buffer[0] = '\0';
+        }
+        return;
+    }
+
+    if (max_length > 31U) {
+        max_length = 31U;
+    }
+
+    buffer[0] = '\0';
+
+    while (1) {
+        ch = cgetc();
+
+        if (ch >= 32 && ch <= 126) {
+            if (len < max_length) {
+                buffer[len++] = ch;
+                buffer[len] = '\0';
+                clear_area(x, y, max_length, 1);
+                print_bold(x, y, buffer);
+            }
+        } else if (ch == '\b' || ch == 127) {
+            if (len > 0U) {
+                buffer[--len] = '\0';
+                clear_area(x, y, max_length, 1);
+                if (len > 0U) {
+                    print_bold(x, y, buffer);
+                }
+            }
+        } else if (ch == '\r' || ch == '\n') {
+            if (len > 0U) {
+                return;
             }
         }
     }

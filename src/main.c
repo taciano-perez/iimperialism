@@ -14,6 +14,9 @@
 GameState state;
 static unsigned char selected_trade_nation;
 
+static unsigned int wait_for_splash_escape(void);
+static void prompt_for_nation_name(char* nation_name, unsigned char max_length);
+
 void render_warehouse_box() {
     box(BOX1_X1, BOX1_Y1, BOX1_X2, BOX1_Y2);
     print((BOX1_X1+1), BOX1_Y1, "Warehouse");
@@ -59,13 +62,49 @@ unsigned char get_selected_trade_nation(void) {
     return selected_trade_nation;
 }
 
+static unsigned int wait_for_splash_escape(void) {
+    char key;
+    unsigned int entropy = 0xA55AU;
+
+    while (1) {
+        entropy = (unsigned int)((entropy << 1) ^ (entropy >> 1) ^ 0xB400U ^ 0x003DU);
+
+        if (kbhit()) {
+            key = cgetc();
+            if (key == 27) {
+                break;
+            }
+            entropy ^= (unsigned char)key;
+        }
+    }
+
+    return entropy;
+}
+
+static void prompt_for_nation_name(char* nation_name, unsigned char max_length) {
+    clear_screen();
+    box(0, 8, 39, 16);
+    print(5, 9, "Your Excellency,");
+    print(4, 11, "What is the name of your");
+    print(5, 13, "nation?");
+
+    print(13, 14, "----------");
+    scan_text(13, 13, nation_name, max_length);
+}
+
+void start_new_game(void) {
+    char nation_name[11];
+
+    prompt_for_nation_name(nation_name, 10U);
+    init_game();
+    snprintf(state.nation_name, sizeof(state.nation_name), "%s", nation_name);
+}
+
 int main(void) {
 
     char key;
     init_overlays();
     ui_init();
-    seed_random(1);
-    init_game();
 
     // splash screen
     clear_screen();
@@ -86,8 +125,8 @@ int main(void) {
     print_bold(29, 18, "`ESC`");
     print(34, 18, "key");
     print(29, 19, "to start.");
-
-    cgetc();
+    seed_random(wait_for_splash_escape());
+    start_new_game();
 
     while (1) { // main game loop
         if (state.current_screen == SCREEN_INDUSTRY) {

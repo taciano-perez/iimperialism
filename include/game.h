@@ -165,12 +165,13 @@ void print_int_right_aligned_currency(unsigned char x, unsigned char y, unsigned
 void print_int(unsigned char x, unsigned char y, unsigned int value);
 void draw_picture_at(const unsigned char picture_index, const unsigned char x_byte, unsigned char y);
 void box (unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
-char cgetc_at(unsigned char x, unsigned char y);
 unsigned int scan_uint(unsigned char x, unsigned char y, unsigned char max_digits);
+void scan_text(unsigned char x, unsigned char y, char* buffer, unsigned char max_length);
 
 // main.c (resident — accessible to overlays via jump table at $0821)
 void render_warehouse_box(void);
 void render_turn_funds_header(void);
+void start_new_game(void);
 const char* get_resource_name(unsigned char resource);
 const char* get_relation_name(unsigned char relation);
 void set_selected_trade_nation(unsigned char nation_index);

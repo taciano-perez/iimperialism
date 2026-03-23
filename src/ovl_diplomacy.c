@@ -24,7 +24,7 @@ void render_diplomacy_screen(void) {
     unsigned char key;
 
     clear_screen();
-    print_bold(0, 0, "Foreign Office");
+    print(0, 0, "Foreign Office");
     render_turn_funds_header();
 
     print(NATION_X, 2, "Nation");

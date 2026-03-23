@@ -32,8 +32,7 @@ void render_game_menu_screen(void) {
         switch (key) {
             case 'N':
             case 'n':
-                init_game();
-                state.current_screen = SCREEN_INDUSTRY;
+                start_new_game();
                 return;
 
             case 'L':

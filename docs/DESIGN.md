@@ -12,6 +12,15 @@ The current playable loop focuses on:
 
 The player cycles through screen overlays to adjust orders, then advances the turn.
 
+## Startup Flow
+
+On cold start, the player sees a splash screen and must press `ESC` to continue.
+The delay before that keypress is mixed into the RNG seed to avoid deterministic
+market and battle rolls. After the splash, the player is prompted to enter a
+nation name of up to 10 characters before the initial game state is created.
+
+The same nation-naming prompt is also reused by the game menu's `New Game` action.
+
 ## Current Gameplay Model
 
 ### Resource Layers
@@ -127,6 +136,6 @@ On some Windows environments, `make SHELL=cmd disk` is required.
 
 ## Near-Term Roadmap
 
-- diplomacy screen
-- trade voyage screens
-- menu, save/load/quit flow, and endgame/retirement flow
+- expand diplomacy depth beyond the current trade-expedition entry flow
+- add more trade-voyage and battle variety
+- add endgame/retirement flow

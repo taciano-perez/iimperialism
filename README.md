@@ -19,7 +19,10 @@ within the Apple II's constraints:
   `CLOSE` calls instead of `stdio`.
 - Save/load also use direct ProDOS MLI calls instead of `fopen()` / `fread()` /
   `fwrite()`.
+- On first launch, the splash screen waits for `ESC`, uses that human-timed delay
+  to seed gameplay randomness, and then prompts for a nation name (up to 10 chars).
 - Pressing `ESC` opens the `MENU` overlay for new/load/save actions.
+- Choosing `New Game` from the menu also re-prompts for the nation name.
 - UI primitives and core game logic are kept in **LOWCODE** (`$0824-$1FFF`) below
   the HGR screen to preserve resident code space.
 - Disk autoboot uses ProDOS `SYS` loader `IIMP.SYSTEM` to launch `IIMPERIALISM`
@@ -43,8 +46,8 @@ in the diplomacy screen as text using these ranges:
 
 | File | Purpose |
 |------|---------|
-| `src/main.c` | Main loop and screen dispatch |
-| `src/ui.c` | UI primitives (`print`, `box`, `clear_screen`, etc.) |
+| `src/main.c` | Main loop, startup/new-game flow, and screen dispatch |
+| `src/ui.c` | UI primitives (`print`, `box`, `clear_screen`, `scan_uint`, `scan_text`, etc.) |
 | `src/ui_buffers.c` | Shared scratch UI buffer storage |
 | `src/logic.c` | `init_game()`, `next_turn()` |
 | `src/gamestate.c` | Shared `GameState` declarations |
@@ -197,10 +200,7 @@ overlays are relinked.
   - introduce enemy powers and not only pirates
   - add sound effects
 - Expand the science tree with wagon capacity improvements
-- Refactor for saving memory
-  - Unless we need it for country name, remove cgetc_at from ui.c
 - Add main menu
-- Add splash screen at startup and seed random number gen
 - Randomize country names and their exports/imports
 - Decrease the relationship status per turn
 - Adjust the initial money amount
@@ -210,3 +210,4 @@ overlays are relinked.
 - Handle overflows of numerical fields when increasing values
 - Improve victory screen
 - Consider adding map screen
+- Balance game for all stages (beginning, mid, and end)
