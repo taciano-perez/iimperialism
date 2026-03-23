@@ -44,6 +44,7 @@ C_SOURCES  = \
 ASM_SOURCES = \
 	$(ASM_DIR)/werner.s \
 	$(ASM_DIR)/text_hgr.s \
+	$(ASM_DIR)/ui_wait.s \
 	$(ASM_DIR)/jmptab.s
 
 MAIN_OBJECTS = \
@@ -56,6 +57,7 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/ui.o \
 	$(BUILD_DIR)/werner.o \
 	$(BUILD_DIR)/text_hgr.o \
+	$(BUILD_DIR)/ui_wait.o \
 	$(BUILD_DIR)/gamestate.o \
 	$(BUILD_DIR)/random.o \
 	$(BUILD_DIR)/logic.o \

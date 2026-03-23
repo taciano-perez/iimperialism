@@ -148,7 +148,11 @@ int main(void) {
             clear_screen();
             draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
             print(5, 20, "Ambushed by pirates!");
+            print(0, 0, "Navy of");
+            print(7, 0, state.nation_name);
+            print(23, 0, "Enemy Fleet");
             run_overlay(OVL_BATTLE);
+            continue;
         } else if (state.current_screen == SCREEN_SCIENCE) {
             run_overlay(OVL_SCIENCE);
             continue;

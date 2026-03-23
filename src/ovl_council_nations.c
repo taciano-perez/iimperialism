@@ -115,7 +115,7 @@ void render_council_nations_screen(void) {
     } else {
         print(5, 20, STR_ADVICE_1);
         print(5, 21, STR_ADVICE_2);
-        print(5, 22, "Press any key to continue.");
+        print_bold(7, 23, "Press any key to continue...");
         cgetc();
         state.current_screen = SCREEN_INDUSTRY;
     }

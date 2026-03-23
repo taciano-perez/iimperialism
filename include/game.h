@@ -170,6 +170,7 @@ void print_int_right_aligned_currency(unsigned char x, unsigned char y, unsigned
 void print_int(unsigned char x, unsigned char y, unsigned int value);
 void draw_picture_at(const unsigned char picture_index, const unsigned char x_byte, unsigned char y);
 void box (unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
+void wait_three_seconds_or_keypress(void);
 unsigned int scan_uint(unsigned char x, unsigned char y, unsigned char max_digits);
 void scan_text(unsigned char x, unsigned char y, char* buffer, unsigned char max_length);
 

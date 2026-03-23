@@ -93,6 +93,28 @@ Documentation: `docs/FLOPPY.md`, `docs/MEMORY.md`, `docs/DESIGN.md`,
 - **cc65** cross-development package
 - **Java** (for AppleCommander)
 
+## Runtime Requirements
+
+The current build targets a **64 KB Apple II family machine with ProDOS support**.
+
+Supported in principle:
+
+- Apple IIe
+- Apple IIc
+- Apple IIgs running Apple II compatible ProDOS software
+- Apple II / Apple II Plus class machines only if they have enough RAM and hardware support to run ProDOS correctly
+
+Not supported:
+
+- 48 KB Apple II configurations
+- Apple II / Apple II Plus / Europlus machines without the RAM expansion needed to reach 64 KB
+
+Why:
+
+- the game uses the main 64 KB Apple II memory map
+- it relies on ProDOS 8 boot/loading and direct ProDOS MLI calls
+- it uses HGR graphics mode and loads 2 KB overlays into main RAM at runtime
+
 ### Windows
 
 1. Download a Windows snapshot from [cc65 releases](https://github.com/cc65/cc65/releases).
@@ -202,7 +224,6 @@ overlays are relinked.
 - Expand the science tree with wagon capacity improvements
 - Add main menu
 - Randomize country names and their exports/imports
-- Decrease the relationship status per turn
 - Adjust the initial money amount
 - Admiralty improvement: increase cost of traders and warships according to science level
 - Attempt to merge overlays when each is less than 1KB to reclaim floppy space

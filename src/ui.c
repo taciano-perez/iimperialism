@@ -8,7 +8,6 @@
 
 #define CHAR_WIDTH 7
 #define CHAR_HEIGHT 8
-
 static char* append_ulong_decimal(char* buffer, unsigned long value);
 
 #pragma code-name (push, "LOWCODE")

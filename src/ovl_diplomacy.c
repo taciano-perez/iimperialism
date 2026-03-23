@@ -100,9 +100,10 @@ static void trade_expedition(void) {
         }
         nation_index = (unsigned char)(selection - 1);
 
-        print(5, 22, "Fleet sailing to the Sea of");
-        print(33, 22, state.foreign_nations[nation_index].name);
-        cgetc();
+        print(5, 22, "Sailing to the Sea of");
+        print(27, 22, state.foreign_nations[nation_index].name);
+        print(33, 22, "...");
+        wait_three_seconds_or_keypress();
         set_selected_trade_nation(nation_index);
         if (rand_range(1U, 100U) <= TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT) {
             state.current_screen = SCREEN_BATTLE;

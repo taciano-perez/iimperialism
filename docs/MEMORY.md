@@ -125,6 +125,7 @@ $0842  JMP _init_game
 $0845  JMP _print_int_right_aligned_currency
 $0848  JMP _render_turn_funds_header
 $084B  JMP _print_bold
+$084E  JMP _wait_three_seconds_or_keypress
 ```
 
 Rule: keep `asm/jmptab.s` and `config/apple2-ovl.cfg` in sync. Rebuild overlays

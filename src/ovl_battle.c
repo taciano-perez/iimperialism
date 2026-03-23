@@ -102,7 +102,6 @@ void render_battle_screen(void) {
     visible_enemy_ships = MIN(enemy_ships, MAX_VISIBLE_SHIPS);
 
     // Render player's navy
-    print(0, 0, "Haxaco Navy");
     print(0, 1, STR_BATTLE_FIREPOWER);
     print(0, 2, "Traders:");
     render_firepower(0, visible_friendly_ships);
@@ -116,7 +115,6 @@ void render_battle_screen(void) {
     }
 
     // Render enemy fleet
-    print(23, 0, "Enemy Fleet");
     print(23, 1, STR_BATTLE_FIREPOWER);
     render_firepower(1, visible_enemy_ships);
     for (i = 0; i < visible_enemy_ships; ++i) {
@@ -149,6 +147,7 @@ void render_battle_screen(void) {
                         print(5, 21, STR_BOUNTY);
                         print_int(29, 21, bounty);
                         state.current_screen = SCREEN_TRADE_EXPEDITION;
+                        wait_three_seconds_or_keypress();
                         return;
                     }
                     previous_friendly_ships = visible_friendly_ships;
@@ -159,7 +158,7 @@ void render_battle_screen(void) {
                         state.remaining_turn_capacity = state.traders * CAPACITY_PER_TRADER_BASE;
                         clear_area(10, 2, 15, 1);
                         print_int_right_aligned(15, 2, state.traders);
-                        cgetc();
+                        wait_three_seconds_or_keypress();
                         clear_area(5, 22, 31, 1);
                         print(5, 22, STR_FIGHT);
                     }
@@ -170,6 +169,7 @@ void render_battle_screen(void) {
                         clear_input_area();
                         print(5, 20, "Defeat!");
                         state.current_screen = SCREEN_DIPLOMACY;
+                        wait_three_seconds_or_keypress();
                         return;
                     }
                 }
