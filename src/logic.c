@@ -6,6 +6,7 @@
 static unsigned char get_resource_base_price(unsigned char resource);
 static unsigned char get_relation_tier(unsigned char relations);
 static unsigned int apply_percent(unsigned int value, unsigned char percent);
+static void add_resource_saturating(unsigned char resource, unsigned char amount);
 static void update_foreign_market_prices(void);
 
 static unsigned char get_resource_base_price(unsigned char resource) {
@@ -52,6 +53,18 @@ static unsigned char get_relation_tier(unsigned char relations) {
 
 static unsigned int apply_percent(unsigned int value, unsigned char percent) {
     return ((value * percent) + 50U) / 100U;
+}
+
+static void add_resource_saturating(unsigned char resource, unsigned char amount) {
+    unsigned int current;
+
+    current = state.resources[resource];
+    if ((unsigned int)(MAX_UINT - current) < amount) {
+        state.resources[resource] = MAX_UINT;
+        return;
+    }
+
+    state.resources[resource] = (unsigned int)(current + amount);
 }
 
 static void update_foreign_market_prices(void) {
@@ -171,48 +184,70 @@ void init_game() {
     update_foreign_market_prices();
 
     state.turn_number = 99;
-    // strcpy(state.nation_name, "Haxaco");
     state.current_screen = SCREEN_INDUSTRY;
     
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;
 }
 
 void next_turn() {
+    unsigned char produced;
+    unsigned char i;
+
     // Update resources based on transport orders
-    state.resources[RESOURCE_TIMBER] += state.transport_timber;
-    state.resources[RESOURCE_WOOL] += state.transport_wool;
-    state.resources[RESOURCE_IRON] += state.transport_iron;
-    state.resources[RESOURCE_COAL] += state.transport_coal;
+    add_resource_saturating(RESOURCE_TIMBER, state.transport_timber);
+    add_resource_saturating(RESOURCE_WOOL, state.transport_wool);
+    add_resource_saturating(RESOURCE_IRON, state.transport_iron);
+    add_resource_saturating(RESOURCE_COAL, state.transport_coal);
 
-    // Update resources based on production orders 
-    state.resources[RESOURCE_LUMBER] += state.production_lumber;
-    state.resources[RESOURCE_TIMBER] -= 2 * state.production_lumber;
-    state.resources[RESOURCE_FABRIC] += state.production_fabric;
-    state.resources[RESOURCE_WOOL] -= 2 * state.production_fabric;
-    state.resources[RESOURCE_STEEL] += state.production_steel;
-    state.resources[RESOURCE_IRON] -= 2 * state.production_steel;
-    state.resources[RESOURCE_COAL] -= 2 * state.production_steel;
-    state.resources[RESOURCE_FURNITURE] += state.production_furniture;
-    state.resources[RESOURCE_LUMBER] -= 2 * state.production_furniture;
-    state.resources[RESOURCE_CLOTHES] += state.production_clothes;
-    state.resources[RESOURCE_FABRIC] -= 2 * state.production_clothes;
-    state.resources[RESOURCE_TOOLS] += state.production_tools;
-    state.resources[RESOURCE_STEEL] -= 2 * state.production_tools;
-    state.resources[RESOURCE_GUNS] += state.production_guns;
-    state.resources[RESOURCE_STEEL] -= 2 * state.production_guns;
+    // Apply production in sequence, limited by currently available inputs.
+    produced = MIN(state.production_lumber, state.resources[RESOURCE_TIMBER] / 2U);
+    state.resources[RESOURCE_TIMBER] -= produced * 2U;
+    add_resource_saturating(RESOURCE_LUMBER, produced);
 
-    // cap production orders to available resources
-    state.production_lumber = MIN(state.production_lumber, state.resources[RESOURCE_TIMBER] / 2);
-    state.production_fabric = MIN(state.production_fabric, state.resources[RESOURCE_WOOL] / 2);
-    state.production_steel = MIN(state.production_steel, MIN(state.resources[RESOURCE_IRON] / 2, state.resources[RESOURCE_COAL] / 2));
-    state.production_furniture = MIN(state.production_furniture, state.resources[RESOURCE_LUMBER] / 2);
-    state.production_clothes = MIN(state.production_clothes, state.resources[RESOURCE_FABRIC] / 2);
-    state.production_tools = MIN(state.production_tools, state.resources[RESOURCE_STEEL] / 2);
-    state.production_guns = MIN(state.production_guns, state.resources[RESOURCE_STEEL] / 2);
+    produced = MIN(state.production_fabric, state.resources[RESOURCE_WOOL] / 2U);
+    state.resources[RESOURCE_WOOL] -= produced * 2U;
+    add_resource_saturating(RESOURCE_FABRIC, produced);
+
+    produced = MIN(state.production_steel,
+                   MIN(state.resources[RESOURCE_IRON] / 2U,
+                       state.resources[RESOURCE_COAL] / 2U));
+    state.resources[RESOURCE_IRON] -= produced * 2U;
+    state.resources[RESOURCE_COAL] -= produced * 2U;
+    add_resource_saturating(RESOURCE_STEEL, produced);
+
+    produced = MIN(state.production_furniture, state.resources[RESOURCE_LUMBER] / 2U);
+    state.resources[RESOURCE_LUMBER] -= produced * 2U;
+    add_resource_saturating(RESOURCE_FURNITURE, produced);
+
+    produced = MIN(state.production_clothes, state.resources[RESOURCE_FABRIC] / 2U);
+    state.resources[RESOURCE_FABRIC] -= produced * 2U;
+    add_resource_saturating(RESOURCE_CLOTHES, produced);
+
+    produced = MIN(state.production_tools, state.resources[RESOURCE_STEEL] / 2U);
+    state.resources[RESOURCE_STEEL] -= produced * 2U;
+    add_resource_saturating(RESOURCE_TOOLS, produced);
+
+    produced = MIN(state.production_guns, state.resources[RESOURCE_STEEL] / 2U);
+    state.resources[RESOURCE_STEEL] -= produced * 2U;
+    add_resource_saturating(RESOURCE_GUNS, produced);
+
+    // Clamp persisted orders to what remains affordable for the next turn.
+    state.production_lumber = MIN(state.production_lumber, state.resources[RESOURCE_TIMBER] / 2U);
+    state.production_fabric = MIN(state.production_fabric, state.resources[RESOURCE_WOOL] / 2U);
+    state.production_steel = MIN(state.production_steel, MIN(state.resources[RESOURCE_IRON] / 2U, state.resources[RESOURCE_COAL] / 2U));
+    state.production_furniture = MIN(state.production_furniture, state.resources[RESOURCE_LUMBER] / 2U);
+    state.production_clothes = MIN(state.production_clothes, state.resources[RESOURCE_FABRIC] / 2U);
+    state.production_tools = MIN(state.production_tools, state.resources[RESOURCE_STEEL] / 2U);
+    state.production_guns = MIN(state.production_guns, state.resources[RESOURCE_STEEL] / 2U);
 
     update_foreign_market_prices();
 
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;
+
+    // decrease relations with all foreign nations
+    for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
+        state.foreign_nations[i].relations = MAX(0, state.foreign_nations[i].relations - RELATIONS_LOSS_PER_TURN);
+    }
 
     // update turn number
     ++state.turn_number;

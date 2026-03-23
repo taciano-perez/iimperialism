@@ -2,6 +2,8 @@
 #define GAME_H
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+#define MAX_UINT 65535U
 
 /* ============================================================================
  * Picture Index Constants
@@ -74,6 +76,7 @@
 #define BATTLE_TRADER_HIT_CHANCE_PERCENT 5U
 #define BATTLE_BOUNTY_VARIANCE_PERCENT 50U
 #define SCIENCE_RESEARCH_COST_MULTIPLIER 1000U
+#define RELATIONS_LOSS_PER_TURN 3U
 #define FOREIGN_NATION_COUNT 5
 #define FOREIGN_TRADE_ENTRY_COUNT 3
 #define FOREIGN_NATION_NAME_LENGTH 6

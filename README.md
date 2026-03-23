@@ -207,7 +207,6 @@ overlays are relinked.
 - Admiralty improvement: increase cost of traders and warships according to science level
 - Attempt to merge overlays when each is less than 1KB to reclaim floppy space
 - Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed
-- Handle overflows of numerical fields when increasing values
 - Improve victory screen
 - Consider adding map screen
 - Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
