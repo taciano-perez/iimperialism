@@ -1,4 +1,5 @@
 #include <conio.h>
+#include <string.h>
 #include "game.h"
 
 static const char STR_TITLE[] = "Council of Nations";
@@ -6,7 +7,8 @@ static const char STR_NATION[] = "Nation";
 static const char STR_PROVINCES[] = "Provinces";
 static const char STR_VOTED_FOR[] = "Voted for";
 static const char STR_ABSTAINED[] = "Abstained";
-static const char STR_VOTES_FOR[] = "Votes for Haxaco:";
+static const char STR_VOTES_FOR_PREFIX[] = "Votes for ";
+static const char STR_COLON[] = ":";
 static const char STR_VICTORY_CONDITION[] = "Victory Condition:";
 static const char STR_VICTORY_TARGET[] = "24 votes";
 static const char STR_WIN[] = "You have won the game!";
@@ -75,6 +77,7 @@ void render_council_nations_screen(void) {
     unsigned char nation_index;
     unsigned char votes_for_haxaco;
     unsigned char victory_achieved;
+    unsigned char votes_for_name_x;
 
     clear_screen();
     print(11, 0, STR_TITLE);
@@ -97,7 +100,10 @@ void render_council_nations_screen(void) {
     votes_for_haxaco = council_votes_for_haxaco();
     victory_achieved = council_victory_achieved(votes_for_haxaco);
 
-    print(5, 12, STR_VOTES_FOR);
+    print(5, 12, STR_VOTES_FOR_PREFIX);
+    votes_for_name_x = (unsigned char)(5U + strlen(STR_VOTES_FOR_PREFIX));
+    print(votes_for_name_x, 12, state.nation_name);
+    print((unsigned char)(votes_for_name_x + strlen(state.nation_name)), 12, STR_COLON);
     print_int_right_aligned(25, 12, votes_for_haxaco);
     print(5, 13, STR_VICTORY_CONDITION);
     print(24, 13, STR_VICTORY_TARGET);

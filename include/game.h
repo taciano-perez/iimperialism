@@ -160,6 +160,8 @@ void paint_area(unsigned char x, unsigned char y, unsigned char width, unsigned 
 void print (unsigned char x, unsigned char y, const char* text);
 void print_bold(unsigned char x, unsigned char y, const char* text);
 void print_right_aligned(unsigned char x, unsigned char y, const char* text);
+void format_uint(char* buffer, unsigned int value);
+void format_money(char* buffer, unsigned long value);
 void print_int_right_aligned(unsigned char x, unsigned char y, unsigned int value);
 void print_int_right_aligned_currency(unsigned char x, unsigned char y, unsigned long value);
 void print_int(unsigned char x, unsigned char y, unsigned int value);

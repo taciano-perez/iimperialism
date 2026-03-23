@@ -1,5 +1,4 @@
 #include <conio.h>
-#include <stdio.h>
 #include "game.h"
 #include "strings.h"
 #include "ui_buffers.h"
@@ -13,7 +12,7 @@ static void change_resource_transport_order(const char* resource_name, unsigned 
         print(5, 20, "Transport how many units of");
         print(33, 20, resource_name);
         print(5, 21, STR_PER_TURN_MAX_FMT);
-        sprintf(ui_buffer, STR_MAX_FMT, max_transport);
+        format_uint(ui_buffer, max_transport);
         print(14, 21, ui_buffer);
         *transport_order = scan_uint(25, 21, 5);
         if (*transport_order > max_transport) {
@@ -72,7 +71,7 @@ static void build_wagons(void) {
     } else {
         while (1) {
             print(5, 20, "Build how many wagons?");
-            sprintf(ui_buffer, STR_MAX_FMT, max_wagons);
+            format_uint(ui_buffer, max_wagons);
             print(28, 20, ui_buffer);
             wagons_to_build = scan_uint(5, 21, 5);
             if (wagons_to_build > max_wagons) {

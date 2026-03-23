@@ -1,5 +1,4 @@
 #include <conio.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <apple2.h>
 #include <tgi.h>
@@ -10,7 +9,26 @@
 #define CHAR_WIDTH 7
 #define CHAR_HEIGHT 8
 
+static char* append_ulong_decimal(char* buffer, unsigned long value);
+
 #pragma code-name (push, "LOWCODE")
+
+static char* append_ulong_decimal(char* buffer, unsigned long value) {
+    unsigned long divisor;
+
+    divisor = 1UL;
+    while ((value / divisor) >= 10UL) {
+        divisor *= 10UL;
+    }
+
+    do {
+        *buffer++ = (char)('0' + (unsigned char)(value / divisor));
+        value %= divisor;
+        divisor /= 10UL;
+    } while (divisor != 0UL);
+
+    return buffer;
+}
 
 void ui_init() {
     tgi_install (a2_hi_tgi);
@@ -65,24 +83,44 @@ void print_right_aligned(unsigned char x, unsigned char y, const char* text) {
     print((unsigned char)pos_x, y, text);
 }
 
+void format_uint(char* buffer, unsigned int value) {
+    append_ulong_decimal(buffer, value)[0] = '\0';
+}
+
+void format_money(char* buffer, unsigned long value) {
+    if (value >= 1000000UL) {
+        unsigned long whole;
+        unsigned char fractional;
+
+        whole = value / 1000000UL;
+        fractional = (unsigned char)(((value % 1000000UL) * 100UL) / 1000000UL);
+
+        *buffer++ = '$';
+        buffer = append_ulong_decimal(buffer, whole);
+        *buffer++ = '.';
+        *buffer++ = (char)('0' + (fractional / 10U));
+        *buffer++ = (char)('0' + (fractional % 10U));
+        *buffer++ = 'M';
+        *buffer = '\0';
+        return;
+    }
+
+    *buffer++ = '$';
+    append_ulong_decimal(buffer, value)[0] = '\0';
+}
+
 void print_int_right_aligned(unsigned char x, unsigned char y, unsigned int value) {
-    sprintf(ui_buffer, "%u", value);
+    format_uint(ui_buffer, value);
     print_right_aligned(x, y, ui_buffer);
 }
 
 void print_int_right_aligned_currency(unsigned char x, unsigned char y, unsigned long value) {
-    if (value >= 1000000UL) {
-        unsigned long whole = value / 1000000UL;
-        unsigned char fractional = (unsigned char)(((value % 1000000UL) * 100UL) / 1000000UL);
-        sprintf(ui_buffer, "$%lu.%02uM", whole, fractional);
-    } else {
-        sprintf(ui_buffer, "$%lu", value);
-    }
+    format_money(ui_buffer, value);
     print_right_aligned(x, y, ui_buffer);
 }
 
 void print_int(unsigned char x, unsigned char y, unsigned int value) {
-    sprintf(ui_buffer, "%u", value);
+    format_uint(ui_buffer, value);
     print(x, y, ui_buffer);
 }
 

@@ -1,5 +1,5 @@
 #include "game.h"
-#include <stdio.h>
+#include <string.h>
 
 #pragma code-name (push, "LOWCODE")
 
@@ -159,10 +159,7 @@ void init_game() {
     state.science_level = 0;
 
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
-        snprintf(state.foreign_nations[i].name,
-                 sizeof(state.foreign_nations[i].name),
-                 "%s",
-                 foreign_nation_names[i]);
+        strcpy(state.foreign_nations[i].name, foreign_nation_names[i]);
         state.foreign_nations[i].relations = foreign_nation_relations[i];
 
         for (j = 0; j < FOREIGN_TRADE_ENTRY_COUNT; ++j) {
@@ -174,7 +171,7 @@ void init_game() {
     update_foreign_market_prices();
 
     state.turn_number = 99;
-    // snprintf(state.nation_name, sizeof(state.nation_name), "Haxaco");
+    // strcpy(state.nation_name, "Haxaco");
     state.current_screen = SCREEN_INDUSTRY;
     
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;

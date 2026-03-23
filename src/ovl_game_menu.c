@@ -20,12 +20,12 @@ void render_game_menu_screen(void) {
         int result;
 
         clear_screen();
-        print(12, 2, "Game Menu");
-        box(8, 4, 31, 14);
-        print(11, 6, "N) New Game");
-        print(11, 8, "L) Load Game");
-        print(11, 10, "S) Save Game");
-        print(11, 12, "ESC returns");
+        print_bold(13, 3, "IImperialism!");
+        box(8, 6, 30, 13);
+        print(13, 7, "N) New Game");
+        print(13, 8, "L) Load Game");
+        print(13, 9, "S) Save Game");
+        print(11, 11, "ESC) Resume Game");
 
         key = cgetc();
 

@@ -210,4 +210,5 @@ overlays are relinked.
 - Handle overflows of numerical fields when increasing values
 - Improve victory screen
 - Consider adding map screen
+- Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
 - Balance game for all stages (beginning, mid, and end)

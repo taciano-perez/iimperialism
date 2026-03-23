@@ -1,5 +1,4 @@
 #include <conio.h>
-#include <stdio.h>
 #include "game.h"
 #include "strings.h"
 #include "ui_buffers.h"
@@ -14,7 +13,7 @@ static void change_resource_production_order(const char* resource_name, unsigned
         print(5, 20, "Produce how many units of");
         print(31, 20, resource_name);
         print(5, 21, STR_PER_TURN_MAX_FMT);
-        sprintf(ui_buffer, STR_MAX_FMT, max_production);
+        format_uint(ui_buffer, max_production);
         print(14, 21, ui_buffer);
         new_production_order = scan_uint(25, 21, 5);
         if (new_production_order > max_production) {
@@ -96,7 +95,7 @@ static void train_new_workers(void) {
             print(5, 20, STR_SIR_TRAIN_WORKERS1);
             print(5, 21, STR_SIR_TRAIN_WORKERS2);
             print(20, 21, "Train how many?");
-            sprintf(ui_buffer, STR_MAX_FMT, max_workers);
+            format_uint(ui_buffer, max_workers);
             print (5, 22, ui_buffer);
             workers_to_train = scan_uint(12, 22, 5);
             if (workers_to_train > max_workers) {

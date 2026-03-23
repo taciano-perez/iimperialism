@@ -1,5 +1,4 @@
 #include <conio.h>
-#include <stdio.h>
 #include <string.h>
 #include "game.h"
 #include "overlay.h"
@@ -97,7 +96,7 @@ void start_new_game(void) {
 
     prompt_for_nation_name(nation_name, 10U);
     init_game();
-    snprintf(state.nation_name, sizeof(state.nation_name), "%s", nation_name);
+    strcpy(state.nation_name, nation_name);
 }
 
 int main(void) {
