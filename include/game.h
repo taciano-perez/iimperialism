@@ -173,6 +173,7 @@ void box (unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2
 void wait_three_seconds_or_keypress(void);
 unsigned int scan_uint(unsigned char x, unsigned char y, unsigned char max_digits);
 void scan_text(unsigned char x, unsigned char y, char* buffer, unsigned char max_length);
+void play_sound_alert();
 
 // main.c (resident — accessible to overlays via jump table at $0821)
 void render_warehouse_box(void);

@@ -1,6 +1,7 @@
 #include <conio.h>
 #include <tgi.h>
 #include "game.h"
+#include "sound.h"
 
 #define MAX_VISIBLE_SHIPS 12
 
@@ -147,6 +148,7 @@ void render_battle_screen(void) {
                         print(5, 21, STR_BOUNTY);
                         print_int(29, 21, bounty);
                         state.current_screen = SCREEN_TRADE_EXPEDITION;
+                        play_sound_alert();
                         wait_three_seconds_or_keypress();
                         return;
                     }
@@ -158,6 +160,7 @@ void render_battle_screen(void) {
                         state.remaining_turn_capacity = state.traders * CAPACITY_PER_TRADER_BASE;
                         clear_area(10, 2, 15, 1);
                         print_int_right_aligned(15, 2, state.traders);
+                        play_sound(SOUND_MUSIC_SCALE);
                         wait_three_seconds_or_keypress();
                         clear_area(5, 22, 31, 1);
                         print(5, 22, STR_FIGHT);
@@ -169,6 +172,7 @@ void render_battle_screen(void) {
                         clear_input_area();
                         print(5, 20, "Defeat!");
                         state.current_screen = SCREEN_DIPLOMACY;
+                        play_sound_alert();
                         wait_three_seconds_or_keypress();
                         return;
                     }

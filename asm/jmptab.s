@@ -24,6 +24,8 @@
 ;  $0848  JMP _render_turn_funds_header
 ;  $084B  JMP _print_bold
 ;  $084E  JMP _wait_three_seconds_or_keypress
+;  $0851  JMP _play_sound
+;  $0854  JMP _play_sound_alert
 
     .import _clear_screen
     .import _clear_input_area
@@ -47,6 +49,8 @@
     .import _render_turn_funds_header
     .import _print_bold
     .import _wait_three_seconds_or_keypress
+    .import _play_sound
+    .import _play_sound_alert
 
     .segment "JMPTAB"
 
@@ -72,3 +76,5 @@
     jmp _render_turn_funds_header   ; $0848
     jmp _print_bold                 ; $084B
     jmp _wait_three_seconds_or_keypress ; $084E
+    jmp _play_sound                     ; $0851
+    jmp _play_sound_alert               ; $0854

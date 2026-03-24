@@ -3,6 +3,7 @@
 #include "game.h"
 #include "overlay.h"
 #include "screens.h"
+#include "sound.h"
 
 #define BOX1_X1 0
 #define BOX1_Y1 2
@@ -151,6 +152,7 @@ int main(void) {
             print(0, 0, "Navy of");
             print(7, 0, state.nation_name);
             print(23, 0, "Enemy Fleet");
+            play_sound_alert();
             run_overlay(OVL_BATTLE);
             continue;
         } else if (state.current_screen == SCREEN_SCIENCE) {

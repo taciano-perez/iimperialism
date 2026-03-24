@@ -5,6 +5,10 @@
 #include "font.h"
 #include "pictures.h"
 #include "ui_buffers.h"
+#include "sound.h"
+
+/* Internal fastcall entry point implemented in asm/sound.s */
+extern void __fastcall__ play_sound_impl(unsigned char sound);
 
 #define CHAR_WIDTH 7
 #define CHAR_HEIGHT 8
@@ -210,6 +214,16 @@ void scan_text(unsigned char x, unsigned char y, char* buffer, unsigned char max
             }
         }
     }
+}
+
+void play_sound(unsigned char sound) {
+    play_sound_impl(sound);
+}
+
+void play_sound_alert() {
+    beep();
+    beep();
+    beep();
 }
 
 #pragma code-name (pop)

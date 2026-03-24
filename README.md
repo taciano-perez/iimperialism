@@ -224,7 +224,7 @@ overlays are relinked.
 - Expand the science tree with wagon capacity improvements
 - Add main menu
 - Randomize country names and their exports/imports
-- Adjust the initial money amount
+- Introduce alliances and colonization
 - Admiralty improvement: increase cost of traders and warships according to science level
 - Attempt to merge overlays when each is less than 1KB to reclaim floppy space
 - Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed
@@ -232,3 +232,5 @@ overlays are relinked.
 - Consider adding map screen
 - Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
 - Balance game for all stages (beginning, mid, and end)
+- Adjust the initial money amount
+

@@ -20,8 +20,8 @@ static const unsigned char COUNCIL_VICTORY_VOTES = 24U;
 static const char* get_council_nation_name(unsigned char nation_index);
 static unsigned char get_council_provinces(unsigned char nation_index);
 static const char* get_council_vote_target(unsigned char nation_index);
-static unsigned char council_votes_for_haxaco(void);
-static unsigned char council_victory_achieved(unsigned char votes_for_haxaco);
+static unsigned char get_player_nation_council_votes(void);
+static unsigned char council_victory_achieved(unsigned char player_nation_votes);
 
 static const char* get_council_nation_name(unsigned char nation_index) {
     if (nation_index == 0U) {
@@ -55,27 +55,27 @@ static const char* get_council_vote_target(unsigned char nation_index) {
     return STR_ABSTAINED;
 }
 
-static unsigned char council_votes_for_haxaco(void) {
+static unsigned char get_player_nation_council_votes(void) {
     unsigned char nation_index;
-    unsigned char votes_for_haxaco;
+    unsigned char player_nation_votes;
 
-    votes_for_haxaco = 0U;
+    player_nation_votes = 0U;
     for (nation_index = 0U; nation_index < COUNCIL_NATION_COUNT; ++nation_index) {
         if (get_council_vote_target(nation_index) == state.nation_name) {
-            votes_for_haxaco = (unsigned char)(votes_for_haxaco + get_council_provinces(nation_index));
+            player_nation_votes = (unsigned char)(player_nation_votes + get_council_provinces(nation_index));
         }
     }
 
-    return votes_for_haxaco;
+    return player_nation_votes;
 }
 
-static unsigned char council_victory_achieved(unsigned char votes_for_haxaco) {
-    return votes_for_haxaco >= COUNCIL_VICTORY_VOTES;
+static unsigned char council_victory_achieved(unsigned char player_nation_votes) {
+    return player_nation_votes >= COUNCIL_VICTORY_VOTES;
 }
 
 void render_council_nations_screen(void) {
     unsigned char nation_index;
-    unsigned char votes_for_haxaco;
+    unsigned char player_nation_votes;
     unsigned char victory_achieved;
     unsigned char votes_for_name_x;
 
@@ -97,14 +97,14 @@ void render_council_nations_screen(void) {
         print(26, row_y, get_council_vote_target(nation_index));
     }
 
-    votes_for_haxaco = council_votes_for_haxaco();
-    victory_achieved = council_victory_achieved(votes_for_haxaco);
+    player_nation_votes = get_player_nation_council_votes();
+    victory_achieved = council_victory_achieved(player_nation_votes);
 
     print(5, 12, STR_VOTES_FOR_PREFIX);
     votes_for_name_x = (unsigned char)(5U + strlen(STR_VOTES_FOR_PREFIX));
     print(votes_for_name_x, 12, state.nation_name);
     print((unsigned char)(votes_for_name_x + strlen(state.nation_name)), 12, STR_COLON);
-    print_int_right_aligned(25, 12, votes_for_haxaco);
+    print_int_right_aligned(25, 12, player_nation_votes);
     print(5, 13, STR_VICTORY_CONDITION);
     print(24, 13, STR_VICTORY_TARGET);
 
@@ -115,6 +115,7 @@ void render_council_nations_screen(void) {
     } else {
         print(5, 20, STR_ADVICE_1);
         print(5, 21, STR_ADVICE_2);
+        play_sound_alert();
         print_bold(7, 23, "Press any key to continue...");
         cgetc();
         state.current_screen = SCREEN_INDUSTRY;
