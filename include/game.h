@@ -75,6 +75,7 @@
 #define TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT 100U
 #define BATTLE_TRADER_HIT_CHANCE_PERCENT 5U
 #define BATTLE_BOUNTY_VARIANCE_PERCENT 50U
+#define BATTLE_RUN_TRADER_HIT_CHANCE_PERCENT 60U
 #define SCIENCE_RESEARCH_COST_MULTIPLIER 1000U
 #define RELATIONS_LOSS_PER_TURN 3U
 #define FOREIGN_NATION_COUNT 5
@@ -162,6 +163,7 @@ void clear_input_area();
 void clear_area(unsigned char x, unsigned char y, unsigned char width, unsigned char height);
 void paint_area(unsigned char x, unsigned char y, unsigned char width, unsigned char height, unsigned char color);
 void print (unsigned char x, unsigned char y, const char* text);
+void print_inverted(unsigned char x, unsigned char y, const char* text);
 void print_bold(unsigned char x, unsigned char y, const char* text);
 void print_right_aligned(unsigned char x, unsigned char y, const char* text);
 void format_uint(char* buffer, unsigned int value);

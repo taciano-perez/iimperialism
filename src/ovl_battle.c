@@ -83,6 +83,16 @@ static void handle_ship_hit(unsigned char is_enemy,
     }
 }
 
+static void trader_lost() {
+    print(5, 22, STR_TRADER_LOSS);
+    --state.traders;
+    state.remaining_turn_capacity = state.traders * CAPACITY_PER_TRADER_BASE;
+    clear_area(10, 2, 15, 1);
+    print_int_right_aligned(15, 2, state.traders);
+    play_sound(SOUND_MUSIC_SCALE);
+    wait_three_seconds_or_keypress();
+}
+
 void render_battle_screen(void) {
     unsigned char base_ships;
     unsigned char enemy_ships;
@@ -155,13 +165,7 @@ void render_battle_screen(void) {
                     previous_friendly_ships = visible_friendly_ships;
                     handle_ship_hit(0, &visible_friendly_ships, visible_enemy_ships);
                     if (state.traders != 0U && rand_range(1U, 100U) <= BATTLE_TRADER_HIT_CHANCE_PERCENT) {
-                        print(5, 22, STR_TRADER_LOSS);
-                        --state.traders;
-                        state.remaining_turn_capacity = state.traders * CAPACITY_PER_TRADER_BASE;
-                        clear_area(10, 2, 15, 1);
-                        print_int_right_aligned(15, 2, state.traders);
-                        play_sound(SOUND_MUSIC_SCALE);
-                        wait_three_seconds_or_keypress();
+                        trader_lost();
                         clear_area(5, 22, 31, 1);
                         print(5, 22, STR_FIGHT);
                     }
@@ -180,6 +184,9 @@ void render_battle_screen(void) {
                 break;
             case 'R':
             case 'r':
+                if (state.traders != 0U && rand_range(1U, 100U) <= BATTLE_RUN_TRADER_HIT_CHANCE_PERCENT) {
+                    trader_lost();
+                }
                 state.current_screen = SCREEN_DIPLOMACY;
                 return;
         }

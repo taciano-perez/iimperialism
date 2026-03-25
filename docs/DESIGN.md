@@ -107,7 +107,10 @@ direct-ProDOS MLI helper for `GAME.DATA` rather than `stdio`.
 
 ## Runtime Architecture
 
-- Main binary is resident code + LOWCODE + shared data.
+- Main binary is resident code plus three important helper regions:
+  - `JMPTAB` in main RAM for fixed overlay-callable entry points
+  - `LOWCODE` in main RAM for compact resident helpers and core logic
+  - `LC` in Language Card RAM for `src/ui.c` UI code
 - Overlays are 2KB binaries loaded into `$8800` on demand.
 - Overlay calls to resident helpers go through jump table entries in
   `asm/jmptab.s`, with matching symbol addresses exported from

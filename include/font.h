@@ -209,5 +209,6 @@ const unsigned char font_bold_data[96][8] = {
 
 void draw_text_hgr_opaque(const char* text, unsigned char x_byte, unsigned char y_char);
 void draw_text_hgr_opaque_bold(const char* text, unsigned char x_byte, unsigned char y_char);
+void draw_text_hgr_opaque_inverted(const char* text, unsigned char x_byte, unsigned char y_char);
 
 #endif

@@ -21,7 +21,7 @@ void render_industry_screen(void) {
 
         /* TRANSPORT & PRODUCTION ORDERS */
         box(BOX_X1, BOX_Y1, BOX_X2, BOX_Y2);
-        print((BOX_X1+1), BOX_Y1, "Transport &");
+        print_inverted((BOX_X1+1), BOX_Y1, "Transport &");
         print((BOX_X1+1), (BOX_Y1+1), "Timber: ");
         print_int_right_aligned((BOX_X1+11), (BOX_Y1+1), state.transport_timber);
         print((BOX_X1+1), (BOX_Y1+2), "Wool: ");
@@ -31,7 +31,7 @@ void render_industry_screen(void) {
         print((BOX_X1+1), (BOX_Y1+4), "Coal: ");
         print_int_right_aligned((BOX_X1+11), (BOX_Y1+4), state.transport_coal);
 
-        print((BOX_X1+13), BOX_Y1, "Production per turn");
+        print_inverted((BOX_X1+13), BOX_Y1, "Production per turn");
         print((BOX_X1+13), (BOX_Y1+1), "Lumber: ");
         print_int_right_aligned((BOX_X1+23), (BOX_Y1+1), state.production_lumber);
         print((BOX_X1+13), (BOX_Y1+2), "Fabric: ");
@@ -55,9 +55,6 @@ void render_industry_screen(void) {
         key = cgetc_at(39, 21);
 
         switch (key) {
-            case 27:
-                run_overlay(OVL_GAME_MENU);
-                break;
             case 't':
             case 'T':
                 state.current_screen = SCREEN_TRANSPORT;

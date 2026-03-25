@@ -8,8 +8,8 @@ $0100-$01FF  6502 hardware stack
 $0200-$03FF  System / ProDOS vectors
 $0400-$07FF  Text screen page 1
 $0803-$080E  STARTUP            (cc65 crt0)
-$080F-$084D  JMPTAB             (resident jump table used by overlays)
-$0824-$1FFF  LOWCODE            (resident UI + core logic)
+$080F-$0865  JMPTAB             (resident jump table used by overlays)
+$0866-$1631  LOWCODE            (resident main-RAM helpers + core logic)
 $2000-$3FFF  HGR page 1         (graphics memory; no code here)
 $4000-...    CODE/RODATA/DATA   (main resident code + data)
 ...          BSS/ONCE/heap
@@ -17,13 +17,17 @@ $8800-$8FFF  OVERLAY_SLOT       (2KB execution window in main RAM)
 $8E00-$95FF  C stack            (2KB, downward from HIMEM=$9600)
 $9600-$BEFF  ProDOS system area
 $BF00-$BFFF  ProDOS MLI
+$D400-$DD79  LC                 (`src/ui.c` UI code in Language Card RAM)
 ```
 
 Current resident note:
 
-- `print()` and `print_bold()` use aligned HGR text blitters in `asm/text_hgr.s`,
-  which live in `LOWCODE` and trade a small amount of resident code and lookup-table
-  data for much faster text rendering
+- `print()`, `print_bold()`, and `print_inverted()` all render through aligned HGR
+  text blitters in `asm/text_hgr.s`
+- those blitters live in main-RAM `LOWCODE`, while the higher-level `src/ui.c`
+  wrappers and input helpers now live in the `LC` segment in Language Card RAM
+- this split preserves scarce main-RAM resident space while keeping overlay-callable
+  entry points stable through JMPTAB
 
 ## Why the Main Binary Is Large
 
@@ -31,7 +35,13 @@ The main binary includes a zero-filled gap between LOWCODE and CODE because:
 
 - HGR requires code to start at `$4000`
 - `$2000-$3FFF` is graphics memory
-- LOWCODE only uses part of `$0824-$1FFF`
+- LOWCODE only uses part of the pre-HGR main-RAM region
+
+Separately, the linker can place selected code into the Apple II Language Card:
+
+- `config/apple2-hgr.cfg` defines `LC` at `$D400-$DFFF`
+- `src/ui.c` currently uses `#pragma code-name (push, "LC")`
+- the current build map places `ui.o` `LC` code at `$D400-$DD79`
 
 As string literals grow, `RODATA/DATA/INIT` move upward. When image size and memory
 pressure cross a threshold, BRUN can fail silently back to ProDOS.
@@ -135,10 +145,15 @@ $0857  JMP _cgetc_at
 $085A  JMP _next_turn
 $085D  JMP _run_overlay
 $0860  JMP _production_orders
+$0863  JMP _print_inverted
 ```
 
 Rule: keep `asm/jmptab.s` and `config/apple2-ovl.cfg` in sync. Rebuild overlays
 after any jump-table change so they relink against the new addresses.
+
+Even though much of `src/ui.c` now lives in `LC`, overlays still call resident UI
+helpers through these fixed JMPTAB addresses. The jump-table entries decouple the
+overlay ABI from the actual placement of the target code.
 
 Current note:
 
@@ -229,15 +244,15 @@ $(AC) -p $(DISK) DSCR BIN 0x8800 < $(BUILD_DIR)/dscr.bin
 If the overlay needs a resident function not in JMPTAB, append a new JMP entry in
 `asm/jmptab.s`, export it from `config/apple2-ovl.cfg`, and declare it in
 `include/game.h`. Current examples include `clear_area(int x, int y, int width, int height)`
-at `$0839` and `print_bold(unsigned char x, unsigned char y, const char* text)`
-at `$084B`.
+at `$0839`, `print_bold(unsigned char x, unsigned char y, const char* text)` at `$084B`,
+and `print_inverted(unsigned char x, unsigned char y, const char* text)` at `$0863`.
 
 ## Expansion Areas
 
 | Area | Address | Capacity | Notes |
 |------|---------|----------|-------|
-| LOWCODE | `$0824-$1FFF` | ~3.9KB free (approx) | Most effective for reducing resident pressure |
-| Language Card | `$D400-$DFFF` | 3KB | Separate RAM bank |
+| LOWCODE | `$0866-$1631` currently used | main RAM below HGR | Compact resident helpers, blitters, overlay loader, core logic |
+| Language Card | `$D400-$DFFF` | 3KB | Separate RAM bank; currently hosts `src/ui.c` code (`$D400-$DD79` used) |
 
 Use `make memory-usage` to get the current used/free breakdown for resident
 memory windows and overlay binaries from the latest build.

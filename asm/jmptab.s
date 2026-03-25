@@ -30,6 +30,7 @@
 ;  $085A  JMP _next_turn
 ;  $085D  JMP _run_overlay
 ;  $0860  JMP _production_orders
+;  $0863  JMP _print_inverted
 
     .import _clear_screen
     .import _clear_input_area
@@ -59,6 +60,7 @@
     .import _next_turn
     .import _run_overlay
     .import _production_orders
+    .import _print_inverted
 
     .segment "JMPTAB"
 
@@ -90,3 +92,4 @@
     jmp _next_turn                      ; $085A
     jmp _run_overlay                    ; $085D
     jmp _production_orders              ; $0860
+    jmp _print_inverted                 ; $0863

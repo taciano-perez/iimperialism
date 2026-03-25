@@ -214,12 +214,17 @@ For this project, resident UI text is a special case worth handling separately:
 
 That makes text a good fit for direct HGR byte writes instead of `tgi_setpixel()`.
 
-The current implementation uses a resident assembly blitter in `asm/text_hgr.s`:
+The current implementation uses resident assembly blitters in `asm/text_hgr.s`:
 
 - one HGR byte is written per glyph row
 - the blitter scans the string once per row and writes opaque bytes directly
 - a 128-byte lookup table reverses the source glyph bit order into Apple II HGR bit order
 - a 24-entry row-base table avoids recomputing HGR addresses for `y * 8`
+
+The high-level UI wrappers in `src/ui.c` now live in the Language Card (`LC`)
+segment, while the tiny hot-path blitters remain in main-RAM `LOWCODE`. That is a
+useful pattern when a helper's call surface must stay resident but its heavier C
+logic can be moved out of scarce main-RAM space.
 
 This is a good pattern when all of the following are true:
 

@@ -18,7 +18,7 @@ static void render_scan_uint_input(unsigned char x, unsigned char y, unsigned ch
 static void render_scan_text_input(unsigned char x, unsigned char y, unsigned char max_length, unsigned char len, unsigned char show_cursor, const char* buffer);
 static void render_cgetc_at_input(unsigned char x, unsigned char y, unsigned char show_cursor);
 
-#pragma code-name (push, "LOWCODE")
+#pragma code-name (push, "LC")
 
 static char* append_ulong_decimal(char* buffer, unsigned long value) {
     unsigned long divisor;
@@ -100,6 +100,10 @@ void paint_area(unsigned char x, unsigned char y, unsigned char width, unsigned 
 
 void print(unsigned char x, unsigned char y, const char* text) {
     draw_text_hgr_opaque(text, x, y);
+}
+
+void print_inverted(unsigned char x, unsigned char y, const char* text) {
+    draw_text_hgr_opaque_inverted(text, x, y);
 }
 
 void print_bold(unsigned char x, unsigned char y, const char* text) {

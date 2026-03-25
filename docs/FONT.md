@@ -192,6 +192,12 @@ and
 2. `draw_text_hgr_opaque_bold()` in `asm/text_hgr.s`
 3. direct HGR byte writes using `font_bold_data`
 
+and
+
+1. `print_inverted()` in `src/ui.c`
+2. `draw_text_hgr_opaque_inverted()` in `asm/text_hgr.s`
+3. direct HGR byte writes using inverted regular-font bits
+
 Relevant entry point:
 
 ```c
@@ -199,10 +205,18 @@ void print(unsigned char x, unsigned char y, const char* text) {
     draw_text_hgr_opaque(text, x, y);
 }
 
+void print_inverted(unsigned char x, unsigned char y, const char* text) {
+    draw_text_hgr_opaque_inverted(text, x, y);
+}
+
 void print_bold(unsigned char x, unsigned char y, const char* text) {
     draw_text_hgr_opaque_bold(text, x, y);
 }
 ```
+
+`src/ui.c` is currently linked into the `LC` segment in Language Card RAM, while
+`asm/text_hgr.s` remains in main-RAM `LOWCODE`. The overlay-visible ABI is still
+provided through the resident jump table, not by direct overlay-to-LC linkage.
 
 ### Coordinate System
 
@@ -226,6 +240,8 @@ The assembly blitter:
   `font_bold_data[96][8]`
 - reverses glyph bits with the `REV7` lookup table before writing
 - writes opaque bytes, so existing pixels under text are overwritten
+- for `print_inverted()`, inverts only the 7 visible glyph bits so white glyph
+  pixels become black and the background cell becomes white
 
 The bit reversal step is required because the stored glyph rows and Apple II HGR
 byte order use opposite horizontal bit ordering.
@@ -234,6 +250,7 @@ byte order use opposite horizontal bit ordering.
 
 `src/ui.c` builds several helpers on top of `print()`:
 
+- `print_inverted()`
 - `print_right_aligned()`
 - `print_int_right_aligned()`
 - `print_int_right_aligned_currency()`
@@ -246,6 +263,7 @@ Example:
 
 ```c
 print(10, 20, "Welcome to the World of Taipan!");
+print_inverted(10, 1, "Selected");
 print_bold(10, 0, "Warehouse");
 print_right_aligned(39, 0, "Turn:");
 print_int_right_aligned_currency(39, 1, 2210000UL);
@@ -274,4 +292,4 @@ row.
 - `tools/extract_font_bold.py` - bold conversion script
 - `include/font.h` - generated glyph tables and font constants
 - `asm/text_hgr.s` - runtime HGR text blitters
-- `src/ui.c` - UI helpers that call the blitters
+- `src/ui.c` - UI helpers in the `LC` segment that call the blitters

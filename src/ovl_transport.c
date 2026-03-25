@@ -52,9 +52,6 @@ void render_transport_screen(void) {
 
         key = cgetc_at(26, 22);
         switch (key) {
-            case 27:
-                run_overlay(OVL_GAME_MENU);
-                break;
             case 'b':
             case 'B':
                 clear_input_area();

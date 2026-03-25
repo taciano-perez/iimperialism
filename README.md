@@ -27,8 +27,10 @@ within the Apple II's constraints:
   to seed gameplay randomness, and then prompts for a nation name (up to 10 chars).
 - Pressing `ESC` opens the `MENU` overlay for new/load/save actions.
 - Choosing `New Game` from the menu also re-prompts for the nation name.
-- UI primitives and core game logic are kept in **LOWCODE** (`$0824-$1FFF`) below
-  the HGR screen to preserve resident code space.
+- The resident helper split is now:
+  - `JMPTAB` at `$080F-$0865` for overlay-callable entry points
+  - `LOWCODE` at `$0866-$1631` for compact main-RAM helpers such as the HGR text blitters
+  - `LC` at `$D400-$DD79` for `src/ui.c` UI code placed in the Language Card
 - Disk autoboot uses ProDOS `SYS` loader `IIMP.SYSTEM` to launch `IIMPERIALISM`
   directly (no `BASIC.SYSTEM` dependency).
 
@@ -52,7 +54,7 @@ in the diplomacy screen as text using these ranges:
 |------|---------|
 | `src/main.c` | Main loop, startup/new-game flow, and screen dispatch |
 | `src/production.c` | Resident `production_orders()` helper used by `pscr.bin` |
-| `src/ui.c` | UI primitives (`print`, `box`, `clear_screen`, `scan_uint`, `scan_text`, etc.) |
+| `src/ui.c` | UI primitives (`print`, `print_inverted`, `box`, `clear_screen`, `scan_uint`, `scan_text`, etc.); code is linked into the Language Card (`LC`) |
 | `src/ui_buffers.c` | Shared scratch UI buffer storage |
 | `src/logic.c` | `init_game()`, `next_turn()` |
 | `src/gamestate.c` | Shared `GameState` declarations |
@@ -76,7 +78,7 @@ in the diplomacy screen as text using these ranges:
 | `asm/ovl_science_entry.s` | Fixed entry stub for science overlay |
 | `asm/ovl_game_menu_entry.s` | Fixed entry stub for game menu overlay |
 | `asm/ovl_council_nations_entry.s` | Fixed entry stub for council overlay |
-| `asm/text_hgr.s` | Aligned opaque HGR text blitter used by `print()` |
+| `asm/text_hgr.s` | Aligned opaque HGR text blitters used by `print()`, `print_bold()`, and `print_inverted()` |
 | `asm/jmptab.s` | Resident jump table used by overlays |
 | `asm/werner.s` | Reserves HGR segment |
 | `asm/loader/loader.s` | Vendored cc65 loader source (patched for fixed target BIN) |
@@ -180,8 +182,10 @@ Overlay note:
 - the build generates `build/apple2-ovl.cfg` from `build/iimperialism.map`
 - overlays are linked against the generated file so `_state` stays in sync with the
   current resident layout
-- resident UI text now uses direct HGR byte writes from `asm/text_hgr.s`, so visual
-  verification in the emulator is still required after text-rendering changes
+- resident UI text now uses direct HGR byte writes from `asm/text_hgr.s`
+- `src/ui.c` itself is linked into the Language Card, while the blitters remain in
+  main-RAM `LOWCODE`
+- visual verification in the emulator is still required after text-rendering changes
 
 In your setup (Git Bash on Windows), use:
 
@@ -226,15 +230,15 @@ overlays are relinked.
 
 ## TODO
 
-- Inverted print()
 - Finish battle screen 
   - introduce enemy powers and not only pirates
-  - When running, risk of losing trader
 - Expand the science tree with wagon capacity improvements
-- Add main menu
+- Add main screen
+  - Fix game menu
 - Randomize country names and their exports/imports
 - Introduce alliances and colonization
 - Admiralty improvement: increase cost of traders and warships according to science level
+- Scientific discoveries to improve max production per province
 - Attempt to merge overlays when each is less than 1KB to reclaim floppy space
 - Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed
 - Improve victory screen

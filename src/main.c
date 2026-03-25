@@ -17,8 +17,8 @@ static unsigned int wait_for_splash_escape(void);
 static void prompt_for_nation_name(char* nation_name, unsigned char max_length);
 
 void render_warehouse_box() {
-    box(BOX1_X1, BOX1_Y1, BOX1_X2, BOX1_Y2);
-    print((BOX1_X1+1), BOX1_Y1, "Warehouse");
+    box(BOX1_X1, BOX1_Y1+1, BOX1_X2, BOX1_Y2);
+    print_inverted((BOX1_X1), BOX1_Y1, "Warehouse");
 
     print((BOX1_X1+1), (BOX1_Y1+1), "Timber:");
     print_int_right_aligned((BOX1_X1+11), (BOX1_Y1+1), state.resources[RESOURCE_TIMBER]);

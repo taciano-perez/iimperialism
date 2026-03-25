@@ -25,6 +25,13 @@ The `Makefile` writes outputs to `build/`:
 - `build/loader.system` loader system file
 - `build/iimperialism.map` linker map
 
+The linker map is the authoritative source for segment placement. In the current
+build it shows:
+
+- `JMPTAB` in main RAM at `$080F-$0865`
+- `LOWCODE` in main RAM at `$0866-$1631`
+- `LC` in Language Card RAM at `$D400-$DD79`, currently including `src/ui.c`
+
 Current overlay binaries include `iscr.bin`, `pscr.bin`, `tscr.bin`, `ascr.bin`,
 `dscr.bin`, `texp.bin`, `txac.bin`, `bscr.bin`, `sscr.bin`, `menu.bin`, and
 `cnsl.bin`.

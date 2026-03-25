@@ -20,7 +20,7 @@ void render_admiralty_screen(void) {
         render_warehouse_box();
 
         box(BOX_X1, BOX_Y1+1, BOX_X1+17, BOX_Y2);
-        print((BOX_X1+1), BOX_Y1, "Merchant Fleet");
+        print_inverted((BOX_X1), BOX_Y1, "Merchant Fleet");
         print((BOX_X1+1), (BOX_Y1+1), "Traders:");
         print_int_right_aligned((BOX_X1+14), (BOX_Y1+1), state.traders);
         print((BOX_X1+1), (BOX_Y1+2), "Cargo/trader:");
@@ -29,7 +29,7 @@ void render_admiralty_screen(void) {
         print_int_right_aligned((BOX_X1+14), (BOX_Y1+4), state.traders * state.capacity_per_trader);
 
         box(BOX_X1+19, BOX_Y1+1, BOX_X2, BOX_Y2);
-        print((BOX_X1+20), BOX_Y1, "Navy");
+        print_inverted((BOX_X1+19), BOX_Y1, "Navy");
         print((BOX_X1+20), (BOX_Y1+1), "Warships:");
         print_int_right_aligned((BOX_X1+36), (BOX_Y1+1), state.frigates);
         print((BOX_X1+20), (BOX_Y1+2), "Guns/ship:");
