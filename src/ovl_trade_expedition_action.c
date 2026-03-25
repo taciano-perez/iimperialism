@@ -22,7 +22,7 @@ void handle_screen_trade_expedition(void) {
 
         clear_input_area();
         print(5, 20, "Buy, Sell or Quit?");
-        key = cgetc();
+        key = cgetc_at(23, 20);
         switch (key) {
             case 'B':
             case 'b':
@@ -42,6 +42,7 @@ void handle_screen_trade_expedition(void) {
 
 static void trade_commodities(unsigned char nation_index, unsigned char mode) {
     unsigned char i;
+    char key;
     unsigned int input;
     unsigned int quantity;
     unsigned int max_quantity;
@@ -73,7 +74,11 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
         }
 
         while (1) {
-            input = scan_uint(39, 21, 1);
+            key = cgetc_at(23, 20);
+            if (key < '0' || key > '9') {
+                continue;
+            }
+            input = (unsigned int)(key - '0');
             if (input >= menu_base && input < (unsigned int)(menu_base + FOREIGN_TRADE_ENTRY_COUNT)) {
                 i = (unsigned char)(input - menu_base);
                 resource = trade_list[i];
@@ -87,9 +92,9 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
 
                 while (1) {
                     clear_area(28, 22, 3, 1);
-                    print(5, 22, "How many? (Max:    )");
-                    print_int_right_aligned(23, 22, max_quantity);
-                    quantity = scan_uint(28, 22, 3);
+                    print(5, 22, "How many units (Max:    )?");
+                    print_int_right_aligned(28, 22, max_quantity);
+                    quantity = scan_uint(31, 22, 3);
                     if (quantity <= max_quantity) {
                         state.remaining_turn_capacity -= quantity;
                         if (mode == TRADE_MODE_BUY) {

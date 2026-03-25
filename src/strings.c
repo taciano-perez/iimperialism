@@ -2,7 +2,6 @@
 #include "strings.h"
 
 const char STR_NOT_ENOUGH_RESOURCES[] = "Not enough resources!";
-const char STR_MAX_FMT[] = "(max %u)";
 const char STR_PER_TURN_MAX_FMT[] = "per turn?";
 const char STR_TRADER_COST[] = "A trader costs 1 lumber, 1 fabric,";
 const char STR_WARSHIP_COST[] = "A warship costs 1 lumber, 1 fabric,";

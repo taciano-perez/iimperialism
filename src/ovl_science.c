@@ -1,7 +1,6 @@
 #include <conio.h>
 #include "game.h"
 
-
 static const char TECH_1[] = "1)Railways";
 static const char TECH_2[] = "2)Carronade";
 static const char TECH_3[] = "3)Clipper ships";
@@ -82,7 +81,7 @@ void render_science_screen(void) {
 
         while (1) {
             unsigned char key;
-            key = cgetc();
+            key = cgetc_at(32, 20);
             switch (key) {
                 case 'R':
                 case 'r':

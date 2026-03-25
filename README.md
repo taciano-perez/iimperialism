@@ -15,6 +15,10 @@ within the Apple II's constraints:
 
 - Screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`, `TSCR`,
   `ASCR`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`, `MENU`) loaded on demand.
+- The industry, transport, and production overlays now own their own input loops.
+- The transport screen is fully overlay-local.
+- The production screen still calls resident `production_orders()` through the jump
+  table to preserve overlay space.
 - Overlay binaries are loaded at runtime with direct ProDOS MLI `OPEN` / `READ` /
   `CLOSE` calls instead of `stdio`.
 - Save/load also use direct ProDOS MLI calls instead of `fopen()` / `fread()` /
@@ -47,14 +51,15 @@ in the diplomacy screen as text using these ranges:
 | File | Purpose |
 |------|---------|
 | `src/main.c` | Main loop, startup/new-game flow, and screen dispatch |
+| `src/production.c` | Resident `production_orders()` helper used by `pscr.bin` |
 | `src/ui.c` | UI primitives (`print`, `box`, `clear_screen`, `scan_uint`, `scan_text`, etc.) |
 | `src/ui_buffers.c` | Shared scratch UI buffer storage |
 | `src/logic.c` | `init_game()`, `next_turn()` |
 | `src/gamestate.c` | Shared `GameState` declarations |
 | `src/overlay.c` | `init_overlays()`, `run_overlay()` |
 | `src/ovl_industry.c` | Industry screen overlay (`iscr.bin`) |
-| `src/ovl_production.c` | Production screen overlay (`pscr.bin`) |
-| `src/ovl_transport.c` | Transport screen overlay (`tscr.bin`) |
+| `src/ovl_production.c` | Production screen overlay and top-level input loop (`pscr.bin`) |
+| `src/ovl_transport.c` | Transport screen overlay, input loop, and transport actions (`tscr.bin`) |
 | `src/ovl_admiralty.c` | Admiralty screen and build flow overlay (`ascr.bin`) |
 | `src/ovl_diplomacy.c` | Diplomacy screen overlay (`dscr.bin`) |
 | `src/ovl_trade_expedition.c` | Diplomacy trade expedition market overlay (`texp.bin`) |
@@ -64,10 +69,13 @@ in the diplomacy screen as text using these ranges:
 | `asm/prodos_overlay_load.s` | Resident ProDOS MLI overlay loader (`OPEN` / `READ` / `CLOSE`) |
 | `asm/prodos_gamestate_io.s` | Menu-overlay ProDOS MLI save/load helper for `GAME.DATA` |
 | `asm/ovl_diplomacy_entry.s` | Fixed entry stub for diplomacy overlay |
+| `asm/ovl_production_entry.s` | Fixed entry stub for production overlay |
+| `asm/ovl_transport_entry.s` | Fixed entry stub for transport overlay |
 | `asm/ovl_trade_expedition_entry.s` | Fixed entry stub for trade expedition market overlay |
 | `asm/ovl_trade_expedition_action_entry.s` | Fixed entry stub for trade expedition action overlay |
 | `asm/ovl_science_entry.s` | Fixed entry stub for science overlay |
 | `asm/ovl_game_menu_entry.s` | Fixed entry stub for game menu overlay |
+| `asm/ovl_council_nations_entry.s` | Fixed entry stub for council overlay |
 | `asm/text_hgr.s` | Aligned opaque HGR text blitter used by `print()` |
 | `asm/jmptab.s` | Resident jump table used by overlays |
 | `asm/werner.s` | Reserves HGR segment |
@@ -218,9 +226,10 @@ overlays are relinked.
 
 ## TODO
 
+- Inverted print()
 - Finish battle screen 
   - introduce enemy powers and not only pirates
-  - add sound effects
+  - When running, risk of losing trader
 - Expand the science tree with wagon capacity improvements
 - Add main menu
 - Randomize country names and their exports/imports
@@ -233,4 +242,3 @@ overlays are relinked.
 - Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
 - Balance game for all stages (beginning, mid, and end)
 - Adjust the initial money amount
-

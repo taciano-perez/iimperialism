@@ -45,7 +45,7 @@ void render_admiralty_screen(void) {
         print(5, 21, "Build Trading vessel, Warship,");
         print(5, 22, "or Quit?");
 
-        key = cgetc();
+        key = cgetc_at(13, 22);
 
         switch (key) {
             case 't':
@@ -55,10 +55,11 @@ void render_admiralty_screen(void) {
 
                 while (1) {
                     clear_input_area();
-                    print(5, 20, "Trader cost: 1 lumber, 1 fabric, &");
-                    print(5, 21, "1 worker. Build how many? Max:");
-                    print_int(35, 21, max_units);
-                    units_to_build = scan_uint(5, 22, 5);
+                    print(5, 20, "Trader cost: 1 lumber, 1 fabric &");
+                    print(5, 21, "1 worker.");
+                    print(5, 22, "Build how many (Max:    )?");
+                    print_int_right_aligned(28, 22, max_units);
+                    units_to_build = scan_uint(30, 22, 3);
                     if (units_to_build > max_units) {
                         continue;
                     }
@@ -79,12 +80,12 @@ void render_admiralty_screen(void) {
 
                 while (1) {
                     clear_input_area();
-                    print(5, 20, "Frigate cost: 1 lumber, 1 fabric,");
-                    print(5, 21, "1 gun, 1 worker. Build how many?");
-                    print(5, 22, "Max:");
-                    print_int_right_aligned(14, 22, max_units);
+                    print(5, 20, "Warship cost: 1 lumber, 1 fabric,");
+                    print(5, 21, "1 gun & 1 worker.");
+                    print(5, 22, "Build how many (Max:    )?");
+                    print_int_right_aligned(28, 22, max_units);
 
-                    units_to_build = scan_uint(20, 22, 5);
+                    units_to_build = scan_uint(30, 22, 3);
                     if (units_to_build > max_units) {
                         continue;
                     }

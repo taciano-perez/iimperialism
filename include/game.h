@@ -152,6 +152,7 @@ void init_game();
 void next_turn();
 void seed_random(unsigned int seed);
 unsigned char rand_range(unsigned char min, unsigned char max);
+void production_orders(void);
 
 // ui.c
 void ui_init();
@@ -171,6 +172,7 @@ void print_int(unsigned char x, unsigned char y, unsigned int value);
 void draw_picture_at(const unsigned char picture_index, const unsigned char x_byte, unsigned char y);
 void box (unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
 void wait_three_seconds_or_keypress(void);
+char cgetc_at(unsigned char x, unsigned char y);
 unsigned int scan_uint(unsigned char x, unsigned char y, unsigned char max_digits);
 void scan_text(unsigned char x, unsigned char y, char* buffer, unsigned char max_length);
 void play_sound_alert();

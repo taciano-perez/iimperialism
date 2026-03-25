@@ -19,8 +19,6 @@ endif
 
 C_SOURCES  = \
 	$(SRC_DIR)/main.c \
-	$(SRC_DIR)/industry.c \
-	$(SRC_DIR)/transport.c \
 	$(SRC_DIR)/production.c \
 	$(SRC_DIR)/strings.c \
 	$(SRC_DIR)/ui_buffers.c \
@@ -50,8 +48,6 @@ ASM_SOURCES = \
 
 MAIN_OBJECTS = \
 	$(BUILD_DIR)/main.o \
-	$(BUILD_DIR)/industry.o \
-	$(BUILD_DIR)/transport.o \
 	$(BUILD_DIR)/production.o \
 	$(BUILD_DIR)/strings.o \
 	$(BUILD_DIR)/ui_buffers.o \
@@ -166,11 +162,11 @@ $(BUILD_DIR)/%.o: $(ASM_DIR)/%.s | $(BUILD_DIR)
 $(BUILD_DIR)/iscr.bin: $(BUILD_DIR)/ovl_industry.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/ovl_industry.o
 
-$(BUILD_DIR)/pscr.bin: $(BUILD_DIR)/ovl_production.o $(OVL_CFG) | $(BUILD_DIR)
-	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/ovl_production.o
+$(BUILD_DIR)/pscr.bin: $(BUILD_DIR)/ovl_production_entry.o $(BUILD_DIR)/ovl_production.o $(OVL_CFG) | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/ovl_production_entry.o $(BUILD_DIR)/ovl_production.o
 
-$(BUILD_DIR)/tscr.bin: $(BUILD_DIR)/ovl_transport.o $(OVL_CFG) | $(BUILD_DIR)
-	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ovl_transport.o
+$(BUILD_DIR)/tscr.bin: $(BUILD_DIR)/ovl_transport_entry.o $(BUILD_DIR)/ovl_transport.o $(OVL_CFG) | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ovl_transport_entry.o $(BUILD_DIR)/ovl_transport.o
 
 $(BUILD_DIR)/ascr.bin: $(BUILD_DIR)/ovl_admiralty.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/ovl_admiralty.o
@@ -202,8 +198,14 @@ $(BUILD_DIR)/ovl_diplomacy_entry.o: $(ASM_DIR)/ovl_diplomacy_entry.s | $(BUILD_D
 $(BUILD_DIR)/ovl_trade_expedition_entry.o: $(ASM_DIR)/ovl_trade_expedition_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_trade_expedition_entry.s -o $(BUILD_DIR)/ovl_trade_expedition_entry.o
 
+$(BUILD_DIR)/ovl_production_entry.o: $(ASM_DIR)/ovl_production_entry.s | $(BUILD_DIR)
+	ca65 $(ASM_DIR)/ovl_production_entry.s -o $(BUILD_DIR)/ovl_production_entry.o
+
 $(BUILD_DIR)/ovl_trade_expedition_action_entry.o: $(ASM_DIR)/ovl_trade_expedition_action_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_trade_expedition_action_entry.s -o $(BUILD_DIR)/ovl_trade_expedition_action_entry.o
+
+$(BUILD_DIR)/ovl_transport_entry.o: $(ASM_DIR)/ovl_transport_entry.s | $(BUILD_DIR)
+	ca65 $(ASM_DIR)/ovl_transport_entry.s -o $(BUILD_DIR)/ovl_transport_entry.o
 
 $(BUILD_DIR)/ovl_battle_entry.o: $(ASM_DIR)/ovl_battle_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_battle_entry.s -o $(BUILD_DIR)/ovl_battle_entry.o

@@ -26,7 +26,8 @@ The `Makefile` writes outputs to `build/`:
 - `build/iimperialism.map` linker map
 
 Current overlay binaries include `iscr.bin`, `pscr.bin`, `tscr.bin`, `ascr.bin`,
-`dscr.bin`, `texp.bin`, `txac.bin`, `bscr.bin`, `sscr.bin`, and `menu.bin`.
+`dscr.bin`, `texp.bin`, `txac.bin`, `bscr.bin`, `sscr.bin`, `menu.bin`, and
+`cnsl.bin`.
 
 The menu overlay now owns its save/load flow internally, including its ProDOS
 MLI helper and fixed overlay entry stub.

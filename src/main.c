@@ -2,7 +2,6 @@
 #include <string.h>
 #include "game.h"
 #include "overlay.h"
-#include "screens.h"
 #include "sound.h"
 
 #define BOX1_X1 0
@@ -131,10 +130,13 @@ int main(void) {
     while (1) { // main game loop
         if (state.current_screen == SCREEN_INDUSTRY) {
             run_overlay(OVL_INDUSTRY);
+            continue;
         } else if (state.current_screen == SCREEN_TRANSPORT) {
             run_overlay(OVL_TRANSPORT);
+            continue;
         } else if (state.current_screen == SCREEN_PRODUCTION) {
             run_overlay(OVL_PRODUCTION);
+            continue;
         } else if (state.current_screen == SCREEN_ADMIRALTY) {
             run_overlay(OVL_ADMIRALTY);
             continue;
@@ -149,8 +151,7 @@ int main(void) {
             clear_screen();
             draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
             print(5, 20, "Ambushed by pirates!");
-            print(0, 0, "Navy of");
-            print(7, 0, state.nation_name);
+            print(0, 0, "Our Navy");
             print(23, 0, "Enemy Fleet");
             play_sound_alert();
             run_overlay(OVL_BATTLE);
@@ -163,21 +164,11 @@ int main(void) {
             continue;
         }
 
-        key = cgetc();
-
+        key = cgetc_at(39, 21);
         switch (key) {
             case 27: // ESC key
                 run_overlay(OVL_GAME_MENU);
                 continue;
-            default:
-                if (state.current_screen == SCREEN_INDUSTRY) {
-                    handle_screen_input_industry(key);
-                } else  if (state.current_screen == SCREEN_TRANSPORT) {
-                    handle_screen_input_transport(key);
-                } else if (state.current_screen == SCREEN_PRODUCTION) {
-                    handle_screen_input_production(key);
-                }
-                break;
         }
     }
 

@@ -68,7 +68,8 @@ Resident main loop (`src/main.c`) dispatches by `state.current_screen`:
 - `SCREEN_SCIENCE` -> `OVL_SCIENCE` (`SSCR`)
 
 `ESC` opens the game menu overlay as a transient flow and then returns to the
-current screen unless the menu action changes game state.
+current screen unless the menu action changes game state. For industry,
+transport, and production, `ESC` is handled inside the overlay's own input loop.
 
 Sub-flows are also overlays:
 
@@ -76,14 +77,15 @@ Sub-flows are also overlays:
 - `OVL_TRADE_EXPEDITION` (`TEXP`) for the trade expedition market screen
 - `OVL_TRADE_EXPEDITION_ACTION` (`TXAC`) for trade expedition input/actions
 
-### Input Handlers
+### Input Ownership
 
-- `src/industry.c`: switch to transport/production/admiralty, or end turn
-- `src/transport.c`: edit transport orders, build wagons, return
-- `src/production.c`: edit production orders, train workers, return
+- `src/ovl_industry.c`: render industry and handle screen switching, `ESC`, and end turn
+- `src/ovl_transport.c`: render transport and handle transport input and order-entry flows
+- `src/ovl_production.c`: render production and handle top-level production input
+- `src/production.c`: resident `production_orders()` helper used by the production overlay
 - `src/ovl_admiralty.c`: render admiralty and handle trader/warship builds
 - `src/ovl_game_menu.c`: handle `ESC` menu actions (new/load/save, return)
-- `src/diplomacy.c`: launch trade expedition flow, return
+- `src/ovl_diplomacy.c`: launch trade expedition flow, return
 
 ## Data Model
 

@@ -7,12 +7,16 @@
 #include "ui_buffers.h"
 #include "sound.h"
 
-/* Internal fastcall entry point implemented in asm/sound.s */
-extern void __fastcall__ play_sound_impl(unsigned char sound);
-
 #define CHAR_WIDTH 7
 #define CHAR_HEIGHT 8
+#define SCAN_CURSOR_BLINK_DELAY 20U
+#define SCAN_CURSOR_POLL_SPIN 400U
+
+extern void __fastcall__ play_sound_impl(unsigned char sound); /* Internal fastcall entry point implemented in asm/sound.s */
 static char* append_ulong_decimal(char* buffer, unsigned long value);
+static void render_scan_uint_input(unsigned char x, unsigned char y, unsigned char max_digits, unsigned char len, unsigned char show_cursor);
+static void render_scan_text_input(unsigned char x, unsigned char y, unsigned char max_length, unsigned char len, unsigned char show_cursor, const char* buffer);
+static void render_cgetc_at_input(unsigned char x, unsigned char y, unsigned char show_cursor);
 
 #pragma code-name (push, "LOWCODE")
 
@@ -31,6 +35,33 @@ static char* append_ulong_decimal(char* buffer, unsigned long value) {
     } while (divisor != 0UL);
 
     return buffer;
+}
+
+static void render_scan_uint_input(unsigned char x, unsigned char y, unsigned char max_digits, unsigned char len, unsigned char show_cursor) {
+    clear_area(x, y, max_digits, 1);
+    if (len > 0U) {
+        print(x, y, ui_buffer);
+    }
+    if (show_cursor && len < max_digits) {
+        print((unsigned char)(x + len), y, "_");
+    }
+}
+
+static void render_scan_text_input(unsigned char x, unsigned char y, unsigned char max_length, unsigned char len, unsigned char show_cursor, const char* buffer) {
+    clear_area(x, y, max_length, 1);
+    if (len > 0U) {
+        print_bold(x, y, buffer);
+    }
+    if (show_cursor && len < max_length) {
+        print_bold((unsigned char)(x + len), y, "_");
+    }
+}
+
+static void render_cgetc_at_input(unsigned char x, unsigned char y, unsigned char show_cursor) {
+    clear_area(x, y, 1, 1);
+    if (show_cursor) {
+        print(x, y, "_");
+    }
 }
 
 void ui_init() {
@@ -142,28 +173,45 @@ void box(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2)
  * max_digits limits input length (1-10). Press Enter to confirm. */
 unsigned int scan_uint(unsigned char x, unsigned char y, unsigned char max_digits) {
     unsigned char len = 0;
+    unsigned char cursor_visible = 1U;
+    unsigned char blink_delay = 0U;
     char ch;
 
     if (max_digits > 10) max_digits = 10;
     ui_buffer[0] = '\0';
+    render_scan_uint_input(x, y, max_digits, len, cursor_visible);
 
     while (1) {
+        if (!kbhit()) {
+            unsigned int spin;
+
+            for (spin = 0U; spin < SCAN_CURSOR_POLL_SPIN; ++spin) {
+                /* Busy wait to keep the cursor blink visible on Apple II. */
+            }
+
+            ++blink_delay;
+            if (blink_delay >= SCAN_CURSOR_BLINK_DELAY) {
+                blink_delay = 0U;
+                cursor_visible = !cursor_visible;
+                render_scan_uint_input(x, y, max_digits, len, cursor_visible);
+            }
+            continue;
+        }
+
         ch = cgetc();
+        cursor_visible = 1U;
+        blink_delay = 0U;
 
         if (ch >= '0' && ch <= '9') {
             if (len < max_digits) {
                 ui_buffer[len++] = ch;
                 ui_buffer[len] = '\0';
-                clear_area(x, y, max_digits, 1);
-                print(x, y, ui_buffer);
+                render_scan_uint_input(x, y, max_digits, len, cursor_visible);
             }
         } else if (ch == '\b' || ch == 127) { /* backspace or delete */
             if (len > 0) {
                 ui_buffer[--len] = '\0';
-                clear_area(x, y, max_digits, 1);
-                if (len > 0) {
-                    print(x, y, ui_buffer);
-                }
+                render_scan_uint_input(x, y, max_digits, len, cursor_visible);
             }
         } else if (ch == '\r' || ch == '\n') {
             if (len > 0) {
@@ -175,6 +223,8 @@ unsigned int scan_uint(unsigned char x, unsigned char y, unsigned char max_digit
 
 void scan_text(unsigned char x, unsigned char y, char* buffer, unsigned char max_length) {
     unsigned char len = 0;
+    unsigned char cursor_visible = 1U;
+    unsigned char blink_delay = 0U;
     char ch;
 
     if (max_length == 0U) {
@@ -189,30 +239,78 @@ void scan_text(unsigned char x, unsigned char y, char* buffer, unsigned char max
     }
 
     buffer[0] = '\0';
+    render_scan_text_input(x, y, max_length, len, cursor_visible, buffer);
 
     while (1) {
+        if (!kbhit()) {
+            unsigned int spin;
+
+            for (spin = 0U; spin < SCAN_CURSOR_POLL_SPIN; ++spin) {
+                /* Busy wait to keep the cursor blink visible on Apple II. */
+            }
+
+            ++blink_delay;
+            if (blink_delay >= SCAN_CURSOR_BLINK_DELAY) {
+                blink_delay = 0U;
+                cursor_visible = !cursor_visible;
+                render_scan_text_input(x, y, max_length, len, cursor_visible, buffer);
+            }
+            continue;
+        }
+
         ch = cgetc();
+        cursor_visible = 1U;
+        blink_delay = 0U;
 
         if (ch >= 32 && ch <= 126) {
             if (len < max_length) {
                 buffer[len++] = ch;
                 buffer[len] = '\0';
-                clear_area(x, y, max_length, 1);
-                print_bold(x, y, buffer);
+                render_scan_text_input(x, y, max_length, len, cursor_visible, buffer);
             }
         } else if (ch == '\b' || ch == 127) {
             if (len > 0U) {
                 buffer[--len] = '\0';
-                clear_area(x, y, max_length, 1);
-                if (len > 0U) {
-                    print_bold(x, y, buffer);
-                }
+                render_scan_text_input(x, y, max_length, len, cursor_visible, buffer);
             }
         } else if (ch == '\r' || ch == '\n') {
             if (len > 0U) {
                 return;
             }
         }
+    }
+}
+
+char cgetc_at(unsigned char x, unsigned char y) {
+    unsigned char cursor_visible = 1U;
+    unsigned char blink_delay = 0U;
+    char ch;
+
+    render_cgetc_at_input(x, y, cursor_visible);
+
+    while (1) {
+        if (!kbhit()) {
+            unsigned int spin;
+
+            for (spin = 0U; spin < SCAN_CURSOR_POLL_SPIN; ++spin) {
+                /* Busy wait to keep the cursor blink visible on Apple II. */
+            }
+
+            ++blink_delay;
+            if (blink_delay >= SCAN_CURSOR_BLINK_DELAY) {
+                blink_delay = 0U;
+                cursor_visible = !cursor_visible;
+                render_cgetc_at_input(x, y, cursor_visible);
+            }
+            continue;
+        }
+
+        ch = cgetc();
+        clear_area(x, y, 1, 1);
+        ui_buffer[0] = ch;
+        ui_buffer[1] = '\0';
+        print(x, y, ui_buffer);
+        return ch;
     }
 }
 

@@ -131,7 +131,7 @@ void render_battle_screen(void) {
         unsigned char previous_friendly_ships;
         clear_area(5, 21, 22, 2);
         print(5, 21, "Fight or Run?");
-        key = cgetc();
+        key = cgetc_at(18, 21);
         switch (key) {
             case 'F':
             case 'f':

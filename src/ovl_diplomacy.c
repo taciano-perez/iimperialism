@@ -41,13 +41,14 @@ void render_diplomacy_screen(void) {
     print(5, 21, "Trade expedition or Quit?");
 
     while (1) {
-        key = cgetc();
+        key = cgetc_at(30, 21);
         switch (key) {
             case 't':
             case 'T':
                 if (state.frigates == 0) {
                     print(5, 22, "We must build warships first!");
-                    cgetc();
+                    play_sound_alert();
+                    wait_three_seconds_or_keypress();
                     return;
                 }
                 trade_expedition();

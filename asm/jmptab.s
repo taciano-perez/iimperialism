@@ -26,6 +26,10 @@
 ;  $084E  JMP _wait_three_seconds_or_keypress
 ;  $0851  JMP _play_sound
 ;  $0854  JMP _play_sound_alert
+;  $0857  JMP _cgetc_at
+;  $085A  JMP _next_turn
+;  $085D  JMP _run_overlay
+;  $0860  JMP _production_orders
 
     .import _clear_screen
     .import _clear_input_area
@@ -51,6 +55,10 @@
     .import _wait_three_seconds_or_keypress
     .import _play_sound
     .import _play_sound_alert
+    .import _cgetc_at
+    .import _next_turn
+    .import _run_overlay
+    .import _production_orders
 
     .segment "JMPTAB"
 
@@ -78,3 +86,7 @@
     jmp _wait_three_seconds_or_keypress ; $084E
     jmp _play_sound                     ; $0851
     jmp _play_sound_alert               ; $0854
+    jmp _cgetc_at                       ; $0857
+    jmp _next_turn                      ; $085A
+    jmp _run_overlay                    ; $085D
+    jmp _production_orders              ; $0860

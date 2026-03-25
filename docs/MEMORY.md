@@ -94,10 +94,13 @@ intended entry point stays at `$8800` even if function ordering changes during
 compilation. Current examples:
 
 - `asm/ovl_diplomacy_entry.s` -> `render_diplomacy_screen()`
+- `asm/ovl_production_entry.s` -> `render_production_screen()`
+- `asm/ovl_transport_entry.s` -> `render_transport_screen()`
 - `asm/ovl_trade_expedition_entry.s` -> `render_trade_market()`
 - `asm/ovl_trade_expedition_action_entry.s` -> `handle_screen_trade_expedition()`
 - `asm/ovl_science_entry.s` -> `render_science_screen()`
 - `asm/ovl_game_menu_entry.s` -> `render_game_menu_screen()`
+- `asm/ovl_council_nations_entry.s` -> `render_council_nations_screen()`
 
 ## Resident Jump Table (`$080F`)
 
@@ -121,15 +124,29 @@ $0836  JMP _get_selected_trade_nation
 $0839  JMP _clear_area
 $083C  JMP _paint_area
 $083F  JMP _rand_range
-$0842  JMP _init_game
+$0842  JMP _start_new_game
 $0845  JMP _print_int_right_aligned_currency
 $0848  JMP _render_turn_funds_header
 $084B  JMP _print_bold
 $084E  JMP _wait_three_seconds_or_keypress
+$0851  JMP _play_sound
+$0854  JMP _play_sound_alert
+$0857  JMP _cgetc_at
+$085A  JMP _next_turn
+$085D  JMP _run_overlay
+$0860  JMP _production_orders
 ```
 
 Rule: keep `asm/jmptab.s` and `config/apple2-ovl.cfg` in sync. Rebuild overlays
 after any jump-table change so they relink against the new addresses.
+
+Current note:
+
+- `src/ovl_industry.c` now handles its own input loop entirely inside the overlay
+- `src/ovl_transport.c` now handles both its screen loop and transport actions fully
+  inside the overlay
+- `src/ovl_production.c` handles its screen loop and training flow inside the overlay,
+  while `src/production.c` still provides resident `production_orders()` through JMPTAB
 
 ## `_state` Address in Overlay Config
 
