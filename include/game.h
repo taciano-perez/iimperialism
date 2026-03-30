@@ -4,6 +4,8 @@
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MAX_UINT 65535U
+#define TRUE 1U
+#define FALSE 0U
 
 /* ============================================================================
  * Picture Index Constants
@@ -65,6 +67,10 @@
 #define RELATION_NEUTRAL 100  
 #define RELATION_GOOD 150
 #define RELATION_EXCELLENT 200
+#define RELATION_ALLY_COLONY 255
+
+#define RELTYPE_COLONY 0U
+#define RELTYPE_ALLIANCE 1U
 
 /* ============================================================================
  * Gameplay constants
@@ -184,7 +190,7 @@ void render_warehouse_box(void);
 void render_turn_funds_header(void);
 void start_new_game(void);
 const char* get_resource_name(unsigned char resource);
-const char* get_relation_name(unsigned char relation);
+const char* get_relation_name(unsigned char relation, unsigned char nation_index);
 void set_selected_trade_nation(unsigned char nation_index);
 unsigned char get_selected_trade_nation(void);
 unsigned char rand_range(unsigned char min, unsigned char max);

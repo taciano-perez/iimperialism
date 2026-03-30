@@ -16,6 +16,8 @@ const char STR_RELATION_BAD[] = "Bad";
 const char STR_RELATION_NEUTRAL[] = "Neutral";
 const char STR_RELATION_GOOD[] = "Good";
 const char STR_RELATION_EXCELLENT[] = "Excellent";
+const char STR_RELATION_ALLY[] = "Ally";
+const char STR_RELATION_COLONY[] = "Colony";
 
 const char* const STR_RESOURCE[] = {
     "Timber",
@@ -39,7 +41,7 @@ const char* get_resource_name(unsigned char resource) {
     return STR_RESOURCE[resource];
 }
 
-const char* get_relation_name(unsigned char relation) {
+const char* get_relation_name(unsigned char relation, unsigned char nation_index) {
     if (relation < RELATION_BAD) {
         return STR_RELATION_TERRIBLE;
     }
@@ -54,6 +56,13 @@ const char* get_relation_name(unsigned char relation) {
 
     if (relation < RELATION_EXCELLENT) {
         return STR_RELATION_GOOD;
+    }
+    if (relation == RELATION_ALLY_COLONY) {
+        if (nation_index < 2) {
+            return STR_RELATION_ALLY;
+        } else {
+            return STR_RELATION_COLONY;
+        }
     }
 
     return STR_RELATION_EXCELLENT;

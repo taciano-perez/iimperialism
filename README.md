@@ -230,13 +230,13 @@ overlays are relinked.
 
 ## TODO
 
+- Make attempts at alliances and colonization fallible, consider cost
 - Finish battle screen 
   - introduce enemy powers and not only pirates
 - Expand the science tree with wagon capacity improvements
 - Add main screen
   - Fix game menu
 - Randomize country names and their exports/imports
-- Introduce alliances and colonization
 - Admiralty improvement: increase cost of traders and warships according to science level
 - Scientific discoveries to improve max production per province
 - Attempt to merge overlays when each is less than 1KB to reclaim floppy space
