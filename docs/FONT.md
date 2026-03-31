@@ -82,9 +82,8 @@ Examples:
 - first glyph: `(2, 2)`
 - second glyph: `(18, 2)`
 
-The checked-in bold source contains blank glyphs for `|`, `}`, and `~`. That is
-intentional for the current asset and is reflected in the generated runtime
-table.
+The checked-in bold source currently contains blank glyphs for `|` and `}`.
+Those blanks are reflected in the generated runtime table.
 
 ## Target Font Format
 

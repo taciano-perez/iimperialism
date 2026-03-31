@@ -84,6 +84,7 @@
 #define BATTLE_RUN_TRADER_HIT_CHANCE_PERCENT 60U
 #define DIPLOMATIC_OVERTURE_CHANCE_PERCENT 50U
 #define DIPLOMATIC_OFFER_COST 1000U
+#define TRADE_RELATIONS_MULTIPLIER 2U
 #define SCIENCE_RESEARCH_COST_MULTIPLIER 1000U
 #define RELATIONS_LOSS_PER_TURN 3U
 #define FOREIGN_NATION_COUNT 5
@@ -94,6 +95,7 @@
 typedef struct {
     char name[FOREIGN_NATION_NAME_LENGTH + 1];
     unsigned char relations;
+    unsigned char relations_previous_turn;
     unsigned char exports[FOREIGN_TRADE_ENTRY_COUNT];
     unsigned char imports[FOREIGN_TRADE_ENTRY_COUNT];
     unsigned char export_prices[FOREIGN_TRADE_ENTRY_COUNT];

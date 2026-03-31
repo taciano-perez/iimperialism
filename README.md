@@ -233,7 +233,7 @@ overlays are relinked.
 
 ## TODO
 
-- Show relationship trend on diplomacy screen
+- Relationship trend on diplomacy screen: fix bug where after end turn it shows always down
 - Finish battle screen 
   - introduce enemy powers and not only pirates
 - Expand the science tree with wagon capacity improvements
@@ -246,6 +246,7 @@ overlays are relinked.
 - Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed
 - Improve victory screen
 - Consider adding map screen
+- Consider adding land battles
 - Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
 - Balance game for all stages (beginning, mid, and end)
 - Adjust the initial money amount

@@ -68,6 +68,9 @@ void render_diplomacy_screen(void) {
             print(NATION_X + 1, y, ")");
             print(NATION_X + 2, y, nation->name);
             print(RELATION_X, y, get_relation_name(nation->relations, i));
+            if (nation->relations != RELATION_ALLY_COLONY) {
+                print_bold(RELATION_X+6, y, (nation->relations_previous_turn > nation->relations) ? "~" : (nation->relations_previous_turn < nation->relations) ? "^" : " ");
+            }
             for (j = 0; j < FOREIGN_TRADE_ENTRY_COUNT; ++j) {
                 print(EXPORT_X, y + j - 1, get_resource_name(nation->exports[j]));
                 print(IMPORT_X, y + j - 1, get_resource_name(nation->imports[j]));

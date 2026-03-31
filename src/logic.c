@@ -164,7 +164,7 @@ void init_game() {
 
     state.available_workers = 6;
 
-    state.traders = 2;
+    state.traders = 8;
     state.frigates = 24;
     state.capacity_per_trader = CAPACITY_PER_TRADER_BASE;
     state.guns_per_frigate = GUNS_PER_FRIGATE_BASE;
@@ -174,6 +174,7 @@ void init_game() {
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
         strcpy(state.foreign_nations[i].name, foreign_nation_names[i]);
         state.foreign_nations[i].relations = foreign_nation_relations[i];
+        state.foreign_nations[i].relations_previous_turn = foreign_nation_relations[i];
 
         for (j = 0; j < FOREIGN_TRADE_ENTRY_COUNT; ++j) {
             state.foreign_nations[i].exports[j] = foreign_nation_exports[i][j];
@@ -244,9 +245,12 @@ void next_turn() {
 
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;
 
-    // decrease relations with all foreign nations
+    // decrease relations with all foreign nations (except allies/colonies)
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
-        state.foreign_nations[i].relations = MAX(0, state.foreign_nations[i].relations - RELATIONS_LOSS_PER_TURN);
+        if (state.foreign_nations[i].relations != RELATION_ALLY_COLONY) {
+            state.foreign_nations[i].relations_previous_turn = state.foreign_nations[i].relations;
+            state.foreign_nations[i].relations = MAX(0, state.foreign_nations[i].relations - RELATIONS_LOSS_PER_TURN);
+        }
     }
 
     // update turn number

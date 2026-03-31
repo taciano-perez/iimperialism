@@ -39,7 +39,11 @@ static const char* const STR_DIPLOMACY[] = {
     "colony status to a minor nation.",
     "Which nation to trade (1-5)?",
     "Sailing to the Sea of",
-    "..."
+    "...",
+    "Buy, Sell or Quit?",
+    "Commodity to buy?",
+    "Commodity to sell?",
+    "How many units (Max:    )?"
 };
 
 const char* const STR_RESOURCE[] = {

@@ -3,6 +3,11 @@
 
 #define TRADE_MODE_BUY  0
 #define TRADE_MODE_SELL 1
+#define TSTR_BUY_SELL_QUIT 21
+#define TSTR_COMMODITY_BUY 22
+#define TSTR_COMMODITY_SELL 23
+#define TSTR_HOW_MANY 24
+#define TSTR(id) get_diplomacy_string(id)
 
 static void trade_commodities(unsigned char nation_index, unsigned char mode);
 
@@ -21,50 +26,50 @@ void handle_screen_trade_expedition(void) {
         print_int_right_aligned(29, 15, state.remaining_turn_capacity);
 
         clear_input_area();
-        print(5, 20, "Buy, Sell or Quit?");
-        key = cgetc_at(23, 20);
-        switch (key) {
-            case 'B':
-            case 'b':
-                trade_commodities(nation_index, TRADE_MODE_BUY);
-                return;
-            case 'S':
-            case 's':
-                trade_commodities(nation_index, TRADE_MODE_SELL);
-                return;
-            case 'Q':
-            case 'q':
-                state.current_screen = SCREEN_DIPLOMACY;
-                return;
+        print(5, 20, TSTR(TSTR_BUY_SELL_QUIT));
+        key = (unsigned char)(cgetc_at(23, 20) & 0xDF);
+        if (key == 'B') {
+            trade_commodities(nation_index, TRADE_MODE_BUY);
+            return;
+        }
+        if (key == 'S') {
+            trade_commodities(nation_index, TRADE_MODE_SELL);
+            return;
+        }
+        if (key == 'Q') {
+            state.current_screen = SCREEN_DIPLOMACY;
+            return;
         }
     }
 }
 
 static void trade_commodities(unsigned char nation_index, unsigned char mode) {
     unsigned char i;
-    char key;
-    unsigned int input;
+    unsigned char key;
     unsigned int quantity;
     unsigned int max_quantity;
     unsigned char resource;
+    ForeignNation* nation;
     const unsigned char* trade_list;
     unsigned char menu_base;
     unsigned int price;
 
+    nation = &state.foreign_nations[nation_index];
+
     if (mode == TRADE_MODE_BUY) {
-        trade_list = state.foreign_nations[nation_index].exports;
+        trade_list = nation->exports;
         menu_base = 4;
     } else {
-        trade_list = state.foreign_nations[nation_index].imports;
+        trade_list = nation->imports;
         menu_base = 1;
     }
 
     while (1) {
         clear_input_area();
         if (mode == TRADE_MODE_BUY) {
-            print(5, 20, "Commodity to buy?");
+            print(5, 20, TSTR(TSTR_COMMODITY_BUY));
         } else {
-            print(5, 20, "Commodity to sell?");
+            print(5, 20, TSTR(TSTR_COMMODITY_SELL));
         }
 
         for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {
@@ -75,24 +80,20 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
 
         while (1) {
             key = cgetc_at(23, 20);
-            if (key < '0' || key > '9') {
-                continue;
-            }
-            input = (unsigned int)(key - '0');
-            if (input >= menu_base && input < (unsigned int)(menu_base + FOREIGN_TRADE_ENTRY_COUNT)) {
-                i = (unsigned char)(input - menu_base);
+            if (key >= (unsigned char)('0' + menu_base) && key < (unsigned char)('0' + menu_base + FOREIGN_TRADE_ENTRY_COUNT)) {
+                i = (unsigned char)(key - '0' - menu_base);
                 resource = trade_list[i];
                 if (mode == TRADE_MODE_BUY) {
-                    price = state.foreign_nations[nation_index].export_prices[i];
+                    price = nation->export_prices[i];
                     max_quantity = MIN(state.remaining_turn_capacity, state.money / price);
                 } else {
-                    price = state.foreign_nations[nation_index].import_prices[i];
+                    price = nation->import_prices[i];
                     max_quantity = MIN(state.remaining_turn_capacity, state.resources[resource]);
                 }
 
                 while (1) {
                     clear_area(28, 22, 3, 1);
-                    print(5, 22, "How many units (Max:    )?");
+                    print(5, 22, TSTR(TSTR_HOW_MANY));
                     print_int_right_aligned(28, 22, max_quantity);
                     quantity = scan_uint(31, 22, 3);
                     if (quantity <= max_quantity) {
@@ -103,6 +104,10 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
                         } else {
                             state.resources[resource] -= quantity;
                             state.money += quantity * price;
+                        }
+                        // improve trade relations proportionally to the trade * multiplier, but only if not already an ally/colony
+                        if (nation->relations != RELATION_ALLY_COLONY) {
+                            nation->relations = MAX(nation->relations + (quantity * TRADE_RELATIONS_MULTIPLIER), RELATION_EXCELLENT);
                         }
                         return;
                     }
