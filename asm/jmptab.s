@@ -31,6 +31,7 @@
 ;  $085D  JMP _run_overlay
 ;  $0860  JMP _production_orders
 ;  $0863  JMP _print_inverted
+;  $0866  JMP _get_diplomacy_string
 
     .import _clear_screen
     .import _clear_input_area
@@ -61,6 +62,7 @@
     .import _run_overlay
     .import _production_orders
     .import _print_inverted
+    .import _get_diplomacy_string
 
     .segment "JMPTAB"
 
@@ -93,3 +95,4 @@
     jmp _run_overlay                    ; $085D
     jmp _production_orders              ; $0860
     jmp _print_inverted                 ; $0863
+    jmp _get_diplomacy_string           ; $0866

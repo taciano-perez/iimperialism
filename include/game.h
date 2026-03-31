@@ -82,6 +82,8 @@
 #define BATTLE_TRADER_HIT_CHANCE_PERCENT 5U
 #define BATTLE_BOUNTY_VARIANCE_PERCENT 50U
 #define BATTLE_RUN_TRADER_HIT_CHANCE_PERCENT 60U
+#define DIPLOMATIC_OVERTURE_CHANCE_PERCENT 50U
+#define DIPLOMATIC_OFFER_COST 1000U
 #define SCIENCE_RESEARCH_COST_MULTIPLIER 1000U
 #define RELATIONS_LOSS_PER_TURN 3U
 #define FOREIGN_NATION_COUNT 5
@@ -190,6 +192,7 @@ void render_warehouse_box(void);
 void render_turn_funds_header(void);
 void start_new_game(void);
 const char* get_resource_name(unsigned char resource);
+const char* get_diplomacy_string(unsigned char index);
 const char* get_relation_name(unsigned char relation, unsigned char nation_index);
 void set_selected_trade_nation(unsigned char nation_index);
 unsigned char get_selected_trade_nation(void);

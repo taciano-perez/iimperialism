@@ -168,7 +168,7 @@ void init_game() {
     state.frigates = 24;
     state.capacity_per_trader = CAPACITY_PER_TRADER_BASE;
     state.guns_per_frigate = GUNS_PER_FRIGATE_BASE;
-    state.money = 2210000U;
+    state.money = 30000U;
     state.science_level = 0;
 
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {

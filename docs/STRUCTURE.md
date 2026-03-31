@@ -28,8 +28,8 @@ The `Makefile` writes outputs to `build/`:
 The linker map is the authoritative source for segment placement. In the current
 build it shows:
 
-- `JMPTAB` in main RAM at `$080F-$0865`
-- `LOWCODE` in main RAM at `$0866-$1631`
+- `JMPTAB` in main RAM at `$080F-$0868`
+- `LOWCODE` in main RAM at `$0869-$1631`
 - `LC` in Language Card RAM at `$D400-$DD79`, currently including `src/ui.c`
 
 Current overlay binaries include `iscr.bin`, `pscr.bin`, `tscr.bin`, `ascr.bin`,

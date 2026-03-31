@@ -164,7 +164,9 @@ This is most useful when:
 For overlays, prefer a local static string over a resident string symbol unless
 that resident data is explicitly part of the overlay ABI. Overlays can safely call
 resident functions through the jump table, but direct references to resident data
-symbols are usually not link-safe.
+symbols are usually not link-safe. If overlay `RODATA` is the real bottleneck and
+resident headroom is available, expose a resident string getter through `JMPTAB`
+instead of trying to import raw resident data symbols directly.
 
 ## Keep Changes Local First
 
@@ -378,6 +380,9 @@ Use these only with more validation:
 
 These can save overlay space, but they can also make the main binary stop booting
 correctly even when the build succeeds.
+
+One current example is the diplomacy overlay: it uses a resident
+`get_diplomacy_string()` helper through `JMPTAB` to keep `dscr.bin` under 2 KB.
 
 ## Rule of Thumb
 

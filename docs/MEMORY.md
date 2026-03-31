@@ -8,8 +8,8 @@ $0100-$01FF  6502 hardware stack
 $0200-$03FF  System / ProDOS vectors
 $0400-$07FF  Text screen page 1
 $0803-$080E  STARTUP            (cc65 crt0)
-$080F-$0865  JMPTAB             (resident jump table used by overlays)
-$0866-$1631  LOWCODE            (resident main-RAM helpers + core logic)
+$080F-$0868  JMPTAB             (resident jump table used by overlays)
+$0869-$1631  LOWCODE            (resident main-RAM helpers + core logic)
 $2000-$3FFF  HGR page 1         (graphics memory; no code here)
 $4000-...    CODE/RODATA/DATA   (main resident code + data)
 ...          BSS/ONCE/heap
@@ -146,6 +146,7 @@ $085A  JMP _next_turn
 $085D  JMP _run_overlay
 $0860  JMP _production_orders
 $0863  JMP _print_inverted
+$0866  JMP _get_diplomacy_string
 ```
 
 Rule: keep `asm/jmptab.s` and `config/apple2-ovl.cfg` in sync. Rebuild overlays
@@ -245,13 +246,14 @@ If the overlay needs a resident function not in JMPTAB, append a new JMP entry i
 `asm/jmptab.s`, export it from `config/apple2-ovl.cfg`, and declare it in
 `include/game.h`. Current examples include `clear_area(int x, int y, int width, int height)`
 at `$0839`, `print_bold(unsigned char x, unsigned char y, const char* text)` at `$084B`,
-and `print_inverted(unsigned char x, unsigned char y, const char* text)` at `$0863`.
+`print_inverted(unsigned char x, unsigned char y, const char* text)` at `$0863`, and
+`get_diplomacy_string(unsigned char index)` at `$0866`.
 
 ## Expansion Areas
 
 | Area | Address | Capacity | Notes |
 |------|---------|----------|-------|
-| LOWCODE | `$0866-$1631` currently used | main RAM below HGR | Compact resident helpers, blitters, overlay loader, core logic |
+| LOWCODE | `$0869-$1631` currently used | main RAM below HGR | Compact resident helpers, blitters, overlay loader, core logic |
 | Language Card | `$D400-$DFFF` | 3KB | Separate RAM bank; currently hosts `src/ui.c` code (`$D400-$DD79` used) |
 
 Use `make memory-usage` to get the current used/free breakdown for resident

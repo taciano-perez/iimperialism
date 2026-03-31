@@ -11,13 +11,36 @@ const char STR_SIR_TRAIN_WORKERS2[] = "and 1 clothes.";
 const char STR_BAR[] = "===========";
 
 
-const char STR_RELATION_TERRIBLE[] = "Terrible";
-const char STR_RELATION_BAD[] = "Bad";
-const char STR_RELATION_NEUTRAL[] = "Neutral";
+const char STR_RELATION_TERRIBLE[] = "Bad";
+const char STR_RELATION_BAD[] = "Poor";
+const char STR_RELATION_NEUTRAL[] = "Fair";
 const char STR_RELATION_GOOD[] = "Good";
-const char STR_RELATION_EXCELLENT[] = "Excellent";
+const char STR_RELATION_EXCELLENT[] = "Great";
 const char STR_RELATION_ALLY[] = "Ally";
 const char STR_RELATION_COLONY[] = "Colony";
+static const char* const STR_DIPLOMACY[] = {
+    "Foreign Office",
+    "Nation",
+    "Status",
+    "Exports",
+    "Imports",
+    "Launch Trade expedition, offer",
+    "Colony status, Alliance or Quit?",
+    "We must build warships first!",
+    "A diplomatic mission costs $1000.",
+    "Nation to offer",
+    "an alliance:",
+    "colony status:",
+    "Offer accepted!",
+    "Offer rejected. Investment lost.",
+    "You need Status = Great",
+    "and $1000 to offer",
+    "an alliance to a great power.",
+    "colony status to a minor nation.",
+    "Which nation to trade (1-5)?",
+    "Sailing to the Sea of",
+    "..."
+};
 
 const char* const STR_RESOURCE[] = {
     "Timber",
@@ -39,6 +62,10 @@ const char* get_resource_name(unsigned char resource) {
     }
 
     return STR_RESOURCE[resource];
+}
+
+const char* get_diplomacy_string(unsigned char index) {
+    return STR_DIPLOMACY[index];
 }
 
 const char* get_relation_name(unsigned char relation, unsigned char nation_index) {

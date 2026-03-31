@@ -85,7 +85,7 @@ Sub-flows are also overlays:
 - `src/production.c`: resident `production_orders()` helper used by the production overlay
 - `src/ovl_admiralty.c`: render admiralty and handle trader/warship builds
 - `src/ovl_game_menu.c`: handle `ESC` menu actions (new/load/save, return)
-- `src/ovl_diplomacy.c`: launch trade expedition flow, return
+- `src/ovl_diplomacy.c`: handle diplomacy input, trade expeditions, and alliance/colony offers
 
 ## Data Model
 
@@ -115,6 +115,8 @@ direct-ProDOS MLI helper for `GAME.DATA` rather than `stdio`.
 - Overlay calls to resident helpers go through jump table entries in
   `asm/jmptab.s`, with matching symbol addresses exported from
   `config/apple2-ovl.cfg`.
+- The diplomacy overlay now uses a resident `get_diplomacy_string()` helper through
+  `JMPTAB` so its larger UI text set does not consume local overlay `RODATA`.
 - After changing the jump table or resident layout, rebuild overlays so the
   generated `build/apple2-ovl.cfg` picks up the current `_state` address and
   resident helper entry points.

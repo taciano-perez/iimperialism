@@ -8,46 +8,82 @@
 #define BOX_X2 39
 #define BOX_Y2 19
 
-#define NATION_X 0
+#define NATION_X 1
 #define RELATION_X 10
 #define EXPORT_X 20
 #define IMPORT_X 30
 #define FIRST_ROW_Y 4
 #define ROW_HEIGHT 3
+#define FIRST_COL_X 5U
 
-static unsigned char get_row_y(unsigned char nation_index);
-static void render_trade_column(unsigned char x, unsigned char y, const unsigned char* resources);
-static void render_nation_row(unsigned char nation_index);
+#define DSTR_TITLE 0
+#define DSTR_NATION 1
+#define DSTR_STATUS 2
+#define DSTR_EXPORTS 3
+#define DSTR_IMPORTS 4
+#define DSTR_PROMPT_1 5
+#define DSTR_PROMPT_2 6
+#define DSTR_NEED_WARSHIPS 7
+#define DSTR_DIPLOMATIC_COST 8
+#define DSTR_OFFER_NATION 9
+#define DSTR_ALLIANCE 10
+#define DSTR_COLONY_STATE 11
+#define DSTR_ACCEPTED 12
+#define DSTR_REJECTED 13
+#define DSTR_NEED_GREAT 14
+#define DSTR_NEED_MONEY 15
+#define DSTR_NEED_ALLIANCE 16
+#define DSTR_NEED_COLONY 17
+#define DSTR_TRADE_WHICH 18
+#define DSTR_SAILING 19
+#define DSTR_ELLIPSIS 20
+
+#define DSTR(id) get_diplomacy_string(id)
+
 static void diplomatic_proposal(unsigned char is_alliance);
 static void trade_expedition(void);
 
 void render_diplomacy_screen(void) {
     unsigned char i;
+    unsigned char j;
     unsigned char key;
+    unsigned char y;
+    ForeignNation* nation;
 
     while (1) {
         clear_screen();
-        print(0, 0, "Foreign Office");
+        print(0, 0, DSTR(DSTR_TITLE));
         render_turn_funds_header();
 
-        print_inverted(NATION_X, 2, "Nation");
-        print_inverted(RELATION_X, 2, "Relations");
-        print_inverted(EXPORT_X, 2, "Exports");
-        print_inverted(IMPORT_X, 2, "Imports");
+        print_inverted(NATION_X, 2, DSTR(DSTR_NATION));
+        print_inverted(RELATION_X, 2, DSTR(DSTR_STATUS));
+        print_inverted(EXPORT_X, 2, DSTR(DSTR_EXPORTS));
+        print_inverted(IMPORT_X, 2, DSTR(DSTR_IMPORTS));
 
+        y = FIRST_ROW_Y;
         for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
-            render_nation_row(i);
+            nation = &state.foreign_nations[i];
+            box(BOX_X1, y - 1, BOX_X2, y + 2);
+            print_int(NATION_X, y, i + 1);
+            print(NATION_X + 1, y, ")");
+            print(NATION_X + 2, y, nation->name);
+            print(RELATION_X, y, get_relation_name(nation->relations, i));
+            for (j = 0; j < FOREIGN_TRADE_ENTRY_COUNT; ++j) {
+                print(EXPORT_X, y + j - 1, get_resource_name(nation->exports[j]));
+                print(IMPORT_X, y + j - 1, get_resource_name(nation->imports[j]));
+            }
+            y = (unsigned char)(y + ROW_HEIGHT);
         }
 
         draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
-        print(5, 20, "Launch Trade expedition, offer");
-        print(5, 21, "Colony status, Alliance or Quit?");
+        print(5, 20, DSTR(DSTR_PROMPT_1));
+        print(5, 21, DSTR(DSTR_PROMPT_2));
         key = cgetc_at(37, 21);
         switch (key) {
             case 't':
             case 'T':
                 if (state.frigates == 0) {
-                    print(5, 22, "We must build warships first!");
+                    print(5, 22, DSTR(DSTR_NEED_WARSHIPS));
                     play_sound_alert();
                     wait_three_seconds_or_keypress();
                     return;
@@ -70,116 +106,83 @@ void render_diplomacy_screen(void) {
     }
 }
 
-static unsigned char get_row_y(unsigned char nation_index) {
-    return FIRST_ROW_Y + (nation_index * ROW_HEIGHT);
-}
-
-static void render_trade_column(unsigned char x, unsigned char y, const unsigned char* resources) {
-    unsigned char i;
-
-    for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {
-        print(x, y + i - 1, get_resource_name(resources[i]));
-    }
-}
-
-static void render_nation_row(unsigned char nation_index) {
-    unsigned char y;
-
-    y = get_row_y(nation_index);
-
-    box(BOX_X1, y - 1, BOX_X2, y + 2);
-    print_int(NATION_X, y, nation_index + 1);
-    print(NATION_X + 1, y, ")");
-    print(NATION_X + 2, y, state.foreign_nations[nation_index].name);
-    print(RELATION_X, y, get_relation_name(state.foreign_nations[nation_index].relations, nation_index));
-    render_trade_column(EXPORT_X, y, state.foreign_nations[nation_index].exports);
-    render_trade_column(IMPORT_X, y, state.foreign_nations[nation_index].imports);
-}
-
 static void diplomatic_proposal(unsigned char is_alliance) {
-    unsigned char nation_index;
-    unsigned char start_index;
-    unsigned char end_index;
+    unsigned char nation_index = (unsigned char)(is_alliance ? 0U : 2U);
     unsigned char x;
-    unsigned char printed_any;
+    unsigned char end_index = (unsigned char)(is_alliance ? 2U : FOREIGN_NATION_COUNT);
+    ForeignNation* nation;
 
     clear_input_area();
-
-    if (is_alliance) {
-        start_index = 0U;
-        end_index = 1U;
-    } else {
-        start_index = 2U;
-        end_index = 4U;
-    }
-
     clear_area(5, 21, 34, 1);
 
-    x = 5U;
-    printed_any = FALSE;
-    for (nation_index = start_index; nation_index <= end_index; ++nation_index) {
-        if (state.foreign_nations[nation_index].relations < RELATION_EXCELLENT || state.foreign_nations[nation_index].relations == RELATION_ALLY_COLONY) {
+    x = FIRST_COL_X;
+    for (; nation_index < end_index; ++nation_index) {
+        nation = &state.foreign_nations[nation_index];
+        if (nation->relations < RELATION_EXCELLENT || nation->relations == RELATION_ALLY_COLONY) {
             continue;
         }
 
-        if (printed_any) {
-            print(x, 21, ", ");
-            x = (unsigned char)(x + 2U);
+        if (x != FIRST_COL_X) {
+            print(x, 22, ",");
+            x = (unsigned char)(x + 1U);
         }
 
-        print_int(x, 21, nation_index + 1U);
-        print(x+1, 21, ")");
+        print_int(x, 22, nation_index + 1U);
+        print(x + 1, 22, ")");
         x = (unsigned char)(x + 2U);
-        print(x, 21, state.foreign_nations[nation_index].name);
-        x = (unsigned char)(x + strlen(state.foreign_nations[nation_index].name));
-        printed_any = TRUE;
+        print(x, 22, nation->name);
+        x = (unsigned char)(x + strlen(nation->name));
+        print(x, 22, ",");
     }
+    print(x+1, 22, "0)Quit?");
 
-    if (printed_any) {
-        print(5, 20, "Nation to offer");
-        if (is_alliance) {
-            print(21, 20, "alliance?");
-        } else {
-            print(21, 20, "colony state?");
-        }
+    if (x != FIRST_COL_X || state.money >= DIPLOMATIC_OFFER_COST) {
+        print(5, 20, DSTR(DSTR_DIPLOMATIC_COST));
+        print(5, 21, DSTR(DSTR_OFFER_NATION));
+        print(21, 21, DSTR(is_alliance ? DSTR_ALLIANCE : DSTR_COLONY_STATE));
         while (1) {
-            nation_index = scan_uint(5, 22, 1)-1;
+            nation_index = (unsigned char)(scan_uint(x+8, 22, 1) - 1U);
+            if (nation_index == 255U) { // user typed 0 to quit
+                break; 
+            }
             if (nation_index < FOREIGN_NATION_COUNT && state.foreign_nations[nation_index].relations >= RELATION_EXCELLENT) {
-                // make acceptance random and print out message
-                state.foreign_nations[nation_index].relations = RELATION_ALLY_COLONY;
+                clear_input_area();
+                if (rand_range(1U, 100U) <= DIPLOMATIC_OVERTURE_CHANCE_PERCENT) {
+                    state.foreign_nations[nation_index].relations = RELATION_ALLY_COLONY;
+                    print(5, 21, DSTR(DSTR_ACCEPTED));
+                } else {
+                    print(5, 21, DSTR(DSTR_REJECTED));
+                }
+                state.money = state.money - DIPLOMATIC_OFFER_COST;
+                play_sound_alert();
+                wait_three_seconds_or_keypress();
                 break;
             }
         }
     } else {
-        // FIXME: we may land here also if all nations are already allies/colonies.
-        print(5, 20, "You need excellent relations with");
-        if (is_alliance) {
-            print(5, 21, "a great power to offer alliance.");
-        } else {
-            print(5, 21, "a minor nation to offer colony status.");
-        }
+        print(5, 20, DSTR(DSTR_NEED_GREAT));
+        print(5, 21, DSTR(DSTR_NEED_MONEY));
+        print(5, 22, DSTR(is_alliance ? DSTR_NEED_ALLIANCE : DSTR_NEED_COLONY));
         play_sound_alert();
         wait_three_seconds_or_keypress();
     }
 }
 
 static void trade_expedition(void) {
-    unsigned int selection;
     unsigned char nation_index;
 
     while (1) {
         clear_input_area();
-        print(5, 20, "Which nation to trade (1-5)?");
+        print(5, 20, DSTR(DSTR_TRADE_WHICH));
 
-        selection = scan_uint(36, 20, 1);
-        if (selection < 1 || selection > FOREIGN_NATION_COUNT) {
+        nation_index = (unsigned char)(scan_uint(36, 20, 1) - 1U);
+        if (nation_index >= FOREIGN_NATION_COUNT) {
             continue;
         }
-        nation_index = (unsigned char)(selection - 1);
 
-        print(5, 22, "Sailing to the Sea of");
+        print(5, 22, DSTR(DSTR_SAILING));
         print(27, 22, state.foreign_nations[nation_index].name);
-        print(33, 22, "...");
+        print(33, 22, DSTR(DSTR_ELLIPSIS));
         wait_three_seconds_or_keypress();
         set_selected_trade_nation(nation_index);
         if (rand_range(1U, 100U) <= TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT) {

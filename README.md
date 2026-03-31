@@ -28,8 +28,8 @@ within the Apple II's constraints:
 - Pressing `ESC` opens the `MENU` overlay for new/load/save actions.
 - Choosing `New Game` from the menu also re-prompts for the nation name.
 - The resident helper split is now:
-  - `JMPTAB` at `$080F-$0865` for overlay-callable entry points
-  - `LOWCODE` at `$0866-$1631` for compact main-RAM helpers such as the HGR text blitters
+  - `JMPTAB` at `$080F-$0868` for overlay-callable entry points
+  - `LOWCODE` at `$0869-$1631` for compact main-RAM helpers such as the HGR text blitters
   - `LC` at `$D400-$DD79` for `src/ui.c` UI code placed in the Language Card
 - Disk autoboot uses ProDOS `SYS` loader `IIMP.SYSTEM` to launch `IIMPERIALISM`
   directly (no `BASIC.SYSTEM` dependency).
@@ -42,11 +42,12 @@ See `docs/FLOPPY.md` for floppy contents and autoboot behavior.
 Foreign nation relations are stored as numeric values in the game state and shown
 in the diplomacy screen as text using these ranges:
 
-- `0-49`: Terrible
-- `50-99`: Bad
-- `100-149`: Neutral
+- `0-49`: Bad
+- `50-99`: Poor
+- `100-149`: Fair
 - `150-199`: Good
-- `200+`: Excellent
+- `200-254`: Great
+- `255`: Ally for great powers, Colony for minor nations
 
 ## File Structure
 
@@ -182,6 +183,8 @@ Overlay note:
 - the build generates `build/apple2-ovl.cfg` from `build/iimperialism.map`
 - overlays are linked against the generated file so `_state` stays in sync with the
   current resident layout
+- `dscr.bin` now pulls most diplomacy UI text from resident code through
+  `get_diplomacy_string()` in `JMPTAB`, which keeps overlay `RODATA` below 2 KB
 - resident UI text now uses direct HGR byte writes from `asm/text_hgr.s`
 - `src/ui.c` itself is linked into the Language Card, while the blitters remain in
   main-RAM `LOWCODE`
@@ -230,7 +233,7 @@ overlays are relinked.
 
 ## TODO
 
-- Make attempts at alliances and colonization fallible, consider cost
+- Show relationship trend on diplomacy screen
 - Finish battle screen 
   - introduce enemy powers and not only pirates
 - Expand the science tree with wagon capacity improvements
