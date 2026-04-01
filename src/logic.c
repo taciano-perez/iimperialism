@@ -9,6 +9,8 @@ static unsigned int apply_percent(unsigned int value, unsigned char percent);
 static void add_resource_saturating(unsigned char resource, unsigned char amount);
 static void update_foreign_market_prices(void);
 static void assign_foreign_nation_names(void);
+static unsigned char rand_resource_excluding(unsigned char min, unsigned char max, unsigned char exclude);
+static void assign_foreign_nation_trade_routes(void);
 
 static unsigned char get_resource_base_price(unsigned char resource) {
     static const unsigned char base_prices[] = {
@@ -97,6 +99,16 @@ static void update_foreign_market_prices(void) {
             state.foreign_nations[i].import_prices[j] = apply_percent(import_base, import_percent);
         }
     }
+}
+
+static unsigned char rand_resource_excluding(unsigned char min, unsigned char max, unsigned char exclude) {
+    unsigned char resource;
+
+    do {
+        resource = rand_range(min, max);
+    } while (resource == exclude);
+
+    return resource;
 }
 
 static void assign_foreign_nation_names(void) {
@@ -190,26 +202,43 @@ static void assign_foreign_nation_names(void) {
     }
 }
 
+static void assign_foreign_nation_trade_routes(void) {
+    unsigned char i;
+
+    for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
+        unsigned char import_mid;
+
+        if (i < 2U) {
+            state.foreign_nations[i].imports[0] = rand_range(RESOURCE_TIMBER, RESOURCE_COAL);
+            state.foreign_nations[i].imports[1] = rand_resource_excluding(RESOURCE_TIMBER, RESOURCE_COAL,
+                                                                          state.foreign_nations[i].imports[0]);
+            import_mid = rand_range(RESOURCE_LUMBER, RESOURCE_STEEL);
+            state.foreign_nations[i].imports[2] = import_mid;
+
+            state.foreign_nations[i].exports[0] = rand_range(RESOURCE_FURNITURE, RESOURCE_GUNS);
+            state.foreign_nations[i].exports[1] = rand_resource_excluding(RESOURCE_FURNITURE, RESOURCE_GUNS,
+                                                                          state.foreign_nations[i].exports[0]);
+            state.foreign_nations[i].exports[2] = rand_resource_excluding(RESOURCE_LUMBER, RESOURCE_STEEL, import_mid);
+        } else {
+            state.foreign_nations[i].imports[0] = rand_range(RESOURCE_FURNITURE, RESOURCE_GUNS);
+            state.foreign_nations[i].imports[1] = rand_resource_excluding(RESOURCE_FURNITURE, RESOURCE_GUNS,
+                                                                          state.foreign_nations[i].imports[0]);
+            import_mid = rand_range(RESOURCE_LUMBER, RESOURCE_STEEL);
+            state.foreign_nations[i].imports[2] = import_mid;
+
+            state.foreign_nations[i].exports[0] = rand_range(RESOURCE_TIMBER, RESOURCE_COAL);
+            state.foreign_nations[i].exports[1] = rand_resource_excluding(RESOURCE_TIMBER, RESOURCE_COAL,
+                                                                          state.foreign_nations[i].exports[0]);
+            state.foreign_nations[i].exports[2] = rand_resource_excluding(RESOURCE_LUMBER, RESOURCE_STEEL, import_mid);
+        }
+    }
+}
+
 void init_game() {
     static const unsigned char foreign_nation_relations[FOREIGN_NATION_COUNT] = {
         RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT
     };
-    static const unsigned char foreign_nation_exports[FOREIGN_NATION_COUNT][FOREIGN_TRADE_ENTRY_COUNT] = {
-        { RESOURCE_STEEL, RESOURCE_FURNITURE, RESOURCE_LUMBER },
-        { RESOURCE_CLOTHES, RESOURCE_TOOLS, RESOURCE_GUNS },
-        { RESOURCE_WOOL, RESOURCE_WOOL, RESOURCE_COAL },
-        { RESOURCE_IRON, RESOURCE_TIMBER, RESOURCE_WOOL },
-        { RESOURCE_WOOL, RESOURCE_COAL, RESOURCE_TIMBER }
-    };
-    static const unsigned char foreign_nation_imports[FOREIGN_NATION_COUNT][FOREIGN_TRADE_ENTRY_COUNT] = {
-        { RESOURCE_TIMBER, RESOURCE_IRON, RESOURCE_WOOL },
-        { RESOURCE_COAL, RESOURCE_TIMBER, RESOURCE_WOOL },
-        { RESOURCE_STEEL, RESOURCE_GUNS, RESOURCE_CLOTHES },
-        { RESOURCE_FURNITURE, RESOURCE_CLOTHES, RESOURCE_GUNS },
-        { RESOURCE_FURNITURE, RESOURCE_GUNS, RESOURCE_LUMBER }
-    };
     unsigned char i;
-    unsigned char j;
 
     // Initialize game state with default values
     state.resources[RESOURCE_TIMBER] = 10;
@@ -257,15 +286,11 @@ void init_game() {
     state.science_level = 0;
 
     assign_foreign_nation_names();
+    assign_foreign_nation_trade_routes();
 
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
         state.foreign_nations[i].relations = foreign_nation_relations[i];
         state.foreign_nations[i].relations_previous_turn = foreign_nation_relations[i];
-
-        for (j = 0; j < FOREIGN_TRADE_ENTRY_COUNT; ++j) {
-            state.foreign_nations[i].exports[j] = foreign_nation_exports[i][j];
-            state.foreign_nations[i].imports[j] = foreign_nation_imports[i][j];
-        }
     }
 
     update_foreign_market_prices();
