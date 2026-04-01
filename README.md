@@ -238,7 +238,7 @@ overlays are relinked.
 - Expand the science tree with wagon capacity improvements
 - Add main screen
   - Fix game menu
-- Randomize country names and their exports/imports
+- Randomize country exports/imports
 - Admiralty improvement: increase cost of traders and warships according to science level
 - Scientific discoveries to improve max production per province
 - Attempt to merge overlays when each is less than 1KB to reclaim floppy space

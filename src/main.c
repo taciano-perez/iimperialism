@@ -95,8 +95,8 @@ void start_new_game(void) {
     char nation_name[11];
 
     prompt_for_nation_name(nation_name, 10U);
-    init_game();
     strcpy(state.nation_name, nation_name);
+    init_game();
 }
 
 int main(void) {

@@ -8,6 +8,7 @@ static unsigned char get_relation_tier(unsigned char relations);
 static unsigned int apply_percent(unsigned int value, unsigned char percent);
 static void add_resource_saturating(unsigned char resource, unsigned char amount);
 static void update_foreign_market_prices(void);
+static void assign_foreign_nation_names(void);
 
 static unsigned char get_resource_base_price(unsigned char resource) {
     static const unsigned char base_prices[] = {
@@ -98,14 +99,98 @@ static void update_foreign_market_prices(void) {
     }
 }
 
-void init_game() {
-    static const char* foreign_nation_names[FOREIGN_NATION_COUNT] = {
-        "Ordune",
+static void assign_foreign_nation_names(void) {
+    static const char* great_power_name_pool[] = {
         "Deneb",
+        "Haxaco",
+        "Patagon",
+        "Zimm",
+        "Kem",
+        "Ordune",
+        "Devron"
+    };
+    static const char* minor_nation_name_pool[] = {
         "Loke",
         "Pont",
-        "Kathay"
+        "Kathay",
+        "Kessel",
+        "Idolon",
+        "Zazi",
+        "Twelt", 
+        "Manx",
+        "Dedge", 
+        "Sindel",
+        "Wodan",
+        "Bruhr",
+        "Pram",
+        "Issa"
     };
+    unsigned char selected_great_power_count;
+    unsigned char selected_minor_nation_count;
+    unsigned char i;
+
+    selected_great_power_count = 0U;
+    while (selected_great_power_count < 2U) {
+        unsigned char pool_index;
+        unsigned char already_selected;
+        unsigned char j;
+
+        pool_index = rand_range(0U, (unsigned char)(sizeof(great_power_name_pool) / sizeof(great_power_name_pool[0])) - 1U);
+        if (strcmp(great_power_name_pool[pool_index], state.nation_name) == 0) {
+            continue;
+        }
+
+        already_selected = FALSE;
+        for (j = 0; j < selected_great_power_count; ++j) {
+            if (strcmp(state.foreign_nations[j].name, great_power_name_pool[pool_index]) == 0) {
+                already_selected = TRUE;
+                break;
+            }
+        }
+
+        if (already_selected) {
+            continue;
+        }
+
+        strcpy(state.foreign_nations[selected_great_power_count].name, great_power_name_pool[pool_index]);
+        ++selected_great_power_count;
+    }
+
+    selected_minor_nation_count = 0U;
+    while (selected_minor_nation_count < 3U) {
+        unsigned char foreign_nation_index;
+        unsigned char pool_index;
+        unsigned char already_selected;
+        unsigned char j;
+
+        foreign_nation_index = (unsigned char)(selected_minor_nation_count + 2U);
+        pool_index = rand_range(0U, (unsigned char)(sizeof(minor_nation_name_pool) / sizeof(minor_nation_name_pool[0])) - 1U);
+        if (strcmp(minor_nation_name_pool[pool_index], state.nation_name) == 0) {
+            continue;
+        }
+
+        already_selected = FALSE;
+        for (j = 0; j < selected_minor_nation_count; ++j) {
+            if (strcmp(state.foreign_nations[j + 2U].name, minor_nation_name_pool[pool_index]) == 0) {
+                already_selected = TRUE;
+                break;
+            }
+        }
+
+        if (already_selected) {
+            continue;
+        }
+
+        strcpy(state.foreign_nations[foreign_nation_index].name, minor_nation_name_pool[pool_index]);
+        ++selected_minor_nation_count;
+    }
+
+    for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
+        state.foreign_nations[i].name[FOREIGN_NATION_NAME_LENGTH] = '\0';
+    }
+}
+
+void init_game() {
     static const unsigned char foreign_nation_relations[FOREIGN_NATION_COUNT] = {
         RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT
     };
@@ -171,8 +256,9 @@ void init_game() {
     state.money = 30000U;
     state.science_level = 0;
 
+    assign_foreign_nation_names();
+
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
-        strcpy(state.foreign_nations[i].name, foreign_nation_names[i]);
         state.foreign_nations[i].relations = foreign_nation_relations[i];
         state.foreign_nations[i].relations_previous_turn = foreign_nation_relations[i];
 
