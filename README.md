@@ -233,7 +233,6 @@ overlays are relinked.
 
 ## TODO
 
-- Relationship trend on diplomacy screen: fix bug where after end turn it shows always down
 - Finish battle screen 
   - introduce enemy powers and not only pirates
 - Expand the science tree with wagon capacity improvements

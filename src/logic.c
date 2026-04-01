@@ -248,7 +248,6 @@ void next_turn() {
     // decrease relations with all foreign nations (except allies/colonies)
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
         if (state.foreign_nations[i].relations != RELATION_ALLY_COLONY) {
-            state.foreign_nations[i].relations_previous_turn = state.foreign_nations[i].relations;
             state.foreign_nations[i].relations = MAX(0, state.foreign_nations[i].relations - RELATIONS_LOSS_PER_TURN);
         }
     }
