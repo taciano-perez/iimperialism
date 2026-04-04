@@ -236,7 +236,7 @@ static void assign_foreign_nation_trade_routes(void) {
 
 void init_game() {
     static const unsigned char foreign_nation_relations[FOREIGN_NATION_COUNT] = {
-        RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT
+        RELATION_BAD, RELATION_BAD, RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT
     };
     unsigned char i;
 

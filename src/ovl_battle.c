@@ -1,4 +1,3 @@
-#include <conio.h>
 #include <tgi.h>
 #include "game.h"
 #include "sound.h"

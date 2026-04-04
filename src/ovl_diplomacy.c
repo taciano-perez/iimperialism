@@ -1,6 +1,5 @@
 #include "game.h"
 #include "strings.h"
-#include <conio.h>
 #include <string.h>
 
 #define BOX_X1 0
@@ -189,8 +188,17 @@ static void trade_expedition(void) {
         wait_three_seconds_or_keypress();
         set_selected_trade_nation(nation_index);
         if (rand_range(1U, 100U) <= TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT) {
+            state.attacker_index = INDEX_PIRATES;
             state.current_screen = SCREEN_BATTLE;
         } else {
+            unsigned char i;
+            for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
+                if (state.foreign_nations[i].relations == RELATION_BAD && rand_range(1U, 100U) <= TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT) {
+                    state.attacker_index = i;
+                    state.current_screen = SCREEN_BATTLE;
+                    return;
+                }
+            }
             state.current_screen = SCREEN_TRADE_EXPEDITION;
         }
         return;

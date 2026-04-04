@@ -1,4 +1,3 @@
-#include <conio.h>
 #include "game.h"
 
 #define BOX_X1 0

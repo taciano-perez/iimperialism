@@ -72,13 +72,16 @@
 #define RELTYPE_COLONY 0U
 #define RELTYPE_ALLIANCE 1U
 
+#define INDEX_PIRATES 255U
+
 /* ============================================================================
  * Gameplay constants
  * ============================================================================
  */
 #define CAPACITY_PER_TRADER_BASE 2
 #define GUNS_PER_FRIGATE_BASE 2
-#define TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT 100U
+#define TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT 50U
+#define TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT 50U
 #define BATTLE_TRADER_HIT_CHANCE_PERCENT 5U
 #define BATTLE_BOUNTY_VARIANCE_PERCENT 50U
 #define BATTLE_RUN_TRADER_HIT_CHANCE_PERCENT 60U
@@ -154,6 +157,7 @@ typedef struct {
 
     /* turn-specific data */
     unsigned char remaining_turn_capacity;
+    unsigned char attacker_index; // INDEX_PIRATES or index of foreign nation attacking in battle screen
 } GameState;
 
 extern GameState state;

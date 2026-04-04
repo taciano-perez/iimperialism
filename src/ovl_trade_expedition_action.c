@@ -1,4 +1,3 @@
-#include <conio.h>
 #include "game.h"
 
 #define TRADE_MODE_BUY  0

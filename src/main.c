@@ -150,7 +150,12 @@ int main(void) {
         } else if (state.current_screen == SCREEN_BATTLE) {
             clear_screen();
             draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
-            print(5, 20, "Ambushed by pirates!");
+            if (state.attacker_index == INDEX_PIRATES) {
+                print(5, 20, "Ambushed by pirates!");
+            } else {
+                print(5, 20, "Attack by buccaneers from");
+                print(31, 20, state.foreign_nations[state.attacker_index].name);
+            }
             print(0, 0, "Our Navy");
             print(23, 0, "Enemy Fleet");
             play_sound_alert();

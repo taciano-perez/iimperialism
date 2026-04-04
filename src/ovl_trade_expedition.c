@@ -1,4 +1,3 @@
-#include <conio.h>
 #include "game.h"
 
 #define PRICE_BOX_Y1 9

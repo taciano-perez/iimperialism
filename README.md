@@ -233,8 +233,10 @@ overlays are relinked.
 
 ## TODO
 
-- Finish battle screen 
-  - introduce enemy powers and not only pirates
+- Trade prices suffer penalty when relations are bad (maybe make proportional to relationship)
+- Introduce ledger screen
+  - Workers, traders and warship cost money per turn
+  - Whenever funds are depleted, all relations turn bad
 - Expand the science tree with wagon capacity improvements
 - Add main screen
   - Fix game menu

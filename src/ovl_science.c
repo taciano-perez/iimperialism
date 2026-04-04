@@ -1,4 +1,3 @@
-#include <conio.h>
 #include "game.h"
 
 static const char TECH_1[] = "1)Railways";

@@ -1,4 +1,3 @@
-#include <conio.h>
 #include "game.h"
 #include "overlay.h"
 
