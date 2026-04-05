@@ -1,8 +1,8 @@
 #include <conio.h>
 #include <string.h>
-#include "game.h"
-#include "overlay.h"
 #include "sound.h"
+#include "overlay.h"
+#include "game.h"
 
 #define BOX1_X1 0
 #define BOX1_Y1 2
@@ -166,6 +166,9 @@ int main(void) {
             continue;
         } else if (state.current_screen == SCREEN_COUNCIL_NATIONS) {
             run_overlay(OVL_COUNCIL_NATIONS);
+            continue;
+        } else if (state.current_screen == SCREEN_LEDGER) {
+            render_ledger_screen();
             continue;
         }
 

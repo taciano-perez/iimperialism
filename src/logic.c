@@ -295,6 +295,10 @@ void init_game() {
 
     update_foreign_market_prices();
 
+    state.trade_expenses = 0;
+    state.trade_revenue = 0;
+    state.turn_booty = 0;
+
     state.turn_number = 99;
     state.current_screen = SCREEN_INDUSTRY;
     
@@ -304,6 +308,10 @@ void init_game() {
 void next_turn() {
     unsigned char produced;
     unsigned char i;
+    int labor_upkeep = (int)state.available_workers * UPKEEP_COST_PER_WORKER * -1;
+    int merchant_upkeep = (int)state.traders * UPKEEP_COST_PER_TRADER * -1;
+    int navy_upkeep = ((int)state.frigates * UPKEEP_COST_PER_WARSHIP) * -1;
+    int balance = (int)state.trade_revenue + (int)state.turn_booty + (int) labor_upkeep + (int)merchant_upkeep + (int)navy_upkeep - (int)state.trade_expenses;
 
     // Update resources based on transport orders
     add_resource_saturating(RESOURCE_TIMBER, state.transport_timber);
@@ -354,12 +362,24 @@ void next_turn() {
 
     update_foreign_market_prices();
 
+    // profit & loss
+    state.money = MAX((unsigned int)((int)state.money + balance), 0);
+
+    state.trade_expenses = 0;
+    state.trade_revenue = 0;
+    state.turn_booty = 0;
+
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;
 
     // decrease relations with all foreign nations (except allies/colonies)
+    // if money is zero, relations drop to bad immediately, otherwise they drop by a fixed amount
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
         if (state.foreign_nations[i].relations != RELATION_ALLY_COLONY) {
-            state.foreign_nations[i].relations = MAX(0, state.foreign_nations[i].relations - RELATIONS_LOSS_PER_TURN);
+            if (state.money == 0) {
+                state.foreign_nations[i].relations = RELATION_BAD;
+            } else {
+                state.foreign_nations[i].relations = MAX(0, state.foreign_nations[i].relations - RELATIONS_LOSS_PER_TURN);
+            }
         }
     }
 

@@ -42,6 +42,7 @@
 #define SCREEN_BATTLE 7
 #define SCREEN_SCIENCE 8
 #define SCREEN_COUNCIL_NATIONS 9
+#define SCREEN_LEDGER 10
 
 /* ============================================================================
  * Resource Constants
@@ -96,6 +97,9 @@
 #define FOREIGN_TRADE_ENTRY_COUNT 3
 #define FOREIGN_NATION_NAME_LENGTH 6
 #define SCIENCE_LEVEL_COUNT 7
+#define UPKEEP_COST_PER_WORKER 2U
+#define UPKEEP_COST_PER_TRADER 5U
+#define UPKEEP_COST_PER_WARSHIP 5U
 
 typedef struct {
     char name[FOREIGN_NATION_NAME_LENGTH + 1];
@@ -159,6 +163,9 @@ typedef struct {
 
     /* turn-specific data */
     unsigned char remaining_turn_capacity;
+    unsigned char trade_expenses;
+    unsigned char trade_revenue;
+    unsigned char turn_booty;
     unsigned char attacker_index; // INDEX_PIRATES or index of foreign nation attacking in battle screen
 } GameState;
 
@@ -170,6 +177,9 @@ void next_turn();
 void seed_random(unsigned int seed);
 unsigned char rand_range(unsigned char min, unsigned char max);
 void production_orders(void);
+
+// ledger.c
+void render_ledger_screen(void);
 
 // ui.c
 void ui_init();
@@ -186,6 +196,7 @@ void format_uint(char* buffer, unsigned int value);
 void format_money(char* buffer, unsigned long value);
 void print_int_right_aligned(unsigned char x, unsigned char y, unsigned int value);
 void print_int_right_aligned_currency(unsigned char x, unsigned char y, unsigned long value);
+void print_signed_int_right_aligned_currency(unsigned char x, unsigned char y, int value);
 void print_int(unsigned char x, unsigned char y, unsigned int value);
 void draw_picture_at(const unsigned char picture_index, const unsigned char x_byte, unsigned char y);
 void box (unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);

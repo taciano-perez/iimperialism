@@ -49,10 +49,10 @@ void render_industry_screen(void) {
 
         /* ADVISOR */
         draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
-        print(5, 20, "Transport, Production, Science,");
-        print(5, 21, "Admiralty, Diplomacy, or End turn?");
+        print(5, 20, "Transport,Production,Science,Ledger,");
+        print(5, 21, "Admiralty,Diplomacy,or End turn?");
 
-        key = cgetc_at(39, 21);
+        key = cgetc_at(37, 21);
 
         switch (key) {
             case 't':
@@ -74,6 +74,10 @@ void render_industry_screen(void) {
             case 's':
             case 'S':
                 state.current_screen = SCREEN_SCIENCE;
+                return;
+            case 'l':
+            case 'L':
+                state.current_screen = SCREEN_LEDGER;
                 return;
             case 'e':
             case 'E':

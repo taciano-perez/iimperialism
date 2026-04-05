@@ -25,6 +25,7 @@ C_SOURCES  = \
 	$(SRC_DIR)/ui.c \
 	$(SRC_DIR)/gamestate.c \
 	$(SRC_DIR)/random.c \
+	$(SRC_DIR)/ledger.c \
 	$(SRC_DIR)/logic.c \
 	$(SRC_DIR)/overlay.c \
 	$(SRC_DIR)/ovl_industry.c \
@@ -58,6 +59,7 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/sound.o \
 	$(BUILD_DIR)/gamestate.o \
 	$(BUILD_DIR)/random.o \
+	$(BUILD_DIR)/ledger.o \
 	$(BUILD_DIR)/logic.o \
 	$(BUILD_DIR)/overlay.o \
 	$(BUILD_DIR)/prodos_overlay_load.o \

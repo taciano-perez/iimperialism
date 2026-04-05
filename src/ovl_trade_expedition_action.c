@@ -46,12 +46,12 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
     unsigned char i;
     unsigned char key;
     unsigned int quantity;
-    unsigned int max_quantity;
+    unsigned char max_quantity;
     unsigned char resource;
     ForeignNation* nation;
     const unsigned char* trade_list;
     unsigned char menu_base;
-    unsigned int price;
+    unsigned char price;
 
     nation = &state.foreign_nations[nation_index];
 
@@ -65,11 +65,7 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
 
     while (1) {
         clear_input_area();
-        if (mode == TRADE_MODE_BUY) {
-            print(5, 20, TSTR(TSTR_COMMODITY_BUY));
-        } else {
-            print(5, 20, TSTR(TSTR_COMMODITY_SELL));
-        }
+        print(5, 20, TSTR(TSTR_COMMODITY_BUY + mode));
 
         for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {
             print_int((i * 12) + 5, 21, i + menu_base);
@@ -100,9 +96,11 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
                         if (mode == TRADE_MODE_BUY) {
                             state.resources[resource] += quantity;
                             state.money -= quantity * price;
+                            state.trade_expenses += quantity * price;
                         } else {
                             state.resources[resource] -= quantity;
                             state.money += quantity * price;
+                            state.trade_revenue += quantity * price;
                         }
                         // improve trade relations proportionally to the trade * multiplier, but only if not already an ally/colony
                         if (nation->relations != RELATION_ALLY_COLONY) {

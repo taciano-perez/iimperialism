@@ -157,6 +157,16 @@ void print_int_right_aligned_currency(unsigned char x, unsigned char y, unsigned
     print_right_aligned(x, y, ui_buffer);
 }
 
+void print_signed_int_right_aligned_currency(unsigned char x, unsigned char y, int value) {
+    if (value < 0) {
+        ui_buffer[0] = '-';
+        format_money(ui_buffer + 1, 0U - (unsigned int)value);
+    } else {
+        format_money(ui_buffer, (unsigned int)value);
+    }
+    print_right_aligned(x, y, ui_buffer);
+}
+
 void print_int(unsigned char x, unsigned char y, unsigned int value) {
     format_uint(ui_buffer, value);
     print(x, y, ui_buffer);

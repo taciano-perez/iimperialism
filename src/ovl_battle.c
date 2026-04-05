@@ -96,7 +96,7 @@ void render_battle_screen(void) {
     unsigned char base_ships;
     unsigned char enemy_ships;
     unsigned char i;
-    unsigned int bounty;
+    unsigned char bounty;
     unsigned char modifier_percent;
     unsigned char min_ships;
     unsigned char max_ships;
@@ -154,6 +154,7 @@ void render_battle_screen(void) {
                                                       100U + BATTLE_BOUNTY_VARIANCE_PERCENT);
                         bounty = ((unsigned int)enemy_ships * 10U * modifier_percent) / 100U;
                         state.money += bounty;
+                        state.turn_booty += bounty;
                         clear_input_area();
                         print(5, 20, "Victory!");
                         print(5, 21, STR_BOUNTY);

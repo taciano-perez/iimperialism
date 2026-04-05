@@ -233,20 +233,21 @@ overlays are relinked.
 
 ## TODO
 
-- Trade prices suffer penalty when relations are bad (maybe make proportional to relationship)
-- Introduce ledger screen
-  - Workers, traders and warship cost money per turn
-  - Whenever funds are depleted, all relations turn bad
-- Expand the science tree with wagon capacity improvements
+Core Features
 - Add main screen
   - Fix game menu
-- Admiralty improvement: increase cost of traders and warships according to science level
+- Expand the science tree with wagon capacity improvements
 - Scientific discoveries to improve max production per province
-- Attempt to merge overlays when each is less than 1KB to reclaim floppy space
-- Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed
+- Trade prices suffer penalty when relations are bad (maybe make proportional to relationship)
+- Admiralty improvement: increase cost of traders and warships according to science level
 - Improve victory screen
+- Balance game for all stages (beginning, mid, and end)
+- Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
+
+Performance Improvements
+- Attempt to merge overlays when each is less than 1KB to reclaim floppy space
+
+Nice to have features
+- Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed
 - Consider adding map screen
 - Consider adding land battles
-- Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
-- Balance game for all stages (beginning, mid, and end)
-- Adjust the initial money amount
