@@ -1,6 +1,6 @@
 # IImperialism - an Apple II Strategy Game
 
-An early-stage strategy game for the Apple II, written in C using the **cc65** compiler
+A strategy game for the Apple II, written in C using the **cc65** compiler
 and its Tiny Graphics Interface (TGI) for Hi-Res Graphics (HGR) mode.
 
 This project is inspired by Imperialism and Taipan!. It is a turn-based resource
@@ -249,5 +249,11 @@ Performance Improvements
 
 Nice to have features
 - Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed
-- Consider adding map screen
 - Consider adding land battles
+
+Discarded ideas:
+- Consider adding map screen - difficult to squeeze inside one floppy
+
+Packaging goodies
+- Manual
+- Floppy Sticker
