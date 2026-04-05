@@ -14,6 +14,7 @@
 
 extern void __fastcall__ play_sound_impl(unsigned char sound); /* Internal fastcall entry point implemented in asm/sound.s */
 static char* append_ulong_decimal(char* buffer, unsigned long value);
+static unsigned int parse_uint_decimal(const char* text);
 static void render_scan_uint_input(unsigned char x, unsigned char y, unsigned char max_digits, unsigned char len, unsigned char show_cursor);
 static void render_scan_text_input(unsigned char x, unsigned char y, unsigned char max_length, unsigned char len, unsigned char show_cursor, const char* buffer);
 static void render_cgetc_at_input(unsigned char x, unsigned char y, unsigned char show_cursor);
@@ -35,6 +36,17 @@ static char* append_ulong_decimal(char* buffer, unsigned long value) {
     } while (divisor != 0UL);
 
     return buffer;
+}
+
+static unsigned int parse_uint_decimal(const char* text) {
+    unsigned int value = 0U;
+
+    while (*text >= '0' && *text <= '9') {
+        value = (unsigned int)(value * 10U + (unsigned char)(*text - '0'));
+        ++text;
+    }
+
+    return value;
 }
 
 static void render_scan_uint_input(unsigned char x, unsigned char y, unsigned char max_digits, unsigned char len, unsigned char show_cursor) {
@@ -229,7 +241,7 @@ unsigned int scan_uint(unsigned char x, unsigned char y, unsigned char max_digit
             }
         } else if (ch == '\r' || ch == '\n') {
             if (len > 0) {
-                return (unsigned int)atoi(ui_buffer);
+                return parse_uint_decimal(ui_buffer);
             }
         }
     }

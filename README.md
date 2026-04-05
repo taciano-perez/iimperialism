@@ -245,7 +245,7 @@ Core Features
 - Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
 
 Performance Improvements
-- Attempt to merge overlays when each is less than 1KB to reclaim floppy space
+- Merge overlays to reclaim floppy space
 
 Nice to have features
 - Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed

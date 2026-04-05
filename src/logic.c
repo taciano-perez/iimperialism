@@ -311,7 +311,6 @@ void next_turn() {
     int labor_upkeep = (int)state.available_workers * UPKEEP_COST_PER_WORKER * -1;
     int merchant_upkeep = (int)state.traders * UPKEEP_COST_PER_TRADER * -1;
     int navy_upkeep = ((int)state.frigates * UPKEEP_COST_PER_WARSHIP) * -1;
-    int balance = (int)state.trade_revenue + (int)state.turn_booty + (int) labor_upkeep + (int)merchant_upkeep + (int)navy_upkeep - (int)state.trade_expenses;
 
     // Update resources based on transport orders
     add_resource_saturating(RESOURCE_TIMBER, state.transport_timber);
@@ -363,7 +362,7 @@ void next_turn() {
     update_foreign_market_prices();
 
     // profit & loss
-    state.money = MAX((unsigned int)((int)state.money + balance), 0);
+    state.money = MAX((unsigned int)((int)state.money + (int) labor_upkeep + (int)merchant_upkeep + (int)navy_upkeep), 0);
 
     state.trade_expenses = 0;
     state.trade_revenue = 0;
