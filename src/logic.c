@@ -1,5 +1,4 @@
 #include "game.h"
-#include <string.h>
 
 #pragma code-name (push, "LOWCODE")
 
@@ -11,6 +10,8 @@ static void update_foreign_market_prices(void);
 static void assign_foreign_nation_names(void);
 static unsigned char rand_resource_excluding(unsigned char min, unsigned char max, unsigned char exclude);
 static void assign_foreign_nation_trade_routes(void);
+static unsigned char strings_equal(const char* left, const char* right);
+static void copy_text(char* dest, const char* src, unsigned char capacity);
 
 static unsigned char get_resource_base_price(unsigned char resource) {
     static const unsigned char base_prices[] = {
@@ -111,6 +112,30 @@ static unsigned char rand_resource_excluding(unsigned char min, unsigned char ma
     return resource;
 }
 
+static unsigned char strings_equal(const char* left, const char* right) {
+    while (*left == *right) {
+        if (*left == '\0') {
+            return TRUE;
+        }
+        ++left;
+        ++right;
+    }
+
+    return FALSE;
+}
+
+static void copy_text(char* dest, const char* src, unsigned char capacity) {
+    if (capacity == 0U) {
+        return;
+    }
+
+    while (--capacity != 0U && *src != '\0') {
+        *dest++ = *src++;
+    }
+
+    *dest = '\0';
+}
+
 static void assign_foreign_nation_names(void) {
     static const char* great_power_name_pool[] = {
         "Deneb",
@@ -148,13 +173,13 @@ static void assign_foreign_nation_names(void) {
         unsigned char j;
 
         pool_index = rand_range(0U, (unsigned char)(sizeof(great_power_name_pool) / sizeof(great_power_name_pool[0])) - 1U);
-        if (strcmp(great_power_name_pool[pool_index], state.nation_name) == 0) {
+        if (strings_equal(great_power_name_pool[pool_index], state.nation_name)) {
             continue;
         }
 
         already_selected = FALSE;
         for (j = 0; j < selected_great_power_count; ++j) {
-            if (strcmp(state.foreign_nations[j].name, great_power_name_pool[pool_index]) == 0) {
+            if (strings_equal(state.foreign_nations[j].name, great_power_name_pool[pool_index])) {
                 already_selected = TRUE;
                 break;
             }
@@ -164,7 +189,9 @@ static void assign_foreign_nation_names(void) {
             continue;
         }
 
-        strcpy(state.foreign_nations[selected_great_power_count].name, great_power_name_pool[pool_index]);
+        copy_text(state.foreign_nations[selected_great_power_count].name,
+                  great_power_name_pool[pool_index],
+                  FOREIGN_NATION_NAME_LENGTH + 1U);
         ++selected_great_power_count;
     }
 
@@ -177,13 +204,13 @@ static void assign_foreign_nation_names(void) {
 
         foreign_nation_index = (unsigned char)(selected_minor_nation_count + 2U);
         pool_index = rand_range(0U, (unsigned char)(sizeof(minor_nation_name_pool) / sizeof(minor_nation_name_pool[0])) - 1U);
-        if (strcmp(minor_nation_name_pool[pool_index], state.nation_name) == 0) {
+        if (strings_equal(minor_nation_name_pool[pool_index], state.nation_name)) {
             continue;
         }
 
         already_selected = FALSE;
         for (j = 0; j < selected_minor_nation_count; ++j) {
-            if (strcmp(state.foreign_nations[j + 2U].name, minor_nation_name_pool[pool_index]) == 0) {
+            if (strings_equal(state.foreign_nations[j + 2U].name, minor_nation_name_pool[pool_index])) {
                 already_selected = TRUE;
                 break;
             }
@@ -193,7 +220,9 @@ static void assign_foreign_nation_names(void) {
             continue;
         }
 
-        strcpy(state.foreign_nations[foreign_nation_index].name, minor_nation_name_pool[pool_index]);
+        copy_text(state.foreign_nations[foreign_nation_index].name,
+                  minor_nation_name_pool[pool_index],
+                  FOREIGN_NATION_NAME_LENGTH + 1U);
         ++selected_minor_nation_count;
     }
 

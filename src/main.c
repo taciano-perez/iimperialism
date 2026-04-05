@@ -1,5 +1,4 @@
 #include <conio.h>
-#include <string.h>
 #include "sound.h"
 #include "overlay.h"
 #include "game.h"
@@ -15,6 +14,7 @@ static unsigned char selected_trade_nation;
 
 static unsigned int wait_for_splash_escape(void);
 static void prompt_for_nation_name(char* nation_name, unsigned char max_length);
+static void copy_text(char* dest, const char* src, unsigned char capacity);
 
 void render_warehouse_box() {
     box(BOX1_X1, BOX1_Y1+1, BOX1_X2, BOX1_Y2);
@@ -91,11 +91,23 @@ static void prompt_for_nation_name(char* nation_name, unsigned char max_length) 
     scan_text(13, 13, nation_name, max_length);
 }
 
+static void copy_text(char* dest, const char* src, unsigned char capacity) {
+    if (capacity == 0U) {
+        return;
+    }
+
+    while (--capacity != 0U && *src != '\0') {
+        *dest++ = *src++;
+    }
+
+    *dest = '\0';
+}
+
 void start_new_game(void) {
     char nation_name[11];
 
     prompt_for_nation_name(nation_name, 10U);
-    strcpy(state.nation_name, nation_name);
+    copy_text(state.nation_name, nation_name, sizeof(state.nation_name));
     init_game();
 }
 

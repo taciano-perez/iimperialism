@@ -244,8 +244,13 @@ Core Features
 - Balance game for all stages (beginning, mid, and end)
 - Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
 
-Performance Improvements
+Performance/Maintanability Improvements
 - Merge overlays to reclaim floppy space
+- Move overlay-specific strings to overlays to shrink resident code (and hence reclaim floppy space)
+- Reduce HGR table and drawing contracts
+- Rename relations constants
+- Rename wiseman portrait
+- Rename frigate to warship
 
 Nice to have features
 - Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed
