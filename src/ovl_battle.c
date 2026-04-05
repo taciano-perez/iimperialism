@@ -61,7 +61,7 @@ static void handle_ship_hit(unsigned char is_enemy,
     ship_index = rand_range(0, *ship_count - 1);
     get_ship_position(is_enemy, ship_index, &x_offset, &y_offset);
 
-    picture = is_enemy ? SHIP_PIRATE : SHIP;
+    picture = is_enemy ? (state.attacker_index == INDEX_PIRATES ? SHIP_PIRATE : SHIP_FOREIGN) : SHIP;
     for (i = 0; i < 6; ++i) {
         paint_area(x_offset, y_offset, 4, 3, TGI_COLOR_WHITE);
         draw_picture_at(picture, x_offset, y_offset);
@@ -102,6 +102,7 @@ void render_battle_screen(void) {
     unsigned char max_ships;
     unsigned char visible_friendly_ships;
     unsigned char visible_enemy_ships;
+    unsigned char picture;
     
     base_ships = 1U + ((state.turn_number - 1U) / 10U);
     min_ships = (base_ships + 1U) / 2U;
@@ -127,12 +128,13 @@ void render_battle_screen(void) {
     // Render enemy fleet
     print(23, 1, STR_BATTLE_FIREPOWER);
     render_firepower(1, visible_enemy_ships);
+    picture = state.attacker_index == INDEX_PIRATES ? SHIP_PIRATE : SHIP_FOREIGN;
     for (i = 0; i < visible_enemy_ships; ++i) {
         unsigned char x_offset;
         unsigned char y_offset;
 
         get_ship_position(1, (unsigned char)i, &x_offset, &y_offset);
-        draw_picture_at(SHIP_PIRATE, x_offset, y_offset);
+        draw_picture_at(picture, x_offset, y_offset);
     }
 
     while (1) {

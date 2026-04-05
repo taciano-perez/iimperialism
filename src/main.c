@@ -153,7 +153,7 @@ int main(void) {
             if (state.attacker_index == INDEX_PIRATES) {
                 print(5, 20, "Ambushed by pirates!");
             } else {
-                print(5, 20, "Attack by buccaneers from");
+                print(5, 20, "Attacked by warships from");
                 print(31, 20, state.foreign_nations[state.attacker_index].name);
             }
             print(0, 0, "Our Navy");

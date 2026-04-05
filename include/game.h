@@ -18,11 +18,13 @@
 #define SCIENCE_PORTRAIT 3
 #define SHIP_PIRATE 4
 #define SHIP 5
+#define SHIP_FOREIGN 11
+#define SHIP_SPLASH 10
+
 #define COUNTRY1 6
 #define COUNTRY2 7
 #define COUNTRY3 8
 #define COMPASS 9
-#define SHIP_SPLASH 10
 
 /* Add more picture indices here as you add pictures */
 
