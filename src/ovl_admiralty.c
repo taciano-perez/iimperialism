@@ -100,7 +100,7 @@ void render_admiralty_screen(void) {
 
             case 'q':
             case 'Q':
-                state.current_screen = SCREEN_INDUSTRY;
+                state.current_screen = SCREEN_MAIN;
                 return;
         }
     }

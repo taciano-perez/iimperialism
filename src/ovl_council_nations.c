@@ -118,6 +118,6 @@ void render_council_nations_screen(void) {
         play_sound_alert();
         print_bold(7, 23, "Press any key to continue...");
         cgetc();
-        state.current_screen = SCREEN_INDUSTRY;
+        state.current_screen = SCREEN_MAIN;
     }
 }

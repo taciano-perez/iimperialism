@@ -25,6 +25,9 @@ within the Apple II's constraints:
   `fwrite()`.
 - On first launch, the splash screen waits for `ESC`, uses that human-timed delay
   to seed gameplay randomness, and then prompts for a nation name (up to 10 chars).
+- After a new game starts, play enters the resident Main Screen, which acts as the
+  top-level hub for Industry, Science, Admiralty, Diplomacy, end-turn, and the
+  transient game menu.
 - Pressing `ESC` opens the `MENU` overlay for new/load/save actions.
 - Choosing `New Game` from the menu also re-prompts for the nation name.
 - The resident helper split is now:
@@ -234,8 +237,7 @@ overlays are relinked.
 ## TODO
 
 Core Features
-- Add main screen
-  - Fix game menu
+- Complete main screen
 - Expand the science tree with wagon capacity improvements
 - Scientific discoveries to improve max production per province
 - Trade prices suffer penalty when relations are bad (maybe make proportional to relationship)

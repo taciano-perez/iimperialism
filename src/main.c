@@ -111,6 +111,50 @@ void start_new_game(void) {
     init_game();
 }
 
+void render_main_screen(void) {
+    char key;
+
+    clear_screen();
+    print(0, 0, "Nation of");
+    print_bold(10,  0, state.nation_name);
+    render_turn_funds_header();
+
+    /* ADVISOR */
+    draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
+    print(5, 20, "Visit Ministry of Industry,");
+    print(5, 21, "Science, Admiralty, Foreign Office,");
+    print(5, 22, "or End turn?");
+
+    while (1) {
+        key = cgetc_at(17, 22);
+        switch (key) {
+            case 'i':
+            case 'I':
+                state.current_screen = SCREEN_INDUSTRY;
+                return;
+            case 's':
+            case 'S':
+                state.current_screen = SCREEN_SCIENCE;
+                return;
+            case 'a':
+            case 'A':
+                state.current_screen = SCREEN_ADMIRALTY;
+                return;
+            case 'f':
+            case 'F':
+                state.current_screen = SCREEN_DIPLOMACY;
+                return;
+            case 'e':
+            case 'E':
+                next_turn();
+                return;
+            case 27: // ESC key
+                run_overlay(OVL_GAME_MENU);
+                return;
+        }
+    }
+}
+
 int main(void) {
 
     char key;
@@ -140,56 +184,70 @@ int main(void) {
     start_new_game();
 
     while (1) { // main game loop
-        if (state.current_screen == SCREEN_INDUSTRY) {
-            run_overlay(OVL_INDUSTRY);
-            continue;
-        } else if (state.current_screen == SCREEN_TRANSPORT) {
-            run_overlay(OVL_TRANSPORT);
-            continue;
-        } else if (state.current_screen == SCREEN_PRODUCTION) {
-            run_overlay(OVL_PRODUCTION);
-            continue;
-        } else if (state.current_screen == SCREEN_ADMIRALTY) {
-            run_overlay(OVL_ADMIRALTY);
-            continue;
-        } else if (state.current_screen == SCREEN_DIPLOMACY) {
-            run_overlay(OVL_DIPLOMACY);
-            continue; // skip input handling and go directly to next screen
-        } else if (state.current_screen == SCREEN_TRADE_EXPEDITION) {
-            run_overlay(OVL_TRADE_EXPEDITION);
-            run_overlay(OVL_TRADE_EXPEDITION_ACTION);
-            continue;
-        } else if (state.current_screen == SCREEN_BATTLE) {
-            clear_screen();
-            draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
-            if (state.attacker_index == INDEX_PIRATES) {
-                print(5, 20, "Ambushed by pirates!");
-            } else {
-                print(5, 20, "Attacked by warships from");
-                print(31, 20, state.foreign_nations[state.attacker_index].name);
-            }
-            print(0, 0, "Our Navy");
-            print(23, 0, "Enemy Fleet");
-            play_sound_alert();
-            run_overlay(OVL_BATTLE);
-            continue;
-        } else if (state.current_screen == SCREEN_SCIENCE) {
-            run_overlay(OVL_SCIENCE);
-            continue;
-        } else if (state.current_screen == SCREEN_COUNCIL_NATIONS) {
-            run_overlay(OVL_COUNCIL_NATIONS);
-            continue;
-        } else if (state.current_screen == SCREEN_LEDGER) {
-            render_ledger_screen();
-            continue;
-        }
+        switch (state.current_screen) {
+            case SCREEN_MAIN:
+                render_main_screen();
+                continue;
 
-        key = cgetc_at(39, 21);
-        switch (key) {
-            case 27: // ESC key
-                run_overlay(OVL_GAME_MENU);
+            case SCREEN_INDUSTRY:
+                run_overlay(OVL_INDUSTRY);
+                continue;
+
+            case SCREEN_TRANSPORT:
+                run_overlay(OVL_TRANSPORT);
+                continue;
+
+            case SCREEN_PRODUCTION:
+                run_overlay(OVL_PRODUCTION);
+                continue;
+
+            case SCREEN_ADMIRALTY:
+                run_overlay(OVL_ADMIRALTY);
+                continue;
+
+            case SCREEN_DIPLOMACY:
+                run_overlay(OVL_DIPLOMACY);
+                continue; // skip input handling and go directly to next screen
+
+            case SCREEN_TRADE_EXPEDITION:
+                run_overlay(OVL_TRADE_EXPEDITION);
+                run_overlay(OVL_TRADE_EXPEDITION_ACTION);
+                continue;
+
+            case SCREEN_BATTLE:
+                clear_screen();
+                draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
+                if (state.attacker_index == INDEX_PIRATES) {
+                    print(5, 20, "Ambushed by pirates!");
+                } else {
+                    print(5, 20, "Attacked by warships from");
+                    print(31, 20, state.foreign_nations[state.attacker_index].name);
+                }
+                print(0, 0, "Our Navy");
+                print(23, 0, "Enemy Fleet");
+                play_sound_alert();
+                run_overlay(OVL_BATTLE);
+                continue;
+
+            case SCREEN_SCIENCE:
+                run_overlay(OVL_SCIENCE);
+                continue;
+
+            case SCREEN_COUNCIL_NATIONS:
+                run_overlay(OVL_COUNCIL_NATIONS);
+                continue;
+
+            case SCREEN_LEDGER:
+                render_ledger_screen();
                 continue;
         }
+
+        // key = cgetc_at(39, 21);
+        // switch (key) {
+        //     case 27: // ESC key
+        //         run_overlay(OVL_GAME_MENU);
+        //         continue;
+        // }
     }
 
 }

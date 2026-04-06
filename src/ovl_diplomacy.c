@@ -102,7 +102,7 @@ void render_diplomacy_screen(void) {
                 break;
             case 'q':
             case 'Q':
-                state.current_screen = SCREEN_INDUSTRY;
+                state.current_screen = SCREEN_MAIN;
                 return;
         }
     }

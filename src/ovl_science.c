@@ -101,7 +101,7 @@ void render_science_screen(void) {
                     continue;
                 case 'Q':
                 case 'q':
-                    state.current_screen = SCREEN_INDUSTRY;
+                    state.current_screen = SCREEN_MAIN;
                     return;
             }
             break;

@@ -329,7 +329,7 @@ void init_game() {
     state.turn_booty = 0;
 
     state.turn_number = 99;
-    state.current_screen = SCREEN_INDUSTRY;
+    state.current_screen = SCREEN_MAIN;
     
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;
 }
@@ -417,7 +417,7 @@ void next_turn() {
     if ((state.turn_number % 10U) == 0U) {
         state.current_screen = SCREEN_COUNCIL_NATIONS;
     } else {
-        state.current_screen = SCREEN_INDUSTRY;
+        state.current_screen = SCREEN_MAIN;
     }
 }
 

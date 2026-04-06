@@ -61,15 +61,32 @@ The same nation-naming prompt is also reused by the game menu's `New Game` actio
 
 Resident main loop (`src/main.c`) dispatches by `state.current_screen`:
 
+- `SCREEN_MAIN` -> resident `render_main_screen()`
 - `SCREEN_INDUSTRY` -> `OVL_INDUSTRY` (`ISCR`)
 - `SCREEN_TRANSPORT` -> `OVL_TRANSPORT` (`TSCR`)
 - `SCREEN_PRODUCTION` -> `OVL_PRODUCTION` (`PSCR`)
 - `SCREEN_ADMIRALTY` -> `OVL_ADMIRALTY` (`ASCR`)
+- `SCREEN_DIPLOMACY` -> `OVL_DIPLOMACY` (`DSCR`)
 - `SCREEN_SCIENCE` -> `OVL_SCIENCE` (`SSCR`)
+- `SCREEN_TRADE_EXPEDITION` -> `OVL_TRADE_EXPEDITION` then `OVL_TRADE_EXPEDITION_ACTION`
+- `SCREEN_BATTLE` -> resident battle prelude, then `OVL_BATTLE` (`BSCR`)
+- `SCREEN_COUNCIL_NATIONS` -> `OVL_COUNCIL_NATIONS` (`CNSL`)
+- `SCREEN_LEDGER` -> resident `render_ledger_screen()`
 
-`ESC` opens the game menu overlay as a transient flow and then returns to the
-current screen unless the menu action changes game state. For industry,
-transport, and production, `ESC` is handled inside the overlay's own input loop.
+The Main Screen is the player's hub between turns. It shows the nation name,
+turn number, funds, and an advisor prompt. From there the player can choose:
+
+- `I` for Industry
+- `S` for Science
+- `A` for Admiralty
+- `F` for Diplomacy / Foreign Office
+- `E` to advance to the next turn
+- `ESC` to open the game menu overlay
+
+`ESC` from the Main Screen opens the game menu overlay as a transient flow and
+then returns to the Main Screen unless the menu action changes game state. For
+industry, transport, and production, `ESC` is handled inside the overlay's own
+input loop.
 
 Sub-flows are also overlays:
 
@@ -83,6 +100,7 @@ Sub-flows are also overlays:
 - `src/ovl_transport.c`: render transport and handle transport input and order-entry flows
 - `src/ovl_production.c`: render production and handle top-level production input
 - `src/production.c`: resident `production_orders()` helper used by the production overlay
+- `src/main.c`: resident startup flow, Main Screen hub, and screen dispatch
 - `src/ovl_admiralty.c`: render admiralty and handle trader/warship builds
 - `src/ovl_game_menu.c`: handle `ESC` menu actions (new/load/save, return)
 - `src/ovl_diplomacy.c`: handle diplomacy input, trade expeditions, and alliance/colony offers

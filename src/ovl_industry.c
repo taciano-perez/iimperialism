@@ -12,9 +12,7 @@ void render_industry_screen(void) {
 
         clear_screen();
 
-        print(0, 0, "Nation of");
-        print_bold(10,  0, state.nation_name);
-        print(0, 1, "Ministry of Industry");
+        print(0, 0, "Ministry of Industry");
         render_turn_funds_header();
 
         render_warehouse_box();
@@ -49,10 +47,10 @@ void render_industry_screen(void) {
 
         /* ADVISOR */
         draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
-        print(5, 20, "Transport,Production,Science,Ledger,");
-        print(5, 21, "Admiralty,Diplomacy,or End turn?");
+        print(5, 20, "Issue orders for Transport,");
+        print(5, 21, "Production, open Ledger, or Quit?");
 
-        key = cgetc_at(37, 21);
+        key = cgetc_at(38, 21);
 
         switch (key) {
             case 't':
@@ -63,26 +61,14 @@ void render_industry_screen(void) {
             case 'P':
                 state.current_screen = SCREEN_PRODUCTION;
                 return;
-            case 'a':
-            case 'A':
-                state.current_screen = SCREEN_ADMIRALTY;
-                return;
-            case 'd':
-            case 'D':
-                state.current_screen = SCREEN_DIPLOMACY;
-                return;
-            case 's':
-            case 'S':
-                state.current_screen = SCREEN_SCIENCE;
-                return;
             case 'l':
             case 'L':
                 state.current_screen = SCREEN_LEDGER;
                 return;
-            case 'e':
-            case 'E':
-                next_turn();
+            case 'q':
+            case 'Q':
+                state.current_screen = SCREEN_MAIN;
                 return;
-        }
+       }
     }
 }
