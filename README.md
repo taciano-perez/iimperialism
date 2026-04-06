@@ -14,8 +14,9 @@ The game runs within the Apple II's main 64KB memory map. It uses a custom memor
 within the Apple II's constraints:
 
 - Screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`, `TSCR`,
-  `ASCR`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`, `MENU`) loaded on demand.
+  `ASCR`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`, `MENU`, `CNSL`) loaded on demand.
 - The industry, transport, and production overlays now own their own input loops.
+- The industry overlay also owns the ledger sub-screen.
 - The transport screen is fully overlay-local.
 - The production screen still calls resident `production_orders()` through the jump
   table to preserve overlay space.
@@ -31,8 +32,8 @@ within the Apple II's constraints:
 - Pressing `ESC` opens the `MENU` overlay for new/load/save actions.
 - Choosing `New Game` from the menu also re-prompts for the nation name.
 - The resident helper split is now:
-  - `JMPTAB` at `$080F-$0868` for overlay-callable entry points
-  - `LOWCODE` at `$0869-$1631` for compact main-RAM helpers such as the HGR text blitters
+  - `JMPTAB` at `$080F-$086B` for overlay-callable entry points
+  - `LOWCODE` at `$086C-$1631` for compact main-RAM helpers such as the HGR text blitters
   - `LC` at `$D400-$DD79` for `src/ui.c` UI code placed in the Language Card
 - Disk autoboot uses ProDOS `SYS` loader `IIMP.SYSTEM` to launch `IIMPERIALISM`
   directly (no `BASIC.SYSTEM` dependency).
@@ -63,7 +64,7 @@ in the diplomacy screen as text using these ranges:
 | `src/logic.c` | `init_game()`, `next_turn()` |
 | `src/gamestate.c` | Shared `GameState` declarations |
 | `src/overlay.c` | `init_overlays()`, `run_overlay()` |
-| `src/ovl_industry.c` | Industry screen overlay (`iscr.bin`) |
+| `src/ovl_industry.c` | Industry screen overlay and ledger sub-screen (`iscr.bin`) |
 | `src/ovl_production.c` | Production screen overlay and top-level input loop (`pscr.bin`) |
 | `src/ovl_transport.c` | Transport screen overlay, input loop, and transport actions (`tscr.bin`) |
 | `src/ovl_admiralty.c` | Admiralty screen and build flow overlay (`ascr.bin`) |
@@ -74,6 +75,7 @@ in the diplomacy screen as text using these ranges:
 | `src/ovl_game_menu.c` | Game menu overlay and save/load flow (`menu.bin`) |
 | `asm/prodos_overlay_load.s` | Resident ProDOS MLI overlay loader (`OPEN` / `READ` / `CLOSE`) |
 | `asm/prodos_gamestate_io.s` | Menu-overlay ProDOS MLI save/load helper for `GAME.DATA` |
+| `asm/ovl_industry_entry.s` | Fixed entry stub for industry overlay |
 | `asm/ovl_diplomacy_entry.s` | Fixed entry stub for diplomacy overlay |
 | `asm/ovl_production_entry.s` | Fixed entry stub for production overlay |
 | `asm/ovl_transport_entry.s` | Fixed entry stub for transport overlay |

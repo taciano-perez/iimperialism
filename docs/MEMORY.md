@@ -8,8 +8,8 @@ $0100-$01FF  6502 hardware stack
 $0200-$03FF  System / ProDOS vectors
 $0400-$07FF  Text screen page 1
 $0803-$080E  STARTUP            (cc65 crt0)
-$080F-$0868  JMPTAB             (resident jump table used by overlays)
-$0869-$1631  LOWCODE            (resident main-RAM helpers + core logic)
+$080F-$086B  JMPTAB             (resident jump table used by overlays)
+$086C-$1631  LOWCODE            (resident main-RAM helpers + core logic)
 $2000-$3FFF  HGR page 1         (graphics memory; no code here)
 $4000-...    CODE/RODATA/DATA   (main resident code + data)
 ...          BSS/ONCE/heap
@@ -104,6 +104,7 @@ intended entry point stays at `$8800` even if function ordering changes during
 compilation. Current examples:
 
 - `asm/ovl_diplomacy_entry.s` -> `render_diplomacy_screen()`
+- `asm/ovl_industry_entry.s` -> `render_industry_screen()`
 - `asm/ovl_production_entry.s` -> `render_production_screen()`
 - `asm/ovl_transport_entry.s` -> `render_transport_screen()`
 - `asm/ovl_trade_expedition_entry.s` -> `render_trade_market()`
