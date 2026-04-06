@@ -237,7 +237,6 @@ overlays are relinked.
 ## TODO
 
 Core Features
-- Complete main screen
 - Expand the science tree with wagon capacity improvements
 - Scientific discoveries to improve max production per province
 - Trade prices suffer penalty when relations are bad (maybe make proportional to relationship)

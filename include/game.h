@@ -169,6 +169,8 @@ extern GameState state;
 // logic.c
 void init_game();
 void next_turn();
+void copy_text_limited(char* dest, const char* src, unsigned char capacity);
+unsigned char get_relation_tier(unsigned char relations);
 void seed_random(unsigned int seed);
 unsigned char rand_range(unsigned char min, unsigned char max);
 void production_orders(void);

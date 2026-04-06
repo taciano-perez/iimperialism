@@ -14,7 +14,7 @@ void render_trade_market(void) {
 
     render_warehouse_box();
 
-    print(1, PRICE_BOX_Y1-1, "Local market prices");
+    print_inverted(0, PRICE_BOX_Y1-1, "Local market");
     box(0, PRICE_BOX_Y1, 39, PRICE_BOX_Y1+4);
     print(1, PRICE_BOX_Y1, "Imports");
     print(19, PRICE_BOX_Y1, "Exports");
@@ -29,9 +29,9 @@ void render_trade_market(void) {
         print(21, PRICE_BOX_Y1 + 1 + i, get_resource_name(state.foreign_nations[nation_index].exports[i]));
         print_int_right_aligned_currency(34, PRICE_BOX_Y1 + 1 + i, state.foreign_nations[nation_index].export_prices[i]);
     }
-    print(1, PRICE_BOX_Y1+6, "Fleet capacity:");
+    print(1, PRICE_BOX_Y1+6, "Fleet trade capacity:");
     print_int_right_aligned(29, PRICE_BOX_Y1+6, state.remaining_turn_capacity);
 
-    draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
+    draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
     return;
 }

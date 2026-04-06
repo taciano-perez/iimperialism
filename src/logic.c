@@ -3,7 +3,6 @@
 #pragma code-name (push, "LOWCODE")
 
 static unsigned char get_resource_base_price(unsigned char resource);
-static unsigned char get_relation_tier(unsigned char relations);
 static unsigned int apply_percent(unsigned int value, unsigned char percent);
 static void add_resource_saturating(unsigned char resource, unsigned char amount);
 static void update_foreign_market_prices(void);
@@ -11,7 +10,6 @@ static void assign_foreign_nation_names(void);
 static unsigned char rand_resource_excluding(unsigned char min, unsigned char max, unsigned char exclude);
 static void assign_foreign_nation_trade_routes(void);
 static unsigned char strings_equal(const char* left, const char* right);
-static void copy_text(char* dest, const char* src, unsigned char capacity);
 
 static unsigned char get_resource_base_price(unsigned char resource) {
     static const unsigned char base_prices[] = {
@@ -35,7 +33,7 @@ static unsigned char get_resource_base_price(unsigned char resource) {
     return base_prices[resource];
 }
 
-static unsigned char get_relation_tier(unsigned char relations) {
+unsigned char get_relation_tier(unsigned char relations) {
     if (relations < RELATION_BAD) {
         return 0U;
     }
@@ -124,7 +122,7 @@ static unsigned char strings_equal(const char* left, const char* right) {
     return FALSE;
 }
 
-static void copy_text(char* dest, const char* src, unsigned char capacity) {
+void copy_text_limited(char* dest, const char* src, unsigned char capacity) {
     if (capacity == 0U) {
         return;
     }
@@ -189,9 +187,9 @@ static void assign_foreign_nation_names(void) {
             continue;
         }
 
-        copy_text(state.foreign_nations[selected_great_power_count].name,
-                  great_power_name_pool[pool_index],
-                  FOREIGN_NATION_NAME_LENGTH + 1U);
+        copy_text_limited(state.foreign_nations[selected_great_power_count].name,
+                          great_power_name_pool[pool_index],
+                          FOREIGN_NATION_NAME_LENGTH + 1U);
         ++selected_great_power_count;
     }
 
@@ -220,9 +218,9 @@ static void assign_foreign_nation_names(void) {
             continue;
         }
 
-        copy_text(state.foreign_nations[foreign_nation_index].name,
-                  minor_nation_name_pool[pool_index],
-                  FOREIGN_NATION_NAME_LENGTH + 1U);
+        copy_text_limited(state.foreign_nations[foreign_nation_index].name,
+                          minor_nation_name_pool[pool_index],
+                          FOREIGN_NATION_NAME_LENGTH + 1U);
         ++selected_minor_nation_count;
     }
 

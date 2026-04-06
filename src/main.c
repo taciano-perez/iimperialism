@@ -2,6 +2,7 @@
 #include "sound.h"
 #include "overlay.h"
 #include "game.h"
+#include "strings.h"
 
 #define BOX1_X1 0
 #define BOX1_Y1 2
@@ -14,16 +15,15 @@ static unsigned char selected_trade_nation;
 
 static unsigned int wait_for_splash_escape(void);
 static void prompt_for_nation_name(char* nation_name, unsigned char max_length);
-static void copy_text(char* dest, const char* src, unsigned char capacity);
+static unsigned int get_assigned_workers(void);
 static unsigned char get_rating_tier(unsigned int value, unsigned int maximum);
-static unsigned char get_relation_rating_tier(unsigned char relation);
 static unsigned char get_industry_rating_tier(void);
 static unsigned char get_science_rating_tier(void);
 static unsigned char get_merchant_marine_rating_tier(void);
 static unsigned char get_navy_rating_tier(void);
 static unsigned char get_diplomacy_rating_tier(void);
 static const char* get_rating_name(unsigned char tier);
-static void print_rating_row(unsigned char y, const char* label, unsigned char tier);
+static void print_rating_row(unsigned char x, unsigned char y, unsigned char right_x, const char* label, unsigned char tier);
 
 void render_warehouse_box() {
     box(BOX1_X1, BOX1_Y1+1, BOX1_X2, BOX1_Y2);
@@ -92,7 +92,7 @@ static unsigned int wait_for_splash_escape(void) {
 static void prompt_for_nation_name(char* nation_name, unsigned char max_length) {
     clear_screen();
     box(0, 8, 39, 16);
-    print(5, 9, "Your Excellency,");
+    // print(5, 9, "Your Excellency,");
     print(4, 11, "What is the name of your");
     print(5, 13, "nation?");
 
@@ -100,16 +100,10 @@ static void prompt_for_nation_name(char* nation_name, unsigned char max_length) 
     scan_text(13, 13, nation_name, max_length);
 }
 
-static void copy_text(char* dest, const char* src, unsigned char capacity) {
-    if (capacity == 0U) {
-        return;
-    }
-
-    while (--capacity != 0U && *src != '\0') {
-        *dest++ = *src++;
-    }
-
-    *dest = '\0';
+static unsigned int get_assigned_workers(void) {
+    return state.production_lumber + state.production_fabric + state.production_steel
+         + state.production_furniture + state.production_clothes
+         + state.production_tools + state.production_guns;
 }
 
 static unsigned char get_rating_tier(unsigned int value, unsigned int maximum) {
@@ -124,28 +118,10 @@ static unsigned char get_rating_tier(unsigned int value, unsigned int maximum) {
     return (unsigned char)((value * 4U + (maximum / 2U)) / maximum);
 }
 
-static unsigned char get_relation_rating_tier(unsigned char relation) {
-    if (relation == RELATION_ALLY_COLONY || relation >= RELATION_EXCELLENT) {
-        return 4U;
-    }
-    if (relation >= RELATION_GOOD) {
-        return 3U;
-    }
-    if (relation >= RELATION_NEUTRAL) {
-        return 2U;
-    }
-    if (relation >= RELATION_BAD) {
-        return 1U;
-    }
-    return 0U;
-}
-
 static unsigned char get_industry_rating_tier(void) {
     unsigned int used_workers;
 
-    used_workers = state.production_lumber + state.production_fabric + state.production_steel
-                 + state.production_furniture + state.production_clothes
-                 + state.production_tools + state.production_guns;
+    used_workers = get_assigned_workers();
     return get_rating_tier(used_workers, used_workers + state.available_workers);
 }
 
@@ -156,9 +132,7 @@ static unsigned char get_science_rating_tier(void) {
 static unsigned char get_merchant_marine_rating_tier(void) {
     unsigned int total_workers;
 
-    total_workers = state.available_workers + state.production_lumber + state.production_fabric
-                  + state.production_steel + state.production_furniture
-                  + state.production_clothes + state.production_tools + state.production_guns;
+    total_workers = state.available_workers + get_assigned_workers();
     return get_rating_tier(state.traders * state.capacity_per_trader, total_workers);
 }
 
@@ -178,7 +152,7 @@ static unsigned char get_diplomacy_rating_tier(void) {
         if (state.foreign_nations[i].relations == RELATION_ALLY_COLONY) {
             allied_votes = (unsigned char)(allied_votes + ((i < 2U) ? 8U : 4U));
         }
-        relation_score = (unsigned char)(relation_score + get_relation_rating_tier(state.foreign_nations[i].relations));
+        relation_score = (unsigned char)(relation_score + get_relation_tier(state.foreign_nations[i].relations));
     }
 
     if (allied_votes >= 16U) {
@@ -189,19 +163,25 @@ static unsigned char get_diplomacy_rating_tier(void) {
 }
 
 static const char* get_rating_name(unsigned char tier) {
-    return get_relation_name((unsigned char)(tier * 50U), 0U);
+    switch (tier) {
+        case 0U: return STR_RELATION_TERRIBLE;
+        case 1U: return STR_RELATION_BAD;
+        case 2U: return STR_RELATION_NEUTRAL;
+        case 3U: return STR_RELATION_GOOD;
+        default: return STR_RELATION_EXCELLENT;
+    }
 }
 
-static void print_rating_row(unsigned char y, const char* label, unsigned char tier) {
-    print(2, y, label);
-    print_right_aligned(37, y, get_rating_name(tier));
+static void print_rating_row(unsigned char x, unsigned char y, unsigned char right_x, const char* label, unsigned char tier) {
+    print(x, y, label);
+    print_right_aligned(right_x, y, get_rating_name(tier));
 }
 
 void start_new_game(void) {
     char nation_name[11];
 
     prompt_for_nation_name(nation_name, 10U);
-    copy_text(state.nation_name, nation_name, sizeof(state.nation_name));
+    copy_text_limited(state.nation_name, nation_name, sizeof(state.nation_name));
     init_game();
 }
 
@@ -214,21 +194,35 @@ void render_main_screen(void) {
     render_turn_funds_header();
 
     box(0, 3, 39, 9);
-    print_inverted(1, 2, "National Ratings");
-    print_rating_row(4, "Industry", get_industry_rating_tier());
-    print_rating_row(5, "Science", get_science_rating_tier());
-    print_rating_row(6, "Merchant Marine", get_merchant_marine_rating_tier());
-    print_rating_row(7, "Navy", get_navy_rating_tier());
-    print_rating_row(8, "Diplomacy", get_diplomacy_rating_tier());
+    print_inverted(1, 3, "Industry Minister");
+    draw_picture_at(INDUSTRY_PORTRAIT, 2, 5);
+    print_rating_row(6, 5, 18, "Economy:", get_industry_rating_tier());
+
+    box(19, 3, 39, 9);
+    print_inverted(20, 3, "Science Minister");
+    draw_picture_at(SCIENCE_PORTRAIT, 20, 5);
+    print_rating_row(24, 5, 38, "Science:", get_science_rating_tier());
+
+    box(0, 11, 39, 17);
+    print_inverted(1, 11, "Admiral");
+    draw_picture_at(ADMIRAL_PORTRAIT, 2, 13);
+    print(6, 13, "Merchant");
+    print_rating_row(6, 14, 18, "Marine:", get_merchant_marine_rating_tier());
+    print_rating_row(6, 16, 18, "Navy:", get_navy_rating_tier());
+
+    box(19, 11, 39, 17);
+    print_inverted(20, 11, "Chancellor");
+    draw_picture_at(WISEMAN_PORTRAIT, 20, 13);
+    print_rating_row(24, 13, 38, "Diplomacy:", get_diplomacy_rating_tier());
 
     /* ADVISOR */
-    draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
-    print(5, 20, "Visit Ministry of Industry, Patent");
-    print(5, 21, "Office, Admiralty, Foreign Office,");
-    print(5, 22, "or End turn?");
+    // draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
+    print(0, 20, "Visit Ministry of Industry, Patent");
+    print(0, 21, "Office, Admiralty, Foreign Office,");
+    print(0, 22, "or End turn?");
 
     while (1) {
-        key = cgetc_at(17, 22);
+        key = cgetc_at(12, 22);
         switch (key) {
             case 'i':
             case 'I':
