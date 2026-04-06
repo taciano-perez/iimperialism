@@ -15,6 +15,15 @@ static unsigned char selected_trade_nation;
 static unsigned int wait_for_splash_escape(void);
 static void prompt_for_nation_name(char* nation_name, unsigned char max_length);
 static void copy_text(char* dest, const char* src, unsigned char capacity);
+static unsigned char get_rating_tier(unsigned int value, unsigned int maximum);
+static unsigned char get_relation_rating_tier(unsigned char relation);
+static unsigned char get_industry_rating_tier(void);
+static unsigned char get_science_rating_tier(void);
+static unsigned char get_merchant_marine_rating_tier(void);
+static unsigned char get_navy_rating_tier(void);
+static unsigned char get_diplomacy_rating_tier(void);
+static const char* get_rating_name(unsigned char tier);
+static void print_rating_row(unsigned char y, const char* label, unsigned char tier);
 
 void render_warehouse_box() {
     box(BOX1_X1, BOX1_Y1+1, BOX1_X2, BOX1_Y2);
@@ -103,6 +112,91 @@ static void copy_text(char* dest, const char* src, unsigned char capacity) {
     *dest = '\0';
 }
 
+static unsigned char get_rating_tier(unsigned int value, unsigned int maximum) {
+    if (value == 0U || maximum == 0U) {
+        return 0U;
+    }
+
+    if (value >= maximum) {
+        return 4U;
+    }
+
+    return (unsigned char)((value * 4U + (maximum / 2U)) / maximum);
+}
+
+static unsigned char get_relation_rating_tier(unsigned char relation) {
+    if (relation == RELATION_ALLY_COLONY || relation >= RELATION_EXCELLENT) {
+        return 4U;
+    }
+    if (relation >= RELATION_GOOD) {
+        return 3U;
+    }
+    if (relation >= RELATION_NEUTRAL) {
+        return 2U;
+    }
+    if (relation >= RELATION_BAD) {
+        return 1U;
+    }
+    return 0U;
+}
+
+static unsigned char get_industry_rating_tier(void) {
+    unsigned int used_workers;
+
+    used_workers = state.production_lumber + state.production_fabric + state.production_steel
+                 + state.production_furniture + state.production_clothes
+                 + state.production_tools + state.production_guns;
+    return get_rating_tier(used_workers, used_workers + state.available_workers);
+}
+
+static unsigned char get_science_rating_tier(void) {
+    return get_rating_tier(state.science_level, SCIENCE_LEVEL_COUNT - 1U);
+}
+
+static unsigned char get_merchant_marine_rating_tier(void) {
+    unsigned int total_workers;
+
+    total_workers = state.available_workers + state.production_lumber + state.production_fabric
+                  + state.production_steel + state.production_furniture
+                  + state.production_clothes + state.production_tools + state.production_guns;
+    return get_rating_tier(state.traders * state.capacity_per_trader, total_workers);
+}
+
+static unsigned char get_navy_rating_tier(void) {
+    return get_rating_tier(state.frigates, 12U);
+}
+
+static unsigned char get_diplomacy_rating_tier(void) {
+    unsigned char i;
+    unsigned char allied_votes;
+    unsigned char relation_score;
+
+    allied_votes = 0U;
+    relation_score = 0U;
+
+    for (i = 0U; i < FOREIGN_NATION_COUNT; ++i) {
+        if (state.foreign_nations[i].relations == RELATION_ALLY_COLONY) {
+            allied_votes = (unsigned char)(allied_votes + ((i < 2U) ? 8U : 4U));
+        }
+        relation_score = (unsigned char)(relation_score + get_relation_rating_tier(state.foreign_nations[i].relations));
+    }
+
+    if (allied_votes >= 16U) {
+        return 4U;
+    }
+
+    return MIN(3U, get_rating_tier(relation_score, FOREIGN_NATION_COUNT * 4U));
+}
+
+static const char* get_rating_name(unsigned char tier) {
+    return get_relation_name((unsigned char)(tier * 50U), 0U);
+}
+
+static void print_rating_row(unsigned char y, const char* label, unsigned char tier) {
+    print(2, y, label);
+    print_right_aligned(37, y, get_rating_name(tier));
+}
+
 void start_new_game(void) {
     char nation_name[11];
 
@@ -118,6 +212,14 @@ void render_main_screen(void) {
     print(0, 0, "Nation of");
     print_bold(10,  0, state.nation_name);
     render_turn_funds_header();
+
+    box(0, 3, 39, 9);
+    print_inverted(1, 2, "National Ratings");
+    print_rating_row(4, "Industry", get_industry_rating_tier());
+    print_rating_row(5, "Science", get_science_rating_tier());
+    print_rating_row(6, "Merchant Marine", get_merchant_marine_rating_tier());
+    print_rating_row(7, "Navy", get_navy_rating_tier());
+    print_rating_row(8, "Diplomacy", get_diplomacy_rating_tier());
 
     /* ADVISOR */
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
@@ -156,8 +258,6 @@ void render_main_screen(void) {
 }
 
 int main(void) {
-
-    char key;
     init_overlays();
     ui_init();
 
@@ -217,11 +317,12 @@ int main(void) {
             case SCREEN_BATTLE:
                 clear_screen();
                 draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
+                print(5, 20, "Battle at sea!");
                 if (state.attacker_index == INDEX_PIRATES) {
-                    print(5, 20, "Ambushed by pirates!");
+                    print(20, 20, "Pirate attack!");
                 } else {
-                    print(5, 20, "Attacked by warships from");
-                    print(31, 20, state.foreign_nations[state.attacker_index].name);
+                    print(20, 20, "Warships from");
+                    print(34, 20, state.foreign_nations[state.attacker_index].name);
                 }
                 print(0, 0, "Our Navy");
                 print(23, 0, "Enemy Fleet");
@@ -241,13 +342,6 @@ int main(void) {
                 render_ledger_screen();
                 continue;
         }
-
-        // key = cgetc_at(39, 21);
-        // switch (key) {
-        //     case 27: // ESC key
-        //         run_overlay(OVL_GAME_MENU);
-        //         continue;
-        // }
     }
 
 }

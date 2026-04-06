@@ -254,6 +254,8 @@ Relations are displayed as:
 - Great
 - Ally or Colony
 
+Arrows are displayed to indicate if the relations status with a nation are trending up or down.
+
 The first two nations are the other Great Powers. The remaining three are minor nations. Great Powers import raw materials and export processed goods, whereas minor nations export raw materials and import processed goods. Great Powers can become allies, and minor nations can be turned into colonies.
 
 From this screen, press:

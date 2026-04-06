@@ -44,7 +44,7 @@ static const char* get_council_vote_target(unsigned char nation_index) {
         return state.nation_name;
     }
 
-    if (state.foreign_nations[nation_index - 1U].relations > RELATION_EXCELLENT) {
+    if (state.foreign_nations[nation_index - 1U].relations == RELATION_ALLY_COLONY) {
         return state.nation_name;
     }
 

@@ -193,7 +193,7 @@ static void trade_expedition(void) {
         } else {
             unsigned char i;
             for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
-                if (state.foreign_nations[i].relations == RELATION_BAD && rand_range(1U, 100U) <= TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT) {
+                if (state.foreign_nations[i].relations == RELATION_TERRIBLE && rand_range(1U, 100U) <= TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT) {
                     state.attacker_index = i;
                     state.current_screen = SCREEN_BATTLE;
                     return;

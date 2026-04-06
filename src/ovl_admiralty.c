@@ -19,7 +19,7 @@ void render_admiralty_screen(void) {
         render_warehouse_box();
 
         box(BOX_X1, BOX_Y1+1, BOX_X1+17, BOX_Y2);
-        print_inverted((BOX_X1), BOX_Y1, "Merchant Fleet");
+        print_inverted((BOX_X1), BOX_Y1, "Merchant Marine");
         print((BOX_X1+1), (BOX_Y1+1), "Traders:");
         print_int_right_aligned((BOX_X1+14), (BOX_Y1+1), state.traders);
         print((BOX_X1+1), (BOX_Y1+2), "Cargo/trader:");

@@ -265,7 +265,7 @@ static void assign_foreign_nation_trade_routes(void) {
 
 void init_game() {
     static const unsigned char foreign_nation_relations[FOREIGN_NATION_COUNT] = {
-        RELATION_BAD, RELATION_BAD, RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT
+        RELATION_TERRIBLE, RELATION_TERRIBLE, RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT
     };
     unsigned char i;
 
@@ -403,10 +403,13 @@ void next_turn() {
     // if money is zero, relations drop to bad immediately, otherwise they drop by a fixed amount
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
         if (state.foreign_nations[i].relations != RELATION_ALLY_COLONY) {
+            state.foreign_nations[i].relations_previous_turn = state.foreign_nations[i].relations;
             if (state.money == 0) {
-                state.foreign_nations[i].relations = RELATION_BAD;
+                state.foreign_nations[i].relations = RELATION_TERRIBLE;
+            } else if (state.foreign_nations[i].relations <= RELATIONS_LOSS_PER_TURN) {
+                state.foreign_nations[i].relations = RELATION_TERRIBLE;
             } else {
-                state.foreign_nations[i].relations = MAX(0, state.foreign_nations[i].relations - RELATIONS_LOSS_PER_TURN);
+                state.foreign_nations[i].relations = (unsigned char)(state.foreign_nations[i].relations - RELATIONS_LOSS_PER_TURN);
             }
         }
     }
