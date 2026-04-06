@@ -121,8 +121,8 @@ void render_main_screen(void) {
 
     /* ADVISOR */
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
-    print(5, 20, "Visit Ministry of Industry,");
-    print(5, 21, "Science, Admiralty, Foreign Office,");
+    print(5, 20, "Visit Ministry of Industry, Patent");
+    print(5, 21, "Office, Admiralty, Foreign Office,");
     print(5, 22, "or End turn?");
 
     while (1) {
@@ -132,8 +132,8 @@ void render_main_screen(void) {
             case 'I':
                 state.current_screen = SCREEN_INDUSTRY;
                 return;
-            case 's':
-            case 'S':
+            case 'p':
+            case 'P':
                 state.current_screen = SCREEN_SCIENCE;
                 return;
             case 'a':
