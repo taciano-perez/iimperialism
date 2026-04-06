@@ -71,7 +71,7 @@ Resident main loop (`src/main.c`) dispatches by `state.current_screen`:
 - `SCREEN_TRADE_EXPEDITION` -> `OVL_TRADE_EXPEDITION` then `OVL_TRADE_EXPEDITION_ACTION`
 - `SCREEN_BATTLE` -> resident battle prelude, then `OVL_BATTLE` (`BSCR`)
 - `SCREEN_COUNCIL_NATIONS` -> `OVL_COUNCIL_NATIONS` (`CNSL`)
-- `SCREEN_LEDGER` -> resident `render_ledger_screen()`
+- `SCREEN_LEDGER` -> `OVL_INDUSTRY` (`ISCR`) ledger sub-screen
 
 The Main Screen is the player's hub between turns. It shows the nation name,
 turn number, funds, and an advisor prompt. From there the player can choose:

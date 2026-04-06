@@ -25,7 +25,6 @@ C_SOURCES  = \
 	$(SRC_DIR)/ui.c \
 	$(SRC_DIR)/gamestate.c \
 	$(SRC_DIR)/random.c \
-	$(SRC_DIR)/ledger.c \
 	$(SRC_DIR)/logic.c \
 	$(SRC_DIR)/overlay.c \
 	$(SRC_DIR)/ovl_industry.c \
@@ -59,7 +58,6 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/sound.o \
 	$(BUILD_DIR)/gamestate.o \
 	$(BUILD_DIR)/random.o \
-	$(BUILD_DIR)/ledger.o \
 	$(BUILD_DIR)/logic.o \
 	$(BUILD_DIR)/overlay.o \
 	$(BUILD_DIR)/prodos_overlay_load.o \
@@ -161,8 +159,8 @@ $(BUILD_DIR)/%.o: $(ASM_DIR)/%.s | $(BUILD_DIR)
 # Overlay binaries: raw 2KB images, zero-padded to exactly 2048 bytes.
 # Must be on the disk alongside the main binary (DOS 3.3 type B).
 # File names: ISCR, PSCR, TSCR  (use 'make disk' to update iimperialism.dsk)
-$(BUILD_DIR)/iscr.bin: $(BUILD_DIR)/ovl_industry.o $(OVL_CFG) | $(BUILD_DIR)
-	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/ovl_industry.o
+$(BUILD_DIR)/iscr.bin: $(BUILD_DIR)/ovl_industry_entry.o $(BUILD_DIR)/ovl_industry.o $(OVL_CFG) | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/ovl_industry_entry.o $(BUILD_DIR)/ovl_industry.o
 
 $(BUILD_DIR)/pscr.bin: $(BUILD_DIR)/ovl_production_entry.o $(BUILD_DIR)/ovl_production.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/ovl_production_entry.o $(BUILD_DIR)/ovl_production.o
@@ -196,6 +194,9 @@ $(BUILD_DIR)/cnsl.bin: $(BUILD_DIR)/ovl_council_nations_entry.o $(BUILD_DIR)/ovl
 
 $(BUILD_DIR)/ovl_diplomacy_entry.o: $(ASM_DIR)/ovl_diplomacy_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_diplomacy_entry.s -o $(BUILD_DIR)/ovl_diplomacy_entry.o
+
+$(BUILD_DIR)/ovl_industry_entry.o: $(ASM_DIR)/ovl_industry_entry.s | $(BUILD_DIR)
+	ca65 $(ASM_DIR)/ovl_industry_entry.s -o $(BUILD_DIR)/ovl_industry_entry.o
 
 $(BUILD_DIR)/ovl_trade_expedition_entry.o: $(ASM_DIR)/ovl_trade_expedition_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_trade_expedition_entry.s -o $(BUILD_DIR)/ovl_trade_expedition_entry.o

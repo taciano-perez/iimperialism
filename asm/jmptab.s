@@ -32,6 +32,7 @@
 ;  $0860  JMP _production_orders
 ;  $0863  JMP _print_inverted
 ;  $0866  JMP _get_diplomacy_string
+;  $0869  JMP _print_signed_int_right_aligned_currency
 
     .import _clear_screen
     .import _clear_input_area
@@ -63,6 +64,7 @@
     .import _production_orders
     .import _print_inverted
     .import _get_diplomacy_string
+    .import _print_signed_int_right_aligned_currency
 
     .segment "JMPTAB"
 
@@ -96,3 +98,4 @@
     jmp _production_orders              ; $0860
     jmp _print_inverted                 ; $0863
     jmp _get_diplomacy_string           ; $0866
+    jmp _print_signed_int_right_aligned_currency ; $0869

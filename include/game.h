@@ -175,9 +175,6 @@ void seed_random(unsigned int seed);
 unsigned char rand_range(unsigned char min, unsigned char max);
 void production_orders(void);
 
-// ledger.c
-void render_ledger_screen(void);
-
 // ui.c
 void ui_init();
 void ui_exit();

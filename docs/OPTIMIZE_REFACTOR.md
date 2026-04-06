@@ -2,542 +2,433 @@
 
 ## Scope
 
-This file summarizes ideas to reduce code and disk footprint without changing game behavior or shortening any user-facing strings.
+This file is the current disk-space analysis for the Apple II floppy build.
+The goal is to reclaim real ProDOS blocks without changing game behavior or
+shortening user-visible text.
 
-I reviewed:
+This refresh is based on the current build as of `2026-04-06`, using:
 
-- `README.md`
-- `docs/FLOPPY.md`
-- `docs/MEMORY.md`
-- `docs/OPTIMIZE_CODE.md`
-- `docs/PICTURES.md`
-- `docs/FONT.md`
-- `Makefile`
-- the current linker map and current disk catalog
-- the older overlay-only analysis that previously lived in `docs/OV_MERGE_REFACTOR.md`
+- `make memory-usage`
+- `java -jar tools/ac.jar -l assets/iimperialism.dsk`
+- `build/iimperialism.map`
+- current sources in `src/`, `asm/`, and `docs/`
 
-This document is now the canonical place for both general size work and overlay-merge analysis.
+This supersedes the earlier overlay-merge notes and the older
+`0 bytes free -> 1024 bytes free` snapshot. The disk is full again.
 
 ## Current State
 
-Current disk catalog after implementing options 1, 5, and 6 below:
+Current disk catalog:
 
-- `IIMPERIALISM` uses `64` ProDOS blocks
-- each overlay file uses `5` ProDOS blocks
-- disk free space is `1024 bytes`
+- `IIMPERIALISM` uses `66` ProDOS blocks
+- `IIMP.SYSTEM` uses `1` ProDOS block
+- `PRODOS` uses `34` ProDOS blocks
+- there are now `11` overlay files on disk:
+  `ISCR`, `PSCR`, `TSCR`, `ASCR`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`, `MENU`, `CNSL`
+- each overlay file still consumes `5` ProDOS blocks
+- disk free space is back to `0 bytes`
 
-Current overlay occupancy from `make memory-usage`:
+Current resident / overlay occupancy from `make memory-usage`:
+
+### Resident
+
+| Area | Used | Free |
+|------|-----:|-----:|
+| `LOWCODE` | 5074 | 965 |
+| `RESIDENT_MAIN_SAFE` | 16331 | 2101 |
+| `LANGUAGE_CARD` | 2593 | 479 |
+
+### Overlays
 
 | Overlay | UsedApprox | FreeApprox |
 |--------|-----------:|-----------:|
-| `ascr.bin` | 1660 | 388 |
+| `ascr.bin` | 1659 | 389 |
 | `bscr.bin` | 1992 | 56 |
 | `cnsl.bin` | 1164 | 884 |
-| `dscr.bin` | 1982 | 66 |
-| `iscr.bin` | 944 | 1104 |
+| `dscr.bin` | 1978 | 70 |
+| `iscr.bin` | 844 | 1204 |
 | `menu.bin` | 917 | 1131 |
 | `pscr.bin` | 1391 | 657 |
-| `sscr.bin` | 1523 | 525 |
-| `texp.bin` | 835 | 1213 |
+| `sscr.bin` | 1521 | 527 |
+| `texp.bin` | 832 | 1216 |
 | `tscr.bin` | 1938 | 110 |
-| `txac.bin` | 1973 | 75 |
+| `txac.bin` | 1919 | 129 |
 
-Important consequence:
+Important consequences:
 
 - shrinking an overlay by 100 bytes does not reclaim floppy space by itself
 - floppy space is reclaimed only if:
-  - the main binary drops enough to free ProDOS blocks, or
+  - the main binary drops enough to free one or more ProDOS blocks, or
   - two overlays are merged so one 2 KB overlay file disappears
+- the current regression from the last document snapshot is explained by:
+  - `IIMPERIALISM` growing back from `64` to `66` blocks
+  - adding the new `CNSL` overlay file, which costs another `5` blocks
 
-## Highest Value Options
+## Fresh Conclusions
 
-### 1. Remove unused resident picture assets
+The best current options are no longer just "trim bytes somewhere."
+They fall into two separate buckets:
+
+### A. Reclaim a whole overlay file
+
+This is still the cleanest immediate disk-space win.
+
+One successful merge removes one `5`-block overlay file from disk. That is
+`2560` bytes of real floppy space.
+
+### B. Move resident code into an existing overlay file
+
+This matters when the resident main binary is sitting on the wrong side of a
+ProDOS block boundary, which it currently is.
+
+If a resident screen can be moved into an overlay file that already exists and
+already has room, that can reduce `IIMPERIALISM` without adding another file to
+the floppy.
+
+This is different from creating a brand-new overlay:
+
+- moving code into a new overlay can reduce the main binary but still lose on
+  disk because the new file also costs `5` blocks
+- moving code into an existing overlay can reduce the main binary and avoid any
+  new disk-file cost
+
+## Best Overlay Merge Candidates
+
+Current viable pairings by raw overlay occupancy:
+
+| Candidate | Combined UsedApprox | Headroom |
+|-----------|--------------------:|---------:|
+| `ISCR + TEXP` | 1676 | 372 |
+| `MENU + TEXP` | 1749 | 299 |
+| `ISCR + MENU` | 1761 | 287 |
+| `CNSL + TEXP` | 1996 | 52 |
+| `CNSL + ISCR` | 2008 | 40 |
+
+All other obvious pairs are over 2 KB and are not currently realistic.
+
+### 1. Best pure disk-space merge: `ISCR + TEXP`
+
+Current sizes:
+
+- `iscr.bin` = `844`
+- `texp.bin` = `832`
+- combined = `1676`
+
+Why this remains the best merge:
+
+- it fits comfortably, with `372` bytes left for a dispatcher and minor growth
+- both overlays already use the same resident warehouse/header helpers
+- both already use `INDUSTRY_PORTRAIT`
+- it deletes one overlay file from disk immediately
+
+Why it is still slightly awkward:
+
+- it is not a natural gameplay pair
+- selection is not purely by overlay ID under the current ABI, so the merged
+  file needs a dispatcher at `$8800`
+- dispatch will likely be based on `state.current_screen`
+
+Current ranking:
+
+- best immediate disk-space win
+- lowest-risk merge that still deletes a file
+
+### 2. Best backup merge: `MENU + TEXP`
+
+Current sizes:
+
+- `menu.bin` = `917`
+- `texp.bin` = `832`
+- combined = `1749`
+
+Why it is viable:
+
+- still plenty of room for a dispatcher
+- also deletes one overlay file from disk
+
+Why I rank it below `ISCR + TEXP`:
+
+- `MENU` is a transient `ESC` flow, not selected directly from
+  `state.current_screen`
+- that means the dispatcher has to key off something other than the normal
+  screen value, or `run_overlay()` has to map multiple overlay IDs to one file
+- it is workable, but not as straightforward
+
+### 3. Pairings involving `CNSL`
+
+Technically:
+
+- `CNSL + TEXP` fits by `52` bytes
+- `CNSL + ISCR` fits by `40` bytes
+
+I do not recommend either as the first move.
+
+Reason:
+
+- the headroom is too small for comfort
+- minor code growth, stub growth, or linker layout shifts could break the fit
+- they are fine only if you are prepared to do a shrink pass first
+
+## Moving Screens Out Of Resident Code
+
+This is the new part that matters most for the current build.
+
+The right question is not "can any resident screen become an overlay?"
+The right question is:
+
+- can it move into an already-existing overlay with spare space
+- without adding a new disk file
+- and with minimal resident glue left behind
+
+### Ledger screen: yes, and it is now a strong candidate
 
 Status: implemented
 
-This is the cleanest resident-space win I found.
+The ledger flow now lives inside `src/ovl_industry.c` and is reached by routing
+`SCREEN_LEDGER` through `OVL_INDUSTRY`.
 
-The following picture data appeared to be compiled into the main binary but not referenced anywhere in current game code:
+Previous resident map contribution from `ledger.o`:
 
-- `COUNTRY1_DATA`
-- `COUNTRY2_DATA`
-- `COUNTRY3_DATA`
-- `COMPASS_DATA`
+- `CODE` = `0x020E` = `526` bytes
+- `RODATA` = `0x00A6` = `166` bytes
+- total direct resident contribution = about `692` bytes
 
-These were defined in `include/pictures.h` and exported through `PICTURES_DATA[]`, but had no actual use sites.
+Why this is attractive:
 
-Approximate resident data tied up in those four unused assets:
+- the ledger is only entered from `src/ovl_industry.c`
+- after closing, it already returns to `SCREEN_INDUSTRY`
+- it uses the same `INDUSTRY_PORTRAIT` theme as the industry / transport /
+  production family
+- `iscr.bin` currently has `1204` bytes free, so the ledger fits comfortably
 
-- `COUNTRY1_DATA`: about `114` bytes
-- `COUNTRY2_DATA`: about `114` bytes
-- `COUNTRY3_DATA`: about `226` bytes
-- `COMPASS_DATA`: about `114` bytes
-- pointer-table entries: about `8` more bytes
+This made `ISCR` the natural home for the ledger flow.
 
-Total: about `576` bytes
+Implemented shape:
 
-Why this mattered:
+1. move ledger rendering into the industry overlay binary
+2. branch inside `render_industry_screen()` when `state.current_screen == SCREEN_LEDGER`
+3. keep `SCREEN_LEDGER` as a screen ID
+4. have resident `main()` send `SCREEN_LEDGER` through `run_overlay(OVL_INDUSTRY)`
+5. export `print_signed_int_right_aligned_currency()` through `JMPTAB` so the
+   overlay can preserve the existing signed-money formatting
 
-- this saved real bytes in the main binary
-- unlike overlay-local shaving, this could directly reduce ProDOS block usage
-- it also reduced resident `RODATA`, which is already large
+Why I like this:
 
-Actual result after implementation:
+- it does not add a new overlay file
+- it directly shrinks `IIMPERIALISM`
+- it matches existing gameplay flow better than most other moves
 
-- `IIMPERIALISM` dropped from `32,885` bytes to `32,317` bytes
-- ProDOS allocation for `IIMPERIALISM` dropped from `66` blocks to `65` blocks
+Actual result:
+
+- `IIMPERIALISM` dropped from `66` blocks to `65` blocks
 - disk free space increased from `0 bytes` to `512 bytes`
+- `iscr.bin` grew to `1824` bytes used, leaving `224` bytes free
 
-Risk:
+New caveat after implementation:
 
-- low
+- if you do this, `ISCR + TEXP` is no longer available as the first merge
+  candidate, because `844 + 692 + 832 = 2368`, which is too large
 
-### 2. Split the splash-only ship art out of the resident binary
+So this creates a branch in the plan:
 
-Status: deferred for now
+- either merge `ISCR + TEXP` first for the immediate `5`-block win
+- or move ledger into `ISCR` first to claw back resident blocks
 
-`SHIP_SPLASH_DATA` is very large and is only used once during startup in `src/main.c`.
+### Ledger screen in `MENU`: technically possible, but not the right fit
 
-Its header says:
+`menu.bin` has `1131` bytes free, so the ledger would also fit there.
 
-- width = `0x1a` = `26` bytes
-- height = `0x43` = `67` rows
+I do not recommend it first.
 
-So its raw embedded payload is about:
+Reason:
 
-- `26 * 67 + 2 = 1744` bytes
+- the menu is not where ledger belongs semantically
+- the ledger is only reached from industry
+- using `MENU` would preserve the `ISCR + TEXP` merge option, but it makes the
+  code organization less coherent
 
-That is a major share of resident `RODATA` for one startup-only image.
+If the only goal were "keep `ISCR` small so it can merge with `TEXP` later,"
+this is a possible compromise. It is not the cleanest architecture.
 
-Critical constraint:
+### Main screen: not the first resident screen to move
 
-- the splash screen is part of the current entropy path
-- the game currently seeds randomness from the human-timed delay before `ESC`
-- any splash refactor must preserve the equivalent of `seed_random(wait_for_splash_escape())`
-- moving the art is acceptable; losing the timed wait is not
+The user specifically called out the main screen. I do not think it is the best
+first move.
 
-Best options:
+Why:
 
-#### 2.1 Startup overlay after `ui_init()`
+- `src/main.c` does much more than render the main screen
+- it also owns startup flow, splash timing, nation naming, the resident screen
+  dispatch loop, helper exports like `render_warehouse_box()` and
+  `render_turn_funds_header()`, and the resident battle prelude
+- several small rating helpers are tightly coupled to `render_main_screen()`
+- the current `main.o` contribution is already large:
+  - `CODE` = `0x0990` = `2448` bytes
+  - `RODATA` = `0x0258` = `600` bytes
 
-Move the splash drawing code and splash text to a dedicated overlay, but keep the actual `wait_for_splash_escape()` and `seed_random()` call resident in `src/main.c`.
+That does not mean the whole main screen is bigger than 2 KB by itself, but it
+does mean "move main.c into an overlay" is not a real option.
 
-Suggested flow:
+A practical main-screen extraction would first need to split:
 
-1. boot into main binary
-2. `ui_init()`
-3. `run_overlay(OVL_SPLASH)` draws the splash and returns
-4. resident `seed_random(wait_for_splash_escape())`
-5. continue to `start_new_game()`
+- splash / startup work
+- nation-name prompt
+- generic resident helpers needed by overlays
+- resident dispatch loop
+- battle prelude
 
-Why this ranks first:
+Only after that split would it be clear whether the remaining hub screen is
+small enough and cohesive enough to live in an overlay.
 
-- preserves the current RNG behavior exactly
-- removes `SHIP_SPLASH_DATA` from resident `RODATA`
-- uses the already-established overlay machinery
-- startup logic stays understandable
+Current recommendation:
 
-Tradeoff:
+- do not start with the main screen
+- move the ledger first if the goal is resident shrink
+- revisit the main screen only after splash and startup responsibilities are
+  disentangled
 
-- adds another overlay file unless it is merged with some other small startup-only screen later
-- that means this is mainly a resident-memory win unless paired with another disk-space change
+## Splash Screen Reassessment
 
-#### 2.2 Loader-owned splash in `IIMP.SYSTEM`
+The earlier document was correct that the splash is still one of the largest
+resident-only feature costs, because `SHIP_SPLASH` is only used once at boot.
 
-Move splash rendering and the timed `ESC` wait into `IIMP.SYSTEM`, then pass the measured entropy into the main program through a fixed memory location before launching `IIMPERIALISM`.
+That remains true, but the disk-space context has changed:
 
-Why it is attractive:
+- adding a new splash overlay right now would cost another `5` blocks on a disk
+  that already has `0 bytes free`
+- so a standalone splash overlay is no longer a good first move for floppy space
 
-- removes the splash art from the main binary completely
-- does not require a new overlay file on disk
+Re-ranked options:
 
-Why it ranks second:
+### 1. Best disk-aware option: loader-owned splash
 
-- requires custom startup graphics work in the loader
-- requires a defined handoff contract from loader to main program for the entropy value
-- loader code is a more fragile place to iterate than normal resident/overlay code
+Move splash rendering and timed `ESC` capture into `IIMP.SYSTEM`, then pass the
+measured entropy into the main program before launch.
 
-This is the best disk-structure option, but not the safest implementation option.
+Why it now ranks first:
 
-#### 2.3 Separate raw splash asset loaded by main
+- removes the splash from the main binary
+- does not add a new overlay file
+- preserves the current entropy model if the handoff is done carefully
 
-Store the splash art as its own disk asset and have resident startup code load it before calling `wait_for_splash_escape()`.
+Cost:
 
-Why it works:
+- loader work is more fragile than normal game-code work
 
-- preserves the RNG seeding behavior
-- removes the splash art from the main binary
+### 2. Best non-loader option: piggyback splash on an existing overlay file
 
-Why it ranks lower:
+If splash logic is moved out of resident code, do not create a twelfth overlay
+file just for it.
 
-- adds another file to the floppy
-- needs either a one-off asset-loading path or a generalization of the current overlay loader
-- weaker disk-space story than the loader option
+Instead:
 
-#### 2.4 Compress the splash art but keep it resident
+- piggyback the splash onto some existing low-occupancy overlay file, with a
+  dispatcher
+- or merge splash work into some startup-only path that does not increase file
+  count
 
-Keep splash logic in `src/main.c`, but store `SHIP_SPLASH_DATA` in a compressed format and decompress it only for startup rendering.
+This is more awkward than a dedicated splash overlay, but it respects the
+actual disk constraint.
 
-Why it ranks lowest:
+### 3. Dedicated splash overlay
 
-- it saves resident bytes, but usually less than moving the art out entirely
-- it adds decode code back into the main binary
-- it does not improve file count or disk structure
+This is now lower priority.
 
-Recommendation:
+It still helps resident size, but it is a poor disk-space move while the floppy
+is already full.
 
-- safest refactor: `2.1` startup overlay, with resident `wait_for_splash_escape()`
-- strongest disk-structure refactor: `2.2` loader-owned splash with entropy handoff
+## Lower-Value Or Deferred Resident Work
 
-Expected gain:
+These remain valid, but they are not the first thing I would do under the
+current `0 bytes free` pressure.
 
-- roughly `1.7 KB` of resident `RODATA`
-- likely enough to reclaim multiple ProDOS blocks from `IIMPERIALISM` if implemented cleanly
+### Replace the 192-entry `HGR_ROWS[]` table
 
-### 3. Replace the 192-entry `HGR_ROWS[]` table in `include/pictures.h`
+Still plausible resident win:
 
-Status: deferred for now
+- about `300+` bytes feels realistic
 
-`draw_picture()` currently uses a full 192-entry HGR row-address table:
+But today it is behind:
 
-- `192 * 2 = 384` bytes of `RODATA`
+- one-file overlay merge
+- ledger-to-overlay move
+- splash relocation that does not add a file
 
-But all actual call sites go through `draw_picture_at()` in `src/ui.c`, which converts a character row to `y * 8`.
+### Revisit resident-only strings
 
-That means picture drawing is currently character-row aligned in practice.
+Still worth asking:
 
-There is already a smaller 24-row base table in `asm/text_hgr.s`:
+- are any resident strings only serving one overlay that already has room
 
-- `CHAR_ROW_BASE_LO`
-- `CHAR_ROW_BASE_HI`
+But this is now a secondary tuning pass, not the primary strategy.
 
-This suggests a smaller picture-row addressing strategy is possible:
+### Bold font derivation / picture compression
 
-- compute from a 24-entry char-row base
-- then advance row addresses inside the picture loop
-- or share a compact row-base helper
-
-Expected gain:
-
-- likely a few hundred bytes resident
-- roughly `300+` bytes looks realistic even after adding some code
-
-Risk:
-
-- low to medium
-- safe if picture drawing remains character-row aligned
-- higher risk only if arbitrary pixel `y` placement is needed later
-
-### 4. Merge one overlay pair and delete one file from disk
-
-Status: deferred for now
-
-This is the most direct way to reclaim floppy space.
-
-One merged overlay removes one overlay file entirely, which should save one overlay file allocation on disk. Today that means roughly `5` ProDOS blocks for each successful merge.
-
-Current ABI constraint:
-
-- `run_overlay()` loads one file and always jumps to `$8800`
-- a merged overlay therefore needs a dispatcher at `$8800`
-- separate overlay IDs can still exist, but they cannot jump to distinct offsets directly under the current ABI
-
-Relevant files:
-
-- `src/overlay.c`
-- `include/overlay.h`
-- `config/apple2-ovl.cfg`
-- `docs/MEMORY.md`
-
-#### Best current candidate: `ISCR + TEXP`
-
-Current approximate usage:
-
-- `iscr.bin` = `944`
-- `texp.bin` = `835`
-- combined = `1779`
-
-That leaves about `269` bytes before the 2 KB limit, which is usable headroom for a small dispatcher.
-
-Why this pair is better than it first appears:
-
-- both screens already use `render_turn_funds_header()`
-- both use `render_warehouse_box()`
-- both draw `INDUSTRY_PORTRAIT`
-- dispatch can be based on `state.current_screen`
-- no new selector variable is required
-
-Why this matters:
-
-- this is the single clearest disk-space win available without touching the main binary
-
-Tradeoff:
-
-- the pairing is not architecturally ideal
-- it is a disk-saving refactor first, not a cleanliness refactor
-
-#### Secondary candidate: `MENU + TEXP`
-
-Approximate combined usage:
-
-- `917 + 835 = 1752`
-
-This fits comfortably by size, but it needs an explicit selector because `MENU` is not uniquely inferable from `state.current_screen`.
-
-I would rank it below `ISCR + TEXP`.
-
-#### Candidate not currently viable anymore
-
-The older analysis favored:
-
-- `industry + transport`
-- `industry + production`
-- `transport + production`
-
-Those no longer fit with the current build:
-
-- `iscr + tscr = 2882`
-- `iscr + pscr = 2335`
-- `tscr + pscr = 3329`
-
-So those rankings are historically useful, but not current.
-
-#### Historical merge analysis from 2026-03-18
-
-From the older `make memory-usage` snapshot on 2026-03-18:
-
-| Overlay | UsedApprox | UsedPercent |
-|---------|------------|-------------|
-| `iscr.bin` | 783 | 38.23% |
-| `pscr.bin` | 988 | 48.24% |
-| `tscr.bin` | 842 | 41.11% |
-| `menu.bin` | 915 | 44.68% |
-| `texp.bin` | 809 | 39.50% |
-| `dscr.bin` | 1190 | 58.11% |
-| `bscr.bin` | 1425 | 69.58% |
-| `sscr.bin` | 1553 | 75.83% |
-| `ascr.bin` | 1695 | 82.76% |
-| `txac.bin` | 1939 | 94.68% |
-
-That earlier ranking was:
-
-1. `industry + transport`
-2. `industry + production`
-3. `transport + production`
-4. `diplomacy + trade market`
-
-Useful historical takeaways that still apply:
-
-- the `industry` / `transport` / `production` family is the most natural merge area when sizes permit
-- `diplomacy + trade market` is cohesive, but tends to be fragile on size
-- any pairing involving `menu` is awkward because `menu` is not selected only by `state.current_screen`
-- `trade market + trade action` is the most natural semantic pair, but it is far too large to fit under the current 2 KB overlay limit
-
-Suggested merge strategy if this is revisited:
-
-1. keep separate overlay IDs if that helps resident call sites stay simple
-2. map multiple IDs to one on-disk file if needed
-3. place one assembly dispatcher stub at `$8800`
-4. dispatch from `state.current_screen` whenever possible
-5. re-run `make memory-usage` after linking the merged image, because `.bin` occupancy is what matters, not just source intuition
-
-Important non-goal:
-
-- overlay merging does not reduce runtime RAM usage
-- it only reduces disk footprint and overlay file count
-- the execution window at `$8800-$8FFF` remains 2 KB either way
-
-## Strong Secondary Options
-
-### 5. Remove the `atoi()` dependency from `scan_uint()`
-
-Status: implemented
-
-`scan_uint()` in `src/ui.c` currently built a text buffer and then called `atoi()`.
-
-The map showed that this pulled in at least:
-
-- `atoi.o`
-- `ctype.o`
-- `ctypemask.o`
-
-That was a few hundred bytes of main-binary code/rodata for one very narrow use case.
-
-A custom digit accumulator inside `scan_uint()` preserved behavior while avoiding those library pulls.
-
-Expected gain:
-
-- likely a few hundred resident bytes
-
-Actual result after implementation:
-
-- `IIMPERIALISM` dropped from `32,317` bytes to `32,084` bytes
-- ProDOS allocation for `IIMPERIALISM` dropped from `65` blocks to `64` blocks
-- disk free space increased from `512 bytes` to `1024 bytes`
-
-Risk:
-
-- low
-- easy to test
-
-### 6. Replace `strcmp()` / `strcpy()` uses in name assignment with fixed-size helpers
-
-Status: implemented
-
-`logic.c` used `strcmp()` and `strcpy()` for short, bounded nation names.
-
-Because these names are fixed-length and very short, custom bounded copy/compare helpers may let the main binary avoid:
-
-- `strcmp.o`
-- `strcpy.o`
-
-This is not a huge win by itself, but it stacked well with the `atoi()` removal.
-
-Expected gain:
-
-- modest
-
-Actual result after implementation:
-
-- resident code now uses local bounded helpers instead of `strcmp()` / `strcpy()` for nation-name initialization and startup name copy
-- `IIMPERIALISM` stayed at `64` ProDOS blocks
-- disk free space stayed at `1024 bytes`
-
-Conclusion:
-
-- this was behavior-safe cleanup
-- it improved control over resident dependencies
-- it did not reclaim additional floppy space in the current build
-
-Risk:
-
-- low
-
-### 7. Revisit which strings really need to stay resident
-
-`strings.o` itself is not the main problem, but the main binary has a lot of resident `RODATA` overall.
-
-The current project already moved diplomacy strings into resident storage to shrink `dscr.bin`. That was the right choice for overlay pressure.
-
-For floppy pressure, the next useful question is narrower:
-
-- are there any resident strings that are only used by one small overlay and could move back into that overlay without blocking a merge candidate?
-
-This is not a blanket recommendation. It only makes sense if it helps one of these:
-
-- reduce main binary block count
-- or make a specific overlay merge feasible
-
-## Lower Priority / Situational Ideas
-
-### 8. Generate bold text from the regular font instead of storing a second full font table
-
-`font_data` and `font_bold_data` together cost:
-
-- `96 * 8 * 2 = 1536` bytes
-
-If bold rendering could be derived from the regular font at render time, the project could potentially remove most or all of `font_bold_data`.
-
-This is attractive in pure size terms, but I consider it higher risk because:
-
-- visual output must remain acceptable
-- runtime code gets more complex
-- exact bold glyph appearance may change
-
-I would not do this before the lower-risk resident wins above.
-
-### 9. Compress picture data
-
-Picture data is another major resident `RODATA` consumer.
-
-Options:
-
-- simple row RLE
-- store repeated blank rows compactly
-- pack only body rows and reconstruct empty margins
-
-This could save meaningful bytes, especially on sparse images, but the tradeoff is extra decode code in resident memory.
-
-I would only explore this after:
-
-- removing unused art
-- splitting splash art
-- shrinking the picture row table
-
-### 10. Replace `draw_picture()` generality with the simpler contract the game actually uses
-
-Right now the resident picture path is more general than the current callers need.
-
-Observed current usage:
-
-- all callers use `draw_picture_at()`
-- all calls are grid-aligned
-- picture set is fixed and known
-
-If that contract is accepted explicitly, the picture renderer can probably be specialized further:
-
-- fewer general-case calculations
-- possibly smaller metadata
-- tighter loop code
-
-This is worth considering, but it is more invasive than the table reduction above.
-
-## Ideas That Do Not Help Floppy Space Much
-
-### Overlay-local micro-optimizations by themselves
-
-Examples:
-
-- shrinking `txac.bin` by 100 bytes
-- shaving 50 bytes from `bscr.bin`
-
-These are still worth doing when an overlay is close to 2 KB, but they do not reclaim disk blocks unless they enable an actual overlay merge.
-
-### `include/icons.h`
-
-`include/icons.h` appears unused, but since nothing includes it, it is not contributing to the built binaries. Cleaning it up may help repo hygiene, but it does not help the floppy.
-
-### Removing unused declarations from `include/strings.h`
-
-There are stale declarations there, but declarations alone do not materially affect disk footprint.
+Still potentially useful, but still higher risk than the options above.
 
 ## Recommended Order
 
-If the goal is to get disk space back with the best risk/reward ratio, I would do the remaining work in this order:
+There are now two sensible paths, depending on whether the first priority is
+"free the most blocks quickly" or "shrink resident first."
 
-1. replace the 192-entry `HGR_ROWS[]` table with a smaller strategy compatible with `draw_picture_at()`
-2. revisit the deferred items:
-   `SHIP_SPLASH_DATA` split-out, picture/overlay disk strategy, and overlay merge `ISCR + TEXP`
+### Path A: fastest disk recovery
 
-## Expected Payoff
+1. merge `ISCR + TEXP`
+2. re-run `make memory-usage` and disk catalog
+3. if more space is still needed, consider moving ledger into `MENU` or another
+   roomy existing overlay instead of growing `ISCR`
+4. revisit splash relocation without adding a new disk file
 
-The combination of these resident wins:
+Why this path ranks first:
 
-- unused pictures: about `576` bytes
-- picture row table reduction: about `300+` bytes
-- `atoi()` and related library pulls: implemented, saved one additional ProDOS block
-- fixed-size name helpers: implemented, but no additional disk-block win in the current build
+- it frees `5` blocks immediately
+- it is the clearest way off a completely full floppy
 
-should be enough to make the main binary materially smaller.
+### Path B: resident-first cleanup
 
-And separately:
+1. move ledger into `ISCR`
+2. verify whether `IIMPERIALISM` drops from `66` to `65` or lower blocks
+3. if more space is still needed, merge `MENU + TEXP`
+4. then revisit splash relocation without adding a new disk file
 
-- merging `ISCR + TEXP` should reclaim one overlay file allocation on disk
+Why this path is attractive:
 
-That combined plan is the most realistic path I see to getting the floppy back off `0 bytes free` without changing behavior or shortening strings.
+- it improves the architecture around the industry flow
+- it removes an isolated resident screen that does not need to stay resident
+- it may recover disk blocks from the main binary without adding any new file
 
-## Validation Notes
+Why I still rank it second:
+
+- the disk is at literal `0 bytes free`
+- a guaranteed `5`-block merge is more valuable than a likely `1`-block resident drop
+
+## Final Recommendation
+
+If I had to pick the best next move today, it would be:
+
+1. merge `ISCR + TEXP` to reclaim one full overlay file
+2. after that, move the ledger into an existing overlay file if the main binary
+   still needs to come down
+
+If the goal is specifically to move resident screens out of the main binary,
+the ledger is the right screen to move first, not the main screen.
+
+The main screen can be reconsidered later, but only after startup / splash /
+dispatch responsibilities are peeled away from `src/main.c`.
+
+## Validation Checklist
 
 After each candidate change:
 
-1. run `make`
-2. run `make memory-usage`
-3. run `java -jar tools/ac.jar -l assets/iimperialism.dsk`
+1. run `make memory-usage`
+2. run `java -jar tools/ac.jar -l assets/iimperialism.dsk`
+3. check `IIMPERIALISM` block count
+4. check whether an overlay file actually disappeared from the disk catalog
 
-For disk work, AppleCommander block counts matter more than raw host-file byte counts.
-
-For resident-data changes, also verify:
+Also verify behavior:
 
 - boot still works
-- overlays still load correctly
-- splash still renders correctly if startup assets are touched
+- splash still preserves timed-`ESC` entropy if touched
+- industry can still open and close ledger correctly
+- merged overlays still dispatch to the correct screen
+- save/load still works if `MENU` is touched

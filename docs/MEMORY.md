@@ -147,6 +147,7 @@ $085D  JMP _run_overlay
 $0860  JMP _production_orders
 $0863  JMP _print_inverted
 $0866  JMP _get_diplomacy_string
+$0869  JMP _print_signed_int_right_aligned_currency
 ```
 
 Rule: keep `asm/jmptab.s` and `config/apple2-ovl.cfg` in sync. Rebuild overlays
@@ -163,6 +164,8 @@ Current note:
   inside the overlay
 - `src/ovl_production.c` handles its screen loop and training flow inside the overlay,
   while `src/production.c` still provides resident `production_orders()` through JMPTAB
+- `src/ovl_industry.c` now also owns the ledger sub-screen, while resident code
+  routes `SCREEN_LEDGER` back through `OVL_INDUSTRY`
 
 ## `_state` Address in Overlay Config
 
@@ -247,7 +250,9 @@ If the overlay needs a resident function not in JMPTAB, append a new JMP entry i
 `include/game.h`. Current examples include `clear_area(int x, int y, int width, int height)`
 at `$0839`, `print_bold(unsigned char x, unsigned char y, const char* text)` at `$084B`,
 `print_inverted(unsigned char x, unsigned char y, const char* text)` at `$0863`, and
-`get_diplomacy_string(unsigned char index)` at `$0866`.
+`get_diplomacy_string(unsigned char index)` at `$0866`, and
+`print_signed_int_right_aligned_currency(unsigned char x, unsigned char y, int value)`
+at `$0869`.
 
 ## Expansion Areas
 

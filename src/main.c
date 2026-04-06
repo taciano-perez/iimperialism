@@ -201,7 +201,7 @@ void render_main_screen(void) {
     box(19, 3, 39, 9);
     print_inverted(20, 3, "Science Minister");
     draw_picture_at(SCIENCE_PORTRAIT, 20, 5);
-    print_rating_row(24, 5, 38, "Science:", get_science_rating_tier());
+    print_rating_row(24, 5, 38, "Research:", get_science_rating_tier());
 
     box(0, 11, 39, 17);
     print_inverted(1, 11, "Admiral");
@@ -215,8 +215,6 @@ void render_main_screen(void) {
     draw_picture_at(WISEMAN_PORTRAIT, 20, 13);
     print_rating_row(24, 13, 38, "Diplomacy:", get_diplomacy_rating_tier());
 
-    /* ADVISOR */
-    // draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
     print(0, 20, "Visit Ministry of Industry, Patent");
     print(0, 21, "Office, Admiralty, Foreign Office,");
     print(0, 22, "or End turn?");
@@ -333,7 +331,7 @@ int main(void) {
                 continue;
 
             case SCREEN_LEDGER:
-                render_ledger_screen();
+                run_overlay(OVL_INDUSTRY);
                 continue;
         }
     }
