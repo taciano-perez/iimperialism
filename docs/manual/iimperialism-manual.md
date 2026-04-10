@@ -35,7 +35,7 @@ During your turn, you may visit the different ministries and screens in any orde
 
 1. Your transport orders move raw materials from the provinces into your warehouse.
 2. Your production orders consume inputs and produce goods.
-3. Market prices are refreshed in foreign nations.
+3. Market prices are refreshed in foreign nations and are influenced by your current relations with them.
 4. Upkeep is deducted from your treasury.
 5. Relations with non-allied nations slowly decline.
 6. The turn number advances.
@@ -313,6 +313,8 @@ When a trade expedition arrives, the market screen shows:
 - Goods they will export to you
 - Your remaining fleet capacity for the turn
 
+Those market prices depend in part on relations: nations that like you offer better terms than nations that do not.
+
 Each expedition uses your merchant fleet's carrying capacity. That capacity is shared across all trading you do in the same turn.
 
 ## BUYING AND SELLING
@@ -402,7 +404,7 @@ A reliable opening plan is:
 2. Expand production of Lumber, Fabric, and Steel before pushing too hard into finished goods.
 3. Train workers when your factories or shipyards are constrained by labor.
 4. Build traders so you can move more cargo, and maintain warships so expeditions are possible.
-5. Trade actively with the same nations to improve relations.
+5. Trade actively with the same nations to improve relations and improve future market prices.
 6. Spend diplomatic missions on nations that have already reached `Great` status.
 
 General advice:

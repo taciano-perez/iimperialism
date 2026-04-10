@@ -36,6 +36,8 @@ The same nation-naming prompt is also reused by the game menu's `New Game` actio
 - `GameState.money` stores the treasury used for market purchases.
 - Foreign nations advertise buy/sell prices through `export_prices[]` and
   `import_prices[]`.
+- Those prices are regenerated from base commodity values with relation-based
+  adjustments, so better relations improve trade terms.
 - Trade expeditions are limited by both `remaining_turn_capacity` and cash on hand.
 - Buying spends money at the nation's export price; selling earns money at the
   nation's import price.

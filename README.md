@@ -5,7 +5,8 @@ and its Tiny Graphics Interface (TGI) for Hi-Res Graphics (HGR) mode.
 
 This project is inspired by Imperialism and Taipan!. It is a turn-based resource
 management game where players manage a supply chain from raw materials through
-production stages to finished goods while managing cash and foreign trade prices.
+production stages to finished goods while managing cash and foreign trade prices
+that shift with each nation's current relations.
 Science research unlocks higher trader capacity and warship firepower over time.
 
 ## Overview
@@ -52,6 +53,9 @@ in the diplomacy screen as text using these ranges:
 - `150-199`: Good
 - `200-254`: Great
 - `255`: Ally for great powers, Colony for minor nations
+
+Trade prices also scale with these relation tiers: stronger relations make a
+nation's exports cheaper to buy and its imports more profitable to sell into.
 
 ## File Structure
 
