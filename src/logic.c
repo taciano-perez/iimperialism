@@ -87,12 +87,15 @@ static void update_foreign_market_prices(void) {
             export_base = get_resource_base_price(state.foreign_nations[i].exports[j]);
             import_base = get_resource_base_price(state.foreign_nations[i].imports[j]);
 
-            export_percent = 85U + rand_range(0U, 15U);
-            if (export_percent > (relation_tier * 3U)) {
-                export_percent -= relation_tier * 3U;
+            export_percent = FOREIGN_EXPORT_PRICE_BASE_PERCENT
+                           + rand_range(0U, FOREIGN_EXPORT_PRICE_VARIANCE_PERCENT);
+            if (export_percent > (relation_tier * FOREIGN_EXPORT_PRICE_RELATION_STEP_PERCENT)) {
+                export_percent -= relation_tier * FOREIGN_EXPORT_PRICE_RELATION_STEP_PERCENT;
             }
 
-            import_percent = 110U + rand_range(0U, 20U) + (relation_tier * 4U);
+            import_percent = FOREIGN_IMPORT_PRICE_BASE_PERCENT
+                           + rand_range(0U, FOREIGN_IMPORT_PRICE_VARIANCE_PERCENT)
+                           + (relation_tier * FOREIGN_IMPORT_PRICE_RELATION_STEP_PERCENT);
 
             state.foreign_nations[i].export_prices[j] = apply_percent(export_base, export_percent);
             state.foreign_nations[i].import_prices[j] = apply_percent(import_base, import_percent);
