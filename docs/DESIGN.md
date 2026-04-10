@@ -11,6 +11,9 @@ The current playable loop focuses on:
 - naval expansion (traders and frigates)
 
 The player cycles through screen overlays to adjust orders, then advances the turn.
+The campaign ends through the Council of Nations: when the player commands enough
+votes, the game shows a Taipan-inspired final report with a large score, a boxed
+historical rank ladder, and a short judgment sentence.
 
 ## Startup Flow
 
@@ -59,6 +62,10 @@ The same nation-naming prompt is also reused by the game menu's `New Game` actio
 3. clamps production orders to available resources
 4. increments turn counter
 
+Every tenth turn, the Council of Nations meets. A player victory at the council
+branches into the final report screen instead of returning directly to the Main
+Screen.
+
 ## Screen Flow
 
 Resident main loop (`src/main.c`) dispatches by `state.current_screen`:
@@ -106,6 +113,92 @@ Sub-flows are also overlays:
 - `src/ovl_admiralty.c`: render admiralty and handle trader/warship builds
 - `src/ovl_game_menu.c`: handle `ESC` menu actions (new/load/save, return)
 - `src/ovl_diplomacy.c`: handle diplomacy input, trade expeditions, and alliance/colony offers
+
+## Council Victory And Final Report
+
+The Council of Nations is both the victory check and the endgame presentation.
+The player wins when their nation reaches `COUNCIL_VICTORY_VOTES`, currently
+`24`, out of `COUNCIL_TOTAL_PROVINCES`, currently `32`.
+
+Vote strength is province-based:
+
+- the player and the two other great powers count as `8` provinces each
+- the three minor nations count as `4` provinces each
+- the player always votes for themselves
+- allied great powers and colonial minor nations vote for the player
+- other great powers vote for themselves
+- unaligned minor nations abstain
+
+On victory, `src/ovl_council_nations.c` first shows the normal Council result
+briefly, then replaces it with `FINAL REPORT TO THE CROWN`. The report blends the
+game's imperial tone with the concise ranking-screen rhythm of Apple II `Taipan!`.
+
+The final report currently shows:
+
+- net treasury
+- sea power as `frigates * guns_per_frigate`
+- merchant fleet as trader count and total capacity
+- foreign relations as the number of friendly provinces that voted for the player
+- winning turn count
+- an inverted `Your score is ...` line
+- a boxed five-rank table with the achieved rank printed inverted
+- a two-line humorous judgment for the achieved rank
+
+The screen deliberately remains text-first. It does not introduce a new overlay
+or new bitmap asset.
+
+### Final Score
+
+The score is calculated in resident logic and presented by the Council overlay.
+All tuning values live as named constants in `include/game.h`, not as literals in
+the overlay.
+
+The score inputs are normalized to `0..100`:
+
+- diplomacy: friendly provinces divided by total council provinces
+- treasury: threshold bands from `SCORE_TREASURY_1` through `SCORE_TREASURY_5`
+- navy: firepower divided by `SCORE_NAVY_POWER_TARGET`
+- merchant marine: total carrying capacity divided by `SCORE_MERCHANT_POWER_TARGET`
+- science: current `science_level` divided by the highest science level
+
+Category weights:
+
+- diplomacy: `SCORE_WEIGHT_DIPLOMACY`
+- treasury: `SCORE_WEIGHT_TREASURY`
+- navy: `SCORE_WEIGHT_NAVY`
+- merchant marine: `SCORE_WEIGHT_MERCHANT`
+- science: `SCORE_WEIGHT_SCIENCE`
+
+The weighted score is divided by `100` and then multiplied by a speed factor.
+The speed factor is selected from `SCORE_SPEED_FACTOR_*` by comparing the current
+`turn_number` to `SCORE_SPEED_TURN_*`. The real campaign turn count starts at
+turn `1`, so no offset is applied.
+
+The target result is a large Taipan-style number, with exceptional wins reaching
+`50,000` or more while still fitting in an `unsigned int`.
+
+### Historical Rank Ladder
+
+The final score maps to a five-step rank ladder:
+
+| Score range | Rank |
+|-------------|------|
+| `50,000 and over` | Queen Victoria |
+| `35,000 to 49,999` | Otto von Bismarck |
+| `20,000 to 34,999` | Napoleon III |
+| `8,000 to 19,999` | Charles X |
+| `less than 8,000` | Ferdinand VII |
+
+The rank table displays rank first and score range second, matching the Taipan
+reference. The achieved rank is printed with inverted text.
+
+Each rank has a two-line judgment:
+
+- Queen Victoria: `You founded an Empire` / `where the sun never sets.`
+- Otto von Bismarck: `Diplomacy forged with` / `an iron will.`
+- Napoleon III: `You reigned confidently,` / `though not always wisely.`
+- Charles X: `Your court looked grander` / `than your results.`
+- Ferdinand VII: `Your creditors remember you` / `more vividly than your subjects.`
 
 ## Data Model
 
@@ -165,4 +258,4 @@ On some Windows environments, `make SHELL=cmd disk` is required.
 
 - expand diplomacy depth beyond the current trade-expedition entry flow
 - add more trade-voyage and battle variety
-- add endgame/retirement flow
+- add a post-victory play-again prompt

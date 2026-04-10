@@ -8,8 +8,8 @@ $0100-$01FF  6502 hardware stack
 $0200-$03FF  System / ProDOS vectors
 $0400-$07FF  Text screen page 1
 $0803-$080E  STARTUP            (cc65 crt0)
-$080F-$086B  JMPTAB             (resident jump table used by overlays)
-$086C-$1631  LOWCODE            (resident main-RAM helpers + core logic)
+$080F-$0871  JMPTAB             (resident jump table used by overlays)
+$0872-$1FFF  LOWCODE            (resident main-RAM helpers + core logic)
 $2000-$3FFF  HGR page 1         (graphics memory; no code here)
 $4000-...    CODE/RODATA/DATA   (main resident code + data)
 ...          BSS/ONCE/heap
@@ -62,6 +62,7 @@ Current overlay files:
 - `BSCR` battle screen
 - `SSCR` science screen
 - `MENU` game menu screen
+- `CNSL` Council of Nations and final victory report
 
 To inspect current resident segment usage plus overlay occupancy from build
 artifacts, run:
@@ -143,12 +144,14 @@ $084E  JMP _wait_three_seconds_or_keypress
 $0851  JMP _play_sound
 $0854  JMP _play_sound_alert
 $0857  JMP _cgetc_at
-$085A  JMP _next_turn
-$085D  JMP _run_overlay
-$0860  JMP _production_orders
-$0863  JMP _print_inverted
-$0866  JMP _get_diplomacy_string
-$0869  JMP _print_signed_int_right_aligned_currency
+$085A  JMP _run_overlay
+$085D  JMP _production_orders
+$0860  JMP _print_inverted
+$0863  JMP _get_diplomacy_string
+$0866  JMP _print_signed_int_right_aligned_currency
+$0869  JMP _build_final_score_line
+$086C  JMP _get_final_rank_index
+$086F  JMP _get_final_victory_string
 ```
 
 Rule: keep `asm/jmptab.s` and `config/apple2-ovl.cfg` in sync. Rebuild overlays
@@ -251,15 +254,36 @@ If the overlay needs a resident function not in JMPTAB, append a new JMP entry i
 `include/game.h`. Current examples include `clear_area(int x, int y, int width, int height)`
 at `$0839`, `print_bold(unsigned char x, unsigned char y, const char* text)` at `$084B`,
 `print_inverted(unsigned char x, unsigned char y, const char* text)` at `$0863`, and
-`get_diplomacy_string(unsigned char index)` at `$0866`, and
+`get_diplomacy_string(unsigned char index)` at `$0863`,
 `print_signed_int_right_aligned_currency(unsigned char x, unsigned char y, int value)`
-at `$0869`.
+at `$0866`, and the Council final-report helpers
+`build_final_score_line(char* buffer)`, `get_final_rank_index()`, and
+`get_final_victory_string(unsigned char index)` at `$0869`, `$086C`, and `$086F`.
+
+## Council Victory Screen Footprint
+
+The victory report intentionally stays inside the existing `CNSL` overlay. Adding
+a separate victory overlay would cost another fixed 2 KB overlay file on disk and
+is not compatible with the current floppy-space pressure.
+
+The implementation splits responsibilities to keep `cnsl.bin` under 2 KB:
+
+- rendering and screen orchestration remain in `src/ovl_council_nations.c`
+- score calculation, rank selection, and score-line formatting live in resident
+  `src/logic.c`
+- final-report strings live in resident `src/strings.c` and are exposed through
+  `get_final_victory_string()`
+- all score tuning constants live in `include/game.h`
+
+This is a deliberate size tradeoff. Moving score formatting into the overlay was
+larger than using the resident `build_final_score_line()` helper, so the helper is
+kept resident and exposed through `JMPTAB`.
 
 ## Expansion Areas
 
 | Area | Address | Capacity | Notes |
 |------|---------|----------|-------|
-| LOWCODE | `$0869-$1631` currently used | main RAM below HGR | Compact resident helpers, blitters, overlay loader, core logic |
+| LOWCODE | `$0872-$1FFF` currently used | main RAM below HGR | Compact resident helpers, blitters, overlay loader, core logic |
 | Language Card | `$D400-$DFFF` | 3KB | Separate RAM bank; currently hosts `src/ui.c` code (`$D400-$DD79` used) |
 
 Use `make memory-usage` to get the current used/free breakdown for resident

@@ -10,6 +10,16 @@ static void assign_foreign_nation_names(void);
 static unsigned char rand_resource_excluding(unsigned char min, unsigned char max, unsigned char exclude);
 static void assign_foreign_nation_trade_routes(void);
 static unsigned char strings_equal(const char* left, const char* right);
+static char* append_uint_decimal(char* buffer, unsigned int value);
+static unsigned int get_final_score(void);
+static unsigned char get_council_provinces(unsigned char nation_index);
+static unsigned char get_final_friendly_provinces(void);
+static unsigned char get_final_treasury_score(void);
+static unsigned char get_final_navy_score(void);
+static unsigned char get_final_merchant_score(void);
+static unsigned char get_final_science_score(void);
+static unsigned char get_final_diplomacy_score(void);
+static unsigned int get_speed_multiplier_factor(void);
 
 static unsigned char get_resource_base_price(unsigned char resource) {
     static const unsigned char base_prices[] = {
@@ -123,6 +133,160 @@ static unsigned char strings_equal(const char* left, const char* right) {
     }
 
     return FALSE;
+}
+
+static char* append_uint_decimal(char* buffer, unsigned int value) {
+    unsigned int divisor;
+
+    divisor = 1U;
+    while ((value / divisor) >= 10U) {
+        divisor *= 10UL;
+    }
+
+    do {
+        *buffer++ = (char)('0' + (unsigned char)(value / divisor));
+        value %= divisor;
+        divisor /= 10U;
+    } while (divisor != 0U);
+
+    return buffer;
+}
+
+static unsigned char get_council_provinces(unsigned char nation_index) {
+    if (nation_index < COUNCIL_GREAT_POWER_COUNT) {
+        return COUNCIL_MAJOR_POWER_PROVINCES;
+    }
+
+    return COUNCIL_MINOR_POWER_PROVINCES;
+}
+
+static unsigned char get_final_friendly_provinces(void) {
+    unsigned char nation_index;
+    unsigned char friendly_provinces;
+
+    friendly_provinces = get_council_provinces(0U);
+    for (nation_index = 0U; nation_index < FOREIGN_NATION_COUNT; ++nation_index) {
+        if (state.foreign_nations[nation_index].relations == RELATION_ALLY_COLONY) {
+            friendly_provinces = (unsigned char)(friendly_provinces + get_council_provinces((unsigned char)(nation_index + 1U)));
+        }
+    }
+
+    return friendly_provinces;
+}
+
+static unsigned char get_final_diplomacy_score(void) {
+    return (unsigned char)((get_final_friendly_provinces() * 100U) / COUNCIL_TOTAL_PROVINCES);
+}
+
+static unsigned char get_final_treasury_score(void) {
+    if (state.money >= SCORE_TREASURY_5) {
+        return 100U;
+    }
+    if (state.money >= SCORE_TREASURY_4) {
+        return 85U;
+    }
+    if (state.money >= SCORE_TREASURY_3) {
+        return 65U;
+    }
+    if (state.money >= SCORE_TREASURY_2) {
+        return 45U;
+    }
+    if (state.money >= SCORE_TREASURY_1) {
+        return 25U;
+    }
+
+    return 10U;
+}
+
+static unsigned char get_final_navy_score(void) {
+    unsigned int navy_power;
+
+    navy_power = state.frigates * state.guns_per_frigate;
+    if (navy_power >= SCORE_NAVY_POWER_TARGET) {
+        return 100U;
+    }
+
+    return (unsigned char)((navy_power * 100U) / SCORE_NAVY_POWER_TARGET);
+}
+
+static unsigned char get_final_merchant_score(void) {
+    unsigned int merchant_power;
+
+    merchant_power = state.traders * state.capacity_per_trader;
+    if (merchant_power >= SCORE_MERCHANT_POWER_TARGET) {
+        return 100U;
+    }
+
+    return (unsigned char)((merchant_power * 100U) / SCORE_MERCHANT_POWER_TARGET);
+}
+
+static unsigned char get_final_science_score(void) {
+    return (unsigned char)((state.science_level * 100U) / (SCIENCE_LEVEL_COUNT - 1U));
+}
+
+static unsigned int get_speed_multiplier_factor(void) {
+    if (state.turn_number <= SCORE_SPEED_TURN_1) {
+        return SCORE_SPEED_FACTOR_1;
+    }
+    if (state.turn_number <= SCORE_SPEED_TURN_2) {
+        return SCORE_SPEED_FACTOR_2;
+    }
+    if (state.turn_number <= SCORE_SPEED_TURN_3) {
+        return SCORE_SPEED_FACTOR_3;
+    }
+    if (state.turn_number <= SCORE_SPEED_TURN_4) {
+        return SCORE_SPEED_FACTOR_4;
+    }
+    if (state.turn_number <= SCORE_SPEED_TURN_5) {
+        return SCORE_SPEED_FACTOR_5;
+    }
+
+    return SCORE_SPEED_FACTOR_6;
+}
+
+static unsigned int get_final_score(void) {
+    unsigned int weighted_score;
+
+    weighted_score = (unsigned int)(get_final_diplomacy_score() * SCORE_WEIGHT_DIPLOMACY)
+                   + (unsigned int)(get_final_treasury_score() * SCORE_WEIGHT_TREASURY)
+                   + (unsigned int)(get_final_navy_score() * SCORE_WEIGHT_NAVY)
+                   + (unsigned int)(get_final_merchant_score() * SCORE_WEIGHT_MERCHANT)
+                   + (unsigned int)(get_final_science_score() * SCORE_WEIGHT_SCIENCE);
+    weighted_score /= 100U;
+    return weighted_score * get_speed_multiplier_factor();
+}
+
+void build_final_score_line(char* buffer) {
+    static const char prefix[] = "Your score is ";
+    const char* src;
+
+    src = prefix;
+    while (*src != '\0') {
+        *buffer++ = *src++;
+    }
+
+    buffer = append_uint_decimal(buffer, get_final_score());
+    *buffer = '\0';
+}
+
+unsigned char get_final_rank_index(void) {
+    unsigned int score;
+
+    score = get_final_score();
+    if (score >= SCORE_RANK_THRESHOLD_VICTORIA) {
+        return SCORE_RANK_VICTORIA;
+    }
+    if (score >= SCORE_RANK_THRESHOLD_BISMARCK) {
+        return SCORE_RANK_BISMARCK;
+    }
+    if (score >= SCORE_RANK_THRESHOLD_NAPOLEON) {
+        return SCORE_RANK_NAPOLEON;
+    }
+    if (score >= SCORE_RANK_THRESHOLD_CHARLES) {
+        return SCORE_RANK_CHARLES;
+    }
+
+    return SCORE_RANK_FERDINAND;
 }
 
 void copy_text_limited(char* dest, const char* src, unsigned char capacity) {
@@ -266,7 +430,7 @@ static void assign_foreign_nation_trade_routes(void) {
 
 void init_game() {
     static const unsigned char foreign_nation_relations[FOREIGN_NATION_COUNT] = {
-        RELATION_TERRIBLE, RELATION_TERRIBLE, RELATION_EXCELLENT, RELATION_EXCELLENT, RELATION_EXCELLENT
+        RELATION_ALLY_COLONY, RELATION_ALLY_COLONY, RELATION_ALLY_COLONY, RELATION_ALLY_COLONY, RELATION_ALLY_COLONY
     };
     unsigned char i;
 
@@ -329,7 +493,7 @@ void init_game() {
     state.trade_revenue = 0;
     state.turn_booty = 0;
 
-    state.turn_number = 99;
+    state.turn_number = 9;
     state.current_screen = SCREEN_MAIN;
     
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;

@@ -27,12 +27,14 @@
 ;  $0851  JMP _play_sound
 ;  $0854  JMP _play_sound_alert
 ;  $0857  JMP _cgetc_at
-;  $085A  JMP _next_turn
-;  $085D  JMP _run_overlay
-;  $0860  JMP _production_orders
-;  $0863  JMP _print_inverted
-;  $0866  JMP _get_diplomacy_string
-;  $0869  JMP _print_signed_int_right_aligned_currency
+;  $085A  JMP _run_overlay
+;  $085D  JMP _production_orders
+;  $0860  JMP _print_inverted
+;  $0863  JMP _get_diplomacy_string
+;  $0866  JMP _print_signed_int_right_aligned_currency
+;  $0869  JMP _build_final_score_line
+;  $086C  JMP _get_final_rank_index
+;  $086F  JMP _get_final_victory_string
 
     .import _clear_screen
     .import _clear_input_area
@@ -59,12 +61,14 @@
     .import _play_sound
     .import _play_sound_alert
     .import _cgetc_at
-    .import _next_turn
     .import _run_overlay
     .import _production_orders
     .import _print_inverted
     .import _get_diplomacy_string
     .import _print_signed_int_right_aligned_currency
+    .import _build_final_score_line
+    .import _get_final_rank_index
+    .import _get_final_victory_string
 
     .segment "JMPTAB"
 
@@ -93,9 +97,11 @@
     jmp _play_sound                     ; $0851
     jmp _play_sound_alert               ; $0854
     jmp _cgetc_at                       ; $0857
-    jmp _next_turn                      ; $085A
-    jmp _run_overlay                    ; $085D
-    jmp _production_orders              ; $0860
-    jmp _print_inverted                 ; $0863
-    jmp _get_diplomacy_string           ; $0866
-    jmp _print_signed_int_right_aligned_currency ; $0869
+    jmp _run_overlay                    ; $085A
+    jmp _production_orders              ; $085D
+    jmp _print_inverted                 ; $0860
+    jmp _get_diplomacy_string           ; $0863
+    jmp _print_signed_int_right_aligned_currency ; $0866
+    jmp _build_final_score_line         ; $0869
+    jmp _get_final_rank_index           ; $086C
+    jmp _get_final_victory_string       ; $086F

@@ -102,6 +102,63 @@
 #define UPKEEP_COST_PER_TRADER 5U
 #define UPKEEP_COST_PER_WARSHIP 5U
 
+/* ============================================================================
+ * Council of Nations constants
+ * ============================================================================
+ */
+#define COUNCIL_NATION_COUNT 6U
+#define COUNCIL_GREAT_POWER_COUNT 3U
+#define COUNCIL_MAJOR_POWER_PROVINCES 8U
+#define COUNCIL_MINOR_POWER_PROVINCES 4U
+#define COUNCIL_VICTORY_VOTES 24U
+#define COUNCIL_TOTAL_PROVINCES 32U
+
+/* ============================================================================
+ * Victory score constants
+ * ============================================================================
+ */
+#define SCORE_WEIGHT_DIPLOMACY 30U
+#define SCORE_WEIGHT_TREASURY 20U
+#define SCORE_WEIGHT_NAVY 20U
+#define SCORE_WEIGHT_MERCHANT 15U
+#define SCORE_WEIGHT_SCIENCE 15U
+
+#define SCORE_SCALE_FACTOR 400U
+
+#define SCORE_TREASURY_1 10000UL
+#define SCORE_TREASURY_2 25000UL
+#define SCORE_TREASURY_3 50000UL
+#define SCORE_TREASURY_4 75000UL
+#define SCORE_TREASURY_5 100000UL
+
+#define SCORE_NAVY_POWER_TARGET 96U
+#define SCORE_MERCHANT_POWER_TARGET 80U
+
+#define SCORE_SPEED_TURN_1 10U
+#define SCORE_SPEED_TURN_2 20U
+#define SCORE_SPEED_TURN_3 30U
+#define SCORE_SPEED_TURN_4 40U
+#define SCORE_SPEED_TURN_5 50U
+
+#define SCORE_SPEED_FACTOR_1 640U
+#define SCORE_SPEED_FACTOR_2 560U
+#define SCORE_SPEED_FACTOR_3 480U
+#define SCORE_SPEED_FACTOR_4 400U
+#define SCORE_SPEED_FACTOR_5 360U
+#define SCORE_SPEED_FACTOR_6 320U
+
+#define SCORE_RANK_VICTORIA 0U
+#define SCORE_RANK_BISMARCK 1U
+#define SCORE_RANK_NAPOLEON 2U
+#define SCORE_RANK_CHARLES 3U
+#define SCORE_RANK_FERDINAND 4U
+#define SCORE_RANK_COUNT 5U
+
+#define SCORE_RANK_THRESHOLD_VICTORIA 50000U
+#define SCORE_RANK_THRESHOLD_BISMARCK 35000U
+#define SCORE_RANK_THRESHOLD_NAPOLEON 20000U
+#define SCORE_RANK_THRESHOLD_CHARLES 8000U
+
 typedef struct {
     char name[FOREIGN_NATION_NAME_LENGTH + 1];
     unsigned char relations;
@@ -180,6 +237,9 @@ unsigned char get_relation_tier(unsigned char relations);
 void seed_random(unsigned int seed);
 unsigned char rand_range(unsigned char min, unsigned char max);
 void production_orders(void);
+void build_final_score_line(char* buffer);
+unsigned char get_final_rank_index(void);
+const char* get_final_victory_string(unsigned char index);
 
 // ui.c
 void ui_init();

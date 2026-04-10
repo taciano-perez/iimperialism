@@ -2,11 +2,11 @@
 
 #define TRADE_MODE_BUY  0
 #define TRADE_MODE_SELL 1
-#define TSTR_BUY_SELL_QUIT 21
-#define TSTR_COMMODITY_BUY 22
-#define TSTR_COMMODITY_SELL 23
-#define TSTR_HOW_MANY 24
-#define TSTR(id) get_diplomacy_string(id)
+
+static const char STR_BUY_SELL_QUIT[] = "Buy, Sell or Quit?";
+static const char STR_COMMODITY_BUY[] = "Commodity to buy?";
+static const char STR_COMMODITY_SELL[] = "Commodity to sell?";
+static const char STR_HOW_MANY[] = "How many units (Max:    )?";
 
 static void trade_commodities(unsigned char nation_index, unsigned char mode);
 
@@ -25,7 +25,7 @@ void handle_screen_trade_expedition(void) {
         print_int_right_aligned(29, 15, state.remaining_turn_capacity);
 
         clear_input_area();
-        print(5, 20, TSTR(TSTR_BUY_SELL_QUIT));
+        print(5, 20, STR_BUY_SELL_QUIT);
         key = (unsigned char)(cgetc_at(23, 20) & 0xDF);
         if (key == 'B') {
             trade_commodities(nation_index, TRADE_MODE_BUY);
@@ -65,7 +65,7 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
 
     while (1) {
         clear_input_area();
-        print(5, 20, TSTR(TSTR_COMMODITY_BUY + mode));
+        print(5, 20, mode == TRADE_MODE_BUY ? STR_COMMODITY_BUY : STR_COMMODITY_SELL);
 
         for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {
             print_int((i * 12) + 5, 21, i + menu_base);
@@ -88,7 +88,7 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
 
                 while (1) {
                     clear_area(28, 22, 3, 1);
-                    print(5, 22, TSTR(TSTR_HOW_MANY));
+                    print(5, 22, STR_HOW_MANY);
                     print_int_right_aligned(28, 22, max_quantity);
                     quantity = scan_uint(31, 22, 3);
                     if (quantity <= max_quantity) {

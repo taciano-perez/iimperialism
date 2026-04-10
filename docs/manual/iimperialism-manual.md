@@ -396,6 +396,8 @@ To win the game, your nation must reach:
 
 Your own nation always votes for itself. Allied Great Powers and colonial minor nations will also vote for you. If you have not yet secured enough support, the game continues after the council session.
 
+If you do secure enough support, the Council first confirms the victory and then shows the final report to the crown.
+
 ## STRATEGY GUIDE
 
 A reliable opening plan is:
@@ -420,6 +422,23 @@ General advice:
 IImperialism! is won in diplomacy, backed by industry and trade.
 
 Build a strong economy, keep the sea lanes open, turn commerce into influence, and enter the Council of Nations with enough allies and colonies to command 24 votes.
+
+After victory, the game presents a final score and historical rating. The score rewards a balanced empire:
+
+- foreign relations, measured as friendly provinces that voted for your nation
+- treasury
+- naval firepower
+- merchant-fleet carrying capacity
+- scientific progress
+- speed of victory
+
+The final report shows `Your score is ...` in inverted text, then compares your campaign to a rank ladder of nineteenth-century European heads of state:
+
+- Queen Victoria: `50,000 and over`
+- Otto von Bismarck: `35,000 to 49,999`
+- Napoleon III: `20,000 to 34,999`
+- Charles X: `8,000 to 19,999`
+- Ferdinand VII: `less than 8,000`
 
 ## INSPIRATION AND AUTHORSHIP
 

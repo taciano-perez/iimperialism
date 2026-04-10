@@ -5,7 +5,7 @@ artifacts separated.
 
 ## Directories
 
-- `src/` - C sources for the resident game code and overlays.
+- `src/` - C sources for the resident game code, final-score helpers, and overlays.
 - `include/` - project headers.
 - `asm/` - 6502 assembly sources.
 - `asm/loader/` - vendored cc65 loader sources used to build `IIMP.SYSTEM`.
@@ -28,8 +28,8 @@ The `Makefile` writes outputs to `build/`:
 The linker map is the authoritative source for segment placement. In the current
 build it shows:
 
-- `JMPTAB` in main RAM at `$080F-$086B`
-- `LOWCODE` in main RAM at `$086C-$1631`
+- `JMPTAB` in main RAM at `$080F-$0871`
+- `LOWCODE` in main RAM at `$0872-$1FFF`
 - `LC` in Language Card RAM at `$D400-$DD79`, currently including `src/ui.c`
 
 Current overlay binaries include `iscr.bin`, `pscr.bin`, `tscr.bin`, `ascr.bin`,
@@ -38,5 +38,9 @@ Current overlay binaries include `iscr.bin`, `pscr.bin`, `tscr.bin`, `ascr.bin`,
 
 The menu overlay now owns its save/load flow internally, including its ProDOS
 MLI helper and fixed overlay entry stub.
+
+The Council overlay (`cnsl.bin`) owns both the Council of Nations vote table and
+the final victory report. Resident code in `src/logic.c` owns the score
+calculation and rank selection so the overlay can stay within its 2 KB slot.
 
 Use `make disk` to update `assets/iimperialism.dsk` with current binaries.

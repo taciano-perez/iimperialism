@@ -24,6 +24,7 @@ Current catalog (from `ac -l`) includes:
 - `BSCR` (`BIN`, `A=$8800`) - battle overlay.
 - `SSCR` (`BIN`, `A=$8800`) - science overlay.
 - `MENU` (`BIN`, `A=$8800`) - game menu overlay.
+- `CNSL` (`BIN`, `A=$8800`) - Council of Nations and final victory report overlay.
 
 Not present on the game disk:
 
@@ -64,6 +65,9 @@ while still loading the long game binary name.
 - Builds loader system file as `build/loader.system`.
 - Removes legacy boot files (`STARTUP`, `BASIC.SYSTEM`) from disk image.
 - Writes `IIMP.SYSTEM` (`SYS`) and all current game binaries.
+
+The final victory report uses the existing `CNSL` overlay and resident helper
+functions. It does not add a separate overlay file or any new picture asset.
 
 Primary command:
 

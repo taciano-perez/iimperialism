@@ -6,7 +6,7 @@ This file is the current disk-space analysis for the Apple II floppy build.
 The goal is to reclaim real ProDOS blocks without changing game behavior or
 shortening user-visible text.
 
-This refresh is based on the current build as of `2026-04-06`, using:
+This refresh is based on the current build as of `2026-04-11`, using:
 
 - `make memory-usage`
 - `java -jar tools/ac.jar -l assets/iimperialism.dsk`
@@ -14,8 +14,7 @@ This refresh is based on the current build as of `2026-04-06`, using:
 - current sources in `src/`, `asm/`, and `docs/`
 
 This supersedes the earlier overlay-merge notes and the older
-`0 bytes free -> 1024 bytes free` snapshot. The latest implemented change has
-recovered a small amount of free space, but the disk is still tight enough that
+`0 bytes free -> 1024 bytes free` snapshot. The disk is still tight enough that
 overlay-file count and resident block count both matter.
 
 ## Current State
@@ -36,8 +35,8 @@ Current resident / overlay occupancy from `make memory-usage`:
 
 | Area | Used | Free |
 |------|-----:|-----:|
-| `LOWCODE` | 5074 | 962 |
-| `RESIDENT_MAIN_SAFE` | 15641 | 2791 |
+| `LOWCODE` | 6008 | 22 |
+| `RESIDENT_MAIN_SAFE` | 16205 | 2227 |
 | `LANGUAGE_CARD` | 2593 | 479 |
 
 ### Overlays
@@ -46,7 +45,7 @@ Current resident / overlay occupancy from `make memory-usage`:
 |--------|-----------:|-----------:|
 | `ascr.bin` | 1659 | 389 |
 | `bscr.bin` | 1992 | 56 |
-| `cnsl.bin` | 1164 | 884 |
+| `cnsl.bin` | 1765 | 283 |
 | `dscr.bin` | 1978 | 70 |
 | `iscr.bin` | 1804 | 244 |
 | `menu.bin` | 917 | 1131 |
@@ -54,7 +53,7 @@ Current resident / overlay occupancy from `make memory-usage`:
 | `sscr.bin` | 1521 | 527 |
 | `texp.bin` | 832 | 1216 |
 | `tscr.bin` | 1938 | 110 |
-| `txac.bin` | 1919 | 129 |
+| `txac.bin` | 2003 | 45 |
 
 Important consequences:
 
@@ -65,8 +64,11 @@ Important consequences:
 - compared with the earlier `1024 bytes free` snapshot, the current build still
   carries the newer `CNSL` overlay file and a larger resident binary than the
   earlier low-water mark
-- the most recent implemented change reclaimed one resident ProDOS block and
-  brought free space back to `512 bytes`
+- the Council victory report has been implemented inside the existing `CNSL`
+  overlay
+- the victory report did not add a new overlay file or picture asset
+- it did consume Council-overlay headroom and added a small resident
+  helper/string surface
 
 ## Fresh Conclusions
 
@@ -100,8 +102,6 @@ Current viable pairings by raw overlay occupancy:
 |-----------|--------------------:|---------:|
 | `MENU + TEXP` | 1749 | 299 |
 | `ISCR + MENU` | 2721 | over |
-| `CNSL + TEXP` | 1996 | 52 |
-| `CNSL + ISCR` | 2968 | over |
 
 Now that ledger lives in `ISCR`, any pairing that depends on the older small
 industry overlay is no longer realistic.
@@ -133,17 +133,17 @@ Current ranking:
 
 ### 2. Pairings involving `CNSL`
 
-Technically:
-
-- `CNSL + TEXP` fits by `52` bytes
-
-I do not recommend either as the first move.
+`CNSL` is no longer a good merge candidate.
 
 Reason:
 
-- the headroom is too small for comfort
-- minor code growth, stub growth, or linker layout shifts could break the fit
-- they are fine only if you are prepared to do a shrink pass first
+- it now owns both the Council vote table and the final victory report
+- the victory report deliberately uses resident strings and helpers to stay under
+  the 2 KB overlay limit
+- future endgame polish is likely to need the remaining `CNSL` headroom
+
+Do not plan on merging another screen into `CNSL` unless the victory report is
+substantially rewritten or more space is reclaimed first.
 
 ## Resident Strategy
 
@@ -260,11 +260,13 @@ But today it is behind:
 
 ### Revisit resident-only strings
 
-Still worth asking:
+This has already produced useful savings and is still worth asking:
 
 - are any resident strings only serving one overlay that already has room
 
-But this is now a secondary tuning pass, not the primary strategy.
+But this is now a secondary tuning pass, not the primary strategy. One current
+exception is the victory report: its strings intentionally remain resident because
+`CNSL` is the constrained side of the tradeoff.
 
 ### Bold font derivation / picture compression
 

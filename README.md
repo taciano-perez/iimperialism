@@ -21,6 +21,8 @@ within the Apple II's constraints:
 - The transport screen is fully overlay-local.
 - The production screen still calls resident `production_orders()` through the jump
   table to preserve overlay space.
+- The Council of Nations overlay owns the endgame flow, including the final
+  report, score display, and historical rank table.
 - Overlay binaries are loaded at runtime with direct ProDOS MLI `OPEN` / `READ` /
   `CLOSE` calls instead of `stdio`.
 - Save/load also use direct ProDOS MLI calls instead of `fopen()` / `fread()` /
@@ -33,8 +35,8 @@ within the Apple II's constraints:
 - Pressing `ESC` opens the `MENU` overlay for new/load/save actions.
 - Choosing `New Game` from the menu also re-prompts for the nation name.
 - The resident helper split is now:
-  - `JMPTAB` at `$080F-$086B` for overlay-callable entry points
-  - `LOWCODE` at `$086C-$1631` for compact main-RAM helpers such as the HGR text blitters
+  - `JMPTAB` at `$080F-$0871` for overlay-callable entry points
+  - `LOWCODE` at `$0872-$1FFF` for compact main-RAM helpers such as the HGR text blitters
   - `LC` at `$D400-$DD79` for `src/ui.c` UI code placed in the Language Card
 - Disk autoboot uses ProDOS `SYS` loader `IIMP.SYSTEM` to launch `IIMPERIALISM`
   directly (no `BASIC.SYSTEM` dependency).
@@ -65,7 +67,7 @@ nation's exports cheaper to buy and its imports more profitable to sell into.
 | `src/production.c` | Resident `production_orders()` helper used by `pscr.bin` |
 | `src/ui.c` | UI primitives (`print`, `print_inverted`, `box`, `clear_screen`, `scan_uint`, `scan_text`, etc.); code is linked into the Language Card (`LC`) |
 | `src/ui_buffers.c` | Shared scratch UI buffer storage |
-| `src/logic.c` | `init_game()`, `next_turn()` |
+| `src/logic.c` | `init_game()`, `next_turn()`, final score calculation, and rank selection |
 | `src/gamestate.c` | Shared `GameState` declarations |
 | `src/overlay.c` | `init_overlays()`, `run_overlay()` |
 | `src/ovl_industry.c` | Industry screen overlay and ledger sub-screen (`iscr.bin`) |
@@ -77,6 +79,7 @@ nation's exports cheaper to buy and its imports more profitable to sell into.
 | `src/ovl_trade_expedition_action.c` | Diplomacy trade expedition action overlay (`txac.bin`) |
 | `src/ovl_science.c` | Science screen overlay (`sscr.bin`) |
 | `src/ovl_game_menu.c` | Game menu overlay and save/load flow (`menu.bin`) |
+| `src/ovl_council_nations.c` | Council of Nations overlay and Taipan-inspired final report (`cnsl.bin`) |
 | `asm/prodos_overlay_load.s` | Resident ProDOS MLI overlay loader (`OPEN` / `READ` / `CLOSE`) |
 | `asm/prodos_gamestate_io.s` | Menu-overlay ProDOS MLI save/load helper for `GAME.DATA` |
 | `asm/ovl_industry_entry.s` | Fixed entry stub for industry overlay |
@@ -106,7 +109,7 @@ nation's exports cheaper to buy and its imports more profitable to sell into.
 
 Documentation: `docs/FLOPPY.md`, `docs/MEMORY.md`, `docs/DESIGN.md`,
 `docs/FONT.md`, `docs/PICTURES.md`, `docs/STRUCTURE.md`,
-`docs/OPTIMIZE_CODE.md`
+`docs/OPTIMIZE_CODE.md`, `docs/OPTIMIZE_REFACTOR.md`
 
 ## Prerequisites
 
@@ -194,6 +197,8 @@ Overlay note:
   current resident layout
 - `dscr.bin` now pulls most diplomacy UI text from resident code through
   `get_diplomacy_string()` in `JMPTAB`, which keeps overlay `RODATA` below 2 KB
+- `cnsl.bin` pulls final-report strings and score helpers from resident code
+  through `JMPTAB`, keeping the Council overlay below the 2 KB limit
 - resident UI text now uses direct HGR byte writes from `asm/text_hgr.s`
 - `src/ui.c` itself is linked into the Language Card, while the blitters remain in
   main-RAM `LOWCODE`
@@ -243,12 +248,12 @@ overlays are relinked.
 ## TODO
 
 Core Features
+- Post-victory flow: nation name, add a play-again prompt after the final report
 - Expand the science tree with wagon capacity improvements
 - Scientific discoveries to improve max production per province
 - Admiralty improvement: increase cost of traders and warships according to science level
-- Improve victory screen
-- Balance game for all stages (beginning, mid, and end)
 - Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
+- Balance game for all stages (beginning, mid, and end)
 
 Performance/Maintanability Improvements
 - Merge overlays to reclaim floppy space
