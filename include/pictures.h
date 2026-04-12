@@ -318,10 +318,14 @@ static const unsigned int HGR_ROWS[] = {
  * Parameters:
  *   picture_index - Index into PICTURES_DATA array (use defined constants)
  *   x_byte - Horizontal position in bytes (0-39)
+ *   x_offset - Additional horizontal pixel offset
  *   y - Vertical position in pixels (0-191)
  */
-void draw_picture(const unsigned char picture_index, const unsigned char x_byte, unsigned char y) {
+void draw_picture(const unsigned char picture_index, const unsigned char x_byte, const unsigned char x_offset, unsigned char y) {
     unsigned char i;
+    unsigned char j;
+    const unsigned char byte_offset = x_offset / 7U;
+    const unsigned char bit_offset = x_offset % 7U;
 
     // Get pointer to the selected picture data
     const unsigned char *picture_data = PICTURES_DATA[picture_index];
@@ -335,10 +339,33 @@ void draw_picture(const unsigned char picture_index, const unsigned char x_byte,
 
     for (i = 0; i < height; ++i) {
         // Calculate screen address for this row
-        unsigned int screen_addr = HGR_ROWS[y + i] + x_byte;
+        unsigned int screen_addr = HGR_ROWS[y + i] + x_byte + byte_offset;
 
-        // Copy width bytes for this row
-        memcpy((void*)screen_addr, data_ptr, width);
+        if (bit_offset == 0U) {
+            // Copy width bytes for this row
+            memcpy((void*)screen_addr, data_ptr, width);
+        } else {
+            unsigned char carry = 0U;
+            const unsigned char carry_shift = 7U - bit_offset;
+            const unsigned char first_mask = (1U << bit_offset) - 1U;
+            const unsigned char last_mask = 0x7FU ^ first_mask;
+            unsigned char *screen_ptr = (unsigned char*)screen_addr;
+
+            for (j = 0; j < width; ++j) {
+                const unsigned char source_byte = data_ptr[j];
+                const unsigned char pixels = source_byte & 0x7FU;
+                unsigned char shifted = ((pixels << bit_offset) & 0x7FU) | carry;
+
+                if (j == 0U) {
+                    shifted = (screen_ptr[j] & first_mask) | shifted;
+                }
+
+                screen_ptr[j] = ((j == 0U) ? (screen_ptr[j] & 0x80U) : (source_byte & 0x80U)) | shifted;
+                carry = pixels >> carry_shift;
+            }
+
+            screen_ptr[width] = (screen_ptr[width] & (0x80U | last_mask)) | carry;
+        }
 
         // Advance to next row
         data_ptr += width;

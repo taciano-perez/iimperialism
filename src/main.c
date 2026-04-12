@@ -8,6 +8,7 @@
 #define BOX1_Y1 2
 #define BOX1_X2 39
 #define BOX1_Y2 7
+#define CHAR_HEIGHT 8
 
 // Global state instance
 GameState state;
@@ -195,20 +196,20 @@ void render_main_screen(void) {
 
     box(0, 3, 39, 9);
     print_inverted(1, 3, "Industry Minister");
-    draw_picture_at(INDUSTRY_PORTRAIT, 2, 5);
-    print_rating_row(6, 5, 18, "Economy:", get_industry_rating_tier());
+    draw_picture_offset_at(INDUSTRY_PORTRAIT, 0, 4U, 5);
+    print_rating_row(5, 6, 17, "Economy:", get_industry_rating_tier());
 
     box(19, 3, 39, 9);
     print_inverted(20, 3, "Science Minister");
-    draw_picture_at(SCIENCE_PORTRAIT, 20, 5);
-    print_rating_row(24, 5, 38, "Research:", get_science_rating_tier());
+    draw_picture_at(WISEMAN_PORTRAIT, 20, 5);
+    print_rating_row(24, 6, 38, "Research:", get_science_rating_tier());
 
     box(0, 11, 39, 17);
     print_inverted(1, 11, "Admiral");
-    draw_picture_at(ADMIRAL_PORTRAIT, 2, 13);
-    print(6, 13, "Merchant");
-    print_rating_row(6, 14, 18, "Marine:", get_merchant_marine_rating_tier());
-    print_rating_row(6, 16, 18, "Navy:", get_navy_rating_tier());
+    draw_picture_offset_at(ADMIRAL_PORTRAIT, 0, 4U, 13);
+    print(5, 13, "Merchant");
+    print_rating_row(5, 14, 17, "Marine:", get_merchant_marine_rating_tier());
+    print_rating_row(5, 16, 17, "Navy:", get_navy_rating_tier());
 
     box(19, 11, 39, 17);
     print_inverted(20, 11, "Chancellor");

@@ -185,7 +185,11 @@ void print_int(unsigned char x, unsigned char y, unsigned int value) {
 }
 
 void draw_picture_at(const unsigned char picture_index, const unsigned char x_byte, unsigned char y) {
-    draw_picture(picture_index, x_byte, y*CHAR_HEIGHT);
+    draw_picture(picture_index, x_byte, 0U, y*CHAR_HEIGHT);
+}
+
+void draw_picture_offset_at(const unsigned char picture_index, const unsigned char x_byte, const unsigned x_offset, unsigned char y) {
+    draw_picture(picture_index, x_byte, x_offset, y*CHAR_HEIGHT);
 }
 
 void box(unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2) {
