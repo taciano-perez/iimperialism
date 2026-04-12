@@ -4,6 +4,7 @@
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MAX_UINT 65535U
+#define MAX_ULONG 4294967295UL
 #define TRUE 1U
 #define FALSE 0U
 

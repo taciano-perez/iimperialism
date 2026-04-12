@@ -98,6 +98,7 @@ static const char* get_rank_quote_line(unsigned char rank_index, unsigned char l
 static void render_final_report(unsigned char player_nation_votes) {
     unsigned char rank_index;
     unsigned char row;
+    unsigned char key;
     unsigned int firepower;
     unsigned int merchant_capacity;
     char score_line[20];
@@ -134,13 +135,13 @@ static void render_final_report(unsigned char player_nation_votes) {
     build_final_score_line(score_line);
     print_inverted((unsigned char)((40U - strlen(score_line)) / 2U), 9, score_line);
 
-    box(0, 12, 39, 19);
+    box(0, 11, 39, 19);
 
     rank_index = get_final_rank_index();
     for (row = 0U; row < SCORE_RANK_COUNT; ++row) {
         unsigned char y;
 
-        y = (unsigned char)(13U + row);
+        y = (unsigned char)(12U + row);
         if (row == rank_index) {
             print_inverted(2, y, get_final_victory_string((unsigned char)(FRSTR_RANK_NAME_BASE + row)));
         } else {
@@ -152,13 +153,19 @@ static void render_final_report(unsigned char player_nation_votes) {
     for (row = 0U; row < 3U; ++row) {
         text = get_rank_quote_line(rank_index, row);
         if (text[0] != '\0') {
-            print((unsigned char)((40U - strlen(text)) / 2U), (unsigned char)(21U + row), text);
+            print((unsigned char)((40U - strlen(text)) / 2U), (unsigned char)(20U + row), text);
         }
     }
 
-    play_sound_alert();
-    cgetc();
-    start_new_game();
+    print(0, 23, "Play again?");
+    while (1) {
+        key = cgetc_at(11, 23);
+        if (key == 'Y' || key == 'y') {
+            start_new_game();
+            return;
+        }
+    }
+    
 }
 
 void render_council_nations_screen(void) {
@@ -198,13 +205,13 @@ void render_council_nations_screen(void) {
 
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
     play_sound_alert();
+    state.current_screen = SCREEN_MAIN;
     if (victory_achieved) {
         print(5, 20, get_final_victory_string(FVSTR_COUNCIL_WIN));
         wait_three_seconds_or_keypress();
         render_final_report(player_nation_votes);
     } else {
         print(5, 20, get_final_victory_string(FVSTR_COUNCIL_ADVICE));
-        state.current_screen = SCREEN_MAIN;
         wait_three_seconds_or_keypress();
     }
 }

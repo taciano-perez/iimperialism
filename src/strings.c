@@ -54,8 +54,8 @@ static const char* const STR_FINAL_VICTORY[] = {
     " less than 8,000",
     "You founded an Empire",
     "where the sun never sets.",
-    "Diplomacy forged with",
-    "an iron will.",
+    "Your skill forged an Empire",
+    "never to be forgotten.",
     "You reigned confidently,",
     "though not always wisely.",
     "Your court looked grander",
@@ -71,7 +71,7 @@ static const char* const STR_FINAL_VICTORY[] = {
     ":",
     "Victory Condition:",
     "24 votes",
-    "You have won the game!",
+    "You are victorious!",
     "Keep trading to improve relations."
 };
 

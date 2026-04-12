@@ -248,7 +248,8 @@ overlays are relinked.
 ## TODO
 
 Core Features
-- Post-victory flow: nation name, add a play-again prompt after the final report
+- Post-victory flow: nation name
+- Avoid money saturation
 - Expand the science tree with wagon capacity improvements
 - Scientific discoveries to improve max production per province
 - Admiralty improvement: increase cost of traders and warships according to science level
@@ -257,6 +258,7 @@ Core Features
 
 Performance/Maintanability Improvements
 - Merge overlays to reclaim floppy space
+- If needed, simplify rank score considering only # provinces and # turns
 - Refactor logic.c to avoid multiple loops over foreign nations
 - Move overlay-specific strings to overlays to shrink resident code (and hence reclaim floppy space)
 - Reduce HGR table and drawing contracts

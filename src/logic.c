@@ -430,7 +430,7 @@ static void assign_foreign_nation_trade_routes(void) {
 
 void init_game() {
     static const unsigned char foreign_nation_relations[FOREIGN_NATION_COUNT] = {
-        RELATION_ALLY_COLONY, RELATION_ALLY_COLONY, RELATION_ALLY_COLONY, RELATION_ALLY_COLONY, RELATION_ALLY_COLONY
+        RELATION_ALLY_COLONY, RELATION_TERRIBLE, RELATION_ALLY_COLONY, RELATION_ALLY_COLONY, RELATION_TERRIBLE
     };
     unsigned char i;
 
@@ -472,12 +472,12 @@ void init_game() {
 
     state.available_workers = 6;
 
-    state.traders = 8;
-    state.frigates = 24;
+    state.traders = 0;
+    state.frigates = 0;
     state.capacity_per_trader = CAPACITY_PER_TRADER_BASE;
     state.guns_per_frigate = GUNS_PER_FRIGATE_BASE;
-    state.money = 30000U;
-    state.science_level = 0;
+    state.money = 0UL;
+    state.science_level = 0U;
 
     assign_foreign_nation_names();
     assign_foreign_nation_trade_routes();
@@ -493,7 +493,7 @@ void init_game() {
     state.trade_revenue = 0;
     state.turn_booty = 0;
 
-    state.turn_number = 9;
+    state.turn_number = 999;
     state.current_screen = SCREEN_MAIN;
     
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;
@@ -502,9 +502,9 @@ void init_game() {
 void next_turn() {
     unsigned char produced;
     unsigned char i;
-    int labor_upkeep = (int)state.available_workers * UPKEEP_COST_PER_WORKER * -1;
-    int merchant_upkeep = (int)state.traders * UPKEEP_COST_PER_TRADER * -1;
-    int navy_upkeep = ((int)state.frigates * UPKEEP_COST_PER_WARSHIP) * -1;
+    unsigned int upkeep = ((unsigned int)state.available_workers * UPKEEP_COST_PER_WORKER)
+                        + ((unsigned int)state.traders * UPKEEP_COST_PER_TRADER)
+                        + ((unsigned int)state.frigates * UPKEEP_COST_PER_WARSHIP);
 
     // Update resources based on transport orders
     add_resource_saturating(RESOURCE_TIMBER, state.transport_timber);
@@ -556,7 +556,11 @@ void next_turn() {
     update_foreign_market_prices();
 
     // profit & loss
-    state.money = MAX((unsigned int)((int)state.money + (int) labor_upkeep + (int)merchant_upkeep + (int)navy_upkeep), 0);
+    if (state.money > upkeep) {
+        state.money -= upkeep;
+    } else {
+        state.money = 0UL;
+    }
 
     state.trade_expenses = 0;
     state.trade_revenue = 0;
