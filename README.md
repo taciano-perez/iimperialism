@@ -260,6 +260,7 @@ Performance/Maintanability Improvements
 - Merge overlays to reclaim floppy space
 - If needed, simplify rank score considering only # provinces and # turns
 - Move overlay-specific strings to overlays to shrink resident code (and hence reclaim floppy space)
+    - Move some council-screen strings into ovl_council_nations.c as direct local constants
 - Reduce HGR table and drawing contracts
 - Rename relations constants
 - Rename wiseman portrait

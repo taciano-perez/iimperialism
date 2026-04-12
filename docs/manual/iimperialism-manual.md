@@ -19,7 +19,7 @@ Your empire runs on four connected systems:
 - Transport brings raw materials from your provinces into the warehouse each turn.
 - Production converts those materials into processed and finished goods.
 - Trade expeditions buy and sell goods abroad for profit and improve foreign relations.
-- Science improves the efficiency of your fleet and navy.
+- Science improves the efficiency of your provinces, fleet, and navy.
 
 The basic economic chain is:
 
@@ -227,19 +227,22 @@ Only the next technology in sequence may be researched. The cost is:
 
 The current research ladder is:
 
-1. Railways: 2x wagon capacity
-2. Carronade: 2x guns per warship
-3. Clipper ships: 2x trader capacity
-4. Telegraph: 4x wagon capacity
-5. Shell guns: 4x guns per warship
-6. Steel hulls: 4x trader capacity
+1. Forestry: 2x Timber output
+2. Sheep Breeding: 2x Wool output
+3. Carronade: 2x guns per warship
+4. Shaft Mining: 2x Iron output
+5. Clipper Ships: 2x trader capacity
+6. Coal Pumps: 2x Coal output
+7. Shell Guns: 4x guns per warship
+8. Steel Hulls: 4x trader capacity
 
-In the current build, the direct gameplay upgrades are the naval and merchant-fleet patents:
+The direct gameplay upgrades are:
 
+- Forestry, Sheep Breeding, Shaft Mining, and Coal Pumps increase raw-material output from provinces
 - Carronade and Shell guns increase guns per warship
-- Clipper ships and Steel hulls increase trader capacity
+- Clipper Ships and Steel Hulls increase trader capacity
 
-Research is expensive, but these upgrades can greatly improve your trade capacity and naval combat power.
+Research is expensive, but these upgrades can greatly improve your industry, trade capacity, and naval combat power.
 
 ## THE FOREIGN OFFICE
 
@@ -414,7 +417,7 @@ General advice:
 - Do not ignore upkeep. A large fleet and workforce can bankrupt you.
 - Tools and Guns are advanced goods, but you must first sustain Steel production.
 - Trade capacity is precious. Buy and sell only what gives useful profits or supports your production chain.
-- Research that improves trader capacity and naval guns has a large long-term payoff.
+- Research that improves raw-material output, trader capacity, and naval guns has a large long-term payoff.
 - A colony or alliance is often worth more than a short-term trade gain because it helps secure Council votes.
 
 ## VICTORY
