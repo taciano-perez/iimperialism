@@ -96,11 +96,6 @@ all: $(BUILD_DIR) iimperialism overlays $(BUILD_DIR)/loader.system
 
 # Update disk image with latest binaries (run after 'make all')
 disk: iimperialism overlays $(BUILD_DIR)/loader.system
-	-$(AC) -d $(DISK) STARTUP
-	-$(AC) -d $(DISK) BASIC.SYSTEM
-	-$(AC) -d $(DISK) IIMPERIALISM.SYSTEM
-	-$(AC) -d $(DISK) IIMPERIALISM.SY
-	-$(AC) -d $(DISK) TEXP
 	-$(AC) -d $(DISK) $(LOADER_SYSTEM)
 	$(AC) -p $(DISK) $(LOADER_SYSTEM) SYS < $(BUILD_DIR)/loader.system
 	-$(AC) -d $(DISK) IIMPERIALISM
