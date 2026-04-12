@@ -250,8 +250,6 @@ overlays are relinked.
 Core Features
 - Post-victory flow: nation name
 - Avoid money saturation
-- Expand the science tree with wagon capacity improvements
-- Scientific discoveries to improve max production per province
 - Admiralty improvement: increase cost of traders and warships according to science level
 - Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
 - Balance game for all stages (beginning, mid, and end)
