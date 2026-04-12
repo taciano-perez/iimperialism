@@ -5,14 +5,12 @@
 static unsigned char get_resource_base_price(unsigned char resource);
 static unsigned int apply_percent(unsigned int value, unsigned char percent);
 static void add_resource_saturating(unsigned char resource, unsigned char amount);
-static void update_foreign_market_prices(void);
+static void update_foreign_nation_prices(ForeignNation* nation);
 static void assign_foreign_nation_names(void);
 static unsigned char rand_resource_excluding(unsigned char min, unsigned char max, unsigned char exclude);
-static void assign_foreign_nation_trade_routes(void);
 static unsigned char strings_equal(const char* left, const char* right);
 static char* append_uint_decimal(char* buffer, unsigned int value);
 static unsigned int get_final_score(void);
-static unsigned char get_council_provinces(unsigned char nation_index);
 static unsigned char get_final_friendly_provinces(void);
 static unsigned char get_final_treasury_score(void);
 static unsigned char get_final_navy_score(void);
@@ -79,37 +77,32 @@ static void add_resource_saturating(unsigned char resource, unsigned char amount
     state.resources[resource] = (unsigned int)(current + amount);
 }
 
-static void update_foreign_market_prices(void) {
-    unsigned char i;
+static void update_foreign_nation_prices(ForeignNation* nation) {
     unsigned char j;
+    unsigned char relation_tier;
 
-    for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
-        unsigned char relation_tier;
+    relation_tier = get_relation_tier(nation->relations);
+    for (j = 0; j < FOREIGN_TRADE_ENTRY_COUNT; ++j) {
+        unsigned char export_base;
+        unsigned char import_base;
+        unsigned char export_percent;
+        unsigned char import_percent;
 
-        relation_tier = get_relation_tier(state.foreign_nations[i].relations);
+        export_base = get_resource_base_price(nation->exports[j]);
+        import_base = get_resource_base_price(nation->imports[j]);
 
-        for (j = 0; j < FOREIGN_TRADE_ENTRY_COUNT; ++j) {
-            unsigned char export_base;
-            unsigned char import_base;
-            unsigned char export_percent;
-            unsigned char import_percent;
-
-            export_base = get_resource_base_price(state.foreign_nations[i].exports[j]);
-            import_base = get_resource_base_price(state.foreign_nations[i].imports[j]);
-
-            export_percent = FOREIGN_EXPORT_PRICE_BASE_PERCENT
-                           + rand_range(0U, FOREIGN_EXPORT_PRICE_VARIANCE_PERCENT);
-            if (export_percent > (relation_tier * FOREIGN_EXPORT_PRICE_RELATION_STEP_PERCENT)) {
-                export_percent -= relation_tier * FOREIGN_EXPORT_PRICE_RELATION_STEP_PERCENT;
-            }
-
-            import_percent = FOREIGN_IMPORT_PRICE_BASE_PERCENT
-                           + rand_range(0U, FOREIGN_IMPORT_PRICE_VARIANCE_PERCENT)
-                           + (relation_tier * FOREIGN_IMPORT_PRICE_RELATION_STEP_PERCENT);
-
-            state.foreign_nations[i].export_prices[j] = apply_percent(export_base, export_percent);
-            state.foreign_nations[i].import_prices[j] = apply_percent(import_base, import_percent);
+        export_percent = FOREIGN_EXPORT_PRICE_BASE_PERCENT
+                       + rand_range(0U, FOREIGN_EXPORT_PRICE_VARIANCE_PERCENT);
+        if (export_percent > (relation_tier * FOREIGN_EXPORT_PRICE_RELATION_STEP_PERCENT)) {
+            export_percent -= relation_tier * FOREIGN_EXPORT_PRICE_RELATION_STEP_PERCENT;
         }
+
+        import_percent = FOREIGN_IMPORT_PRICE_BASE_PERCENT
+                       + rand_range(0U, FOREIGN_IMPORT_PRICE_VARIANCE_PERCENT)
+                       + (relation_tier * FOREIGN_IMPORT_PRICE_RELATION_STEP_PERCENT);
+
+        nation->export_prices[j] = apply_percent(export_base, export_percent);
+        nation->import_prices[j] = apply_percent(import_base, import_percent);
     }
 }
 
@@ -152,22 +145,18 @@ static char* append_uint_decimal(char* buffer, unsigned int value) {
     return buffer;
 }
 
-static unsigned char get_council_provinces(unsigned char nation_index) {
-    if (nation_index < COUNCIL_GREAT_POWER_COUNT) {
-        return COUNCIL_MAJOR_POWER_PROVINCES;
-    }
-
-    return COUNCIL_MINOR_POWER_PROVINCES;
-}
-
 static unsigned char get_final_friendly_provinces(void) {
     unsigned char nation_index;
     unsigned char friendly_provinces;
 
-    friendly_provinces = get_council_provinces(0U);
+    friendly_provinces = COUNCIL_MAJOR_POWER_PROVINCES;
     for (nation_index = 0U; nation_index < FOREIGN_NATION_COUNT; ++nation_index) {
         if (state.foreign_nations[nation_index].relations == RELATION_ALLY_COLONY) {
-            friendly_provinces = (unsigned char)(friendly_provinces + get_council_provinces((unsigned char)(nation_index + 1U)));
+            if (nation_index < 2U) {
+                friendly_provinces = (unsigned char)(friendly_provinces + COUNCIL_MAJOR_POWER_PROVINCES);
+            } else {
+                friendly_provinces = (unsigned char)(friendly_provinces + COUNCIL_MINOR_POWER_PROVINCES);
+            }
         }
     }
 
@@ -302,7 +291,7 @@ void copy_text_limited(char* dest, const char* src, unsigned char capacity) {
 }
 
 static void assign_foreign_nation_names(void) {
-    static const char* great_power_name_pool[] = {
+    static const char great_power_name_pool[][8] = {
         "Deneb",
         "Haxaco",
         "Patagon",
@@ -311,7 +300,7 @@ static void assign_foreign_nation_names(void) {
         "Ordune",
         "Devron"
     };
-    static const char* minor_nation_name_pool[] = {
+    static const char minor_nation_name_pool[][8] = {
         "Loke",
         "Pont",
         "Kathay",
@@ -396,42 +385,7 @@ static void assign_foreign_nation_names(void) {
     }
 }
 
-static void assign_foreign_nation_trade_routes(void) {
-    unsigned char i;
-
-    for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
-        unsigned char import_mid;
-
-        if (i < 2U) {
-            state.foreign_nations[i].imports[0] = rand_range(RESOURCE_TIMBER, RESOURCE_COAL);
-            state.foreign_nations[i].imports[1] = rand_resource_excluding(RESOURCE_TIMBER, RESOURCE_COAL,
-                                                                          state.foreign_nations[i].imports[0]);
-            import_mid = rand_range(RESOURCE_LUMBER, RESOURCE_STEEL);
-            state.foreign_nations[i].imports[2] = import_mid;
-
-            state.foreign_nations[i].exports[0] = rand_range(RESOURCE_FURNITURE, RESOURCE_GUNS);
-            state.foreign_nations[i].exports[1] = rand_resource_excluding(RESOURCE_FURNITURE, RESOURCE_GUNS,
-                                                                          state.foreign_nations[i].exports[0]);
-            state.foreign_nations[i].exports[2] = rand_resource_excluding(RESOURCE_LUMBER, RESOURCE_STEEL, import_mid);
-        } else {
-            state.foreign_nations[i].imports[0] = rand_range(RESOURCE_FURNITURE, RESOURCE_GUNS);
-            state.foreign_nations[i].imports[1] = rand_resource_excluding(RESOURCE_FURNITURE, RESOURCE_GUNS,
-                                                                          state.foreign_nations[i].imports[0]);
-            import_mid = rand_range(RESOURCE_LUMBER, RESOURCE_STEEL);
-            state.foreign_nations[i].imports[2] = import_mid;
-
-            state.foreign_nations[i].exports[0] = rand_range(RESOURCE_TIMBER, RESOURCE_COAL);
-            state.foreign_nations[i].exports[1] = rand_resource_excluding(RESOURCE_TIMBER, RESOURCE_COAL,
-                                                                          state.foreign_nations[i].exports[0]);
-            state.foreign_nations[i].exports[2] = rand_resource_excluding(RESOURCE_LUMBER, RESOURCE_STEEL, import_mid);
-        }
-    }
-}
-
 void init_game() {
-    static const unsigned char foreign_nation_relations[FOREIGN_NATION_COUNT] = {
-        RELATION_ALLY_COLONY, RELATION_TERRIBLE, RELATION_ALLY_COLONY, RELATION_ALLY_COLONY, RELATION_TERRIBLE
-    };
     unsigned char i;
 
     // Initialize game state with default values
@@ -472,28 +426,54 @@ void init_game() {
 
     state.available_workers = 6;
 
-    state.traders = 0;
-    state.frigates = 0;
+    state.traders = 2;
+    state.frigates = 2;
     state.capacity_per_trader = CAPACITY_PER_TRADER_BASE;
     state.guns_per_frigate = GUNS_PER_FRIGATE_BASE;
-    state.money = 0UL;
+    state.money = 250UL;
     state.science_level = 0U;
 
     assign_foreign_nation_names();
-    assign_foreign_nation_trade_routes();
 
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
-        state.foreign_nations[i].relations = foreign_nation_relations[i];
-        state.foreign_nations[i].relations_previous_turn = foreign_nation_relations[i];
-    }
+        unsigned char import_mid;
+        ForeignNation* nation;
 
-    update_foreign_market_prices();
+        nation = &state.foreign_nations[i];
+        if (i < 2U) {
+            nation->imports[0] = rand_range(RESOURCE_TIMBER, RESOURCE_COAL);
+            nation->imports[1] = rand_resource_excluding(RESOURCE_TIMBER, RESOURCE_COAL,
+                                                         nation->imports[0]);
+            import_mid = rand_range(RESOURCE_LUMBER, RESOURCE_STEEL);
+            nation->imports[2] = import_mid;
+
+            nation->exports[0] = rand_range(RESOURCE_FURNITURE, RESOURCE_GUNS);
+            nation->exports[1] = rand_resource_excluding(RESOURCE_FURNITURE, RESOURCE_GUNS,
+                                                         nation->exports[0]);
+            nation->exports[2] = rand_resource_excluding(RESOURCE_LUMBER, RESOURCE_STEEL, import_mid);
+        } else {
+            nation->imports[0] = rand_range(RESOURCE_FURNITURE, RESOURCE_GUNS);
+            nation->imports[1] = rand_resource_excluding(RESOURCE_FURNITURE, RESOURCE_GUNS,
+                                                         nation->imports[0]);
+            import_mid = rand_range(RESOURCE_LUMBER, RESOURCE_STEEL);
+            nation->imports[2] = import_mid;
+
+            nation->exports[0] = rand_range(RESOURCE_TIMBER, RESOURCE_COAL);
+            nation->exports[1] = rand_resource_excluding(RESOURCE_TIMBER, RESOURCE_COAL,
+                                                         nation->exports[0]);
+            nation->exports[2] = rand_resource_excluding(RESOURCE_LUMBER, RESOURCE_STEEL, import_mid);
+        }
+
+        nation->relations = RELATION_NEUTRAL;
+        nation->relations_previous_turn = nation->relations;
+        update_foreign_nation_prices(nation);
+    }
 
     state.trade_expenses = 0;
     state.trade_revenue = 0;
     state.turn_booty = 0;
 
-    state.turn_number = 999;
+    state.turn_number = 1;
     state.current_screen = SCREEN_MAIN;
     
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;
@@ -553,8 +533,6 @@ void next_turn() {
     state.production_tools = MIN(state.production_tools, state.resources[RESOURCE_STEEL] / 2U);
     state.production_guns = MIN(state.production_guns, state.resources[RESOURCE_STEEL] / 2U);
 
-    update_foreign_market_prices();
-
     // profit & loss
     if (state.money > upkeep) {
         state.money -= upkeep;
@@ -568,17 +546,21 @@ void next_turn() {
 
     state.remaining_turn_capacity = state.traders * state.capacity_per_trader;
 
-    // decrease relations with all foreign nations (except allies/colonies)
+    // Update prices, then decrease relations with all foreign nations (except allies/colonies).
     // if money is zero, relations drop to bad immediately, otherwise they drop by a fixed amount
     for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
-        if (state.foreign_nations[i].relations != RELATION_ALLY_COLONY) {
-            state.foreign_nations[i].relations_previous_turn = state.foreign_nations[i].relations;
+        ForeignNation* nation;
+
+        nation = &state.foreign_nations[i];
+        update_foreign_nation_prices(nation);
+        if (nation->relations != RELATION_ALLY_COLONY) {
+            nation->relations_previous_turn = nation->relations;
             if (state.money == 0) {
-                state.foreign_nations[i].relations = RELATION_TERRIBLE;
-            } else if (state.foreign_nations[i].relations <= RELATIONS_LOSS_PER_TURN) {
-                state.foreign_nations[i].relations = RELATION_TERRIBLE;
+                nation->relations = RELATION_TERRIBLE;
+            } else if (nation->relations <= RELATIONS_LOSS_PER_TURN) {
+                nation->relations = RELATION_TERRIBLE;
             } else {
-                state.foreign_nations[i].relations = (unsigned char)(state.foreign_nations[i].relations - RELATIONS_LOSS_PER_TURN);
+                nation->relations = (unsigned char)(nation->relations - RELATIONS_LOSS_PER_TURN);
             }
         }
     }
