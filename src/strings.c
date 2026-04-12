@@ -61,18 +61,7 @@ static const char* const STR_FINAL_VICTORY[] = {
     "Your court looked grander",
     "than your results.",
     "Your creditors remember you",
-    "more vividly than your subjects.",
-    "Council of Nations",
-    "Nation",
-    "Provinces",
-    "Voted for",
-    "Abstained",
-    "Votes for ",
-    ":",
-    "Victory Condition:",
-    "24 votes",
-    "You are victorious!",
-    "Keep trading to improve relations."
+    "more vividly than your subjects."
 };
 
 const char* const STR_RESOURCE[] = {

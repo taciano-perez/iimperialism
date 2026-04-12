@@ -16,19 +16,12 @@ static const unsigned char QUOTE_COUNT[SCORE_RANK_COUNT] = { 2U, 2U, 2U, 2U, 2U 
 #define FRSTR_FIREPOWER_SUFFIX 8
 #define FRSTR_SHIPS_SUFFIX 9
 #define FRSTR_CAPACITY_SUFFIX 10
+
 #define FRSTR_RANK_NAME_BASE 11
 #define FRSTR_RANK_RANGE_BASE 16
-#define FVSTR_COUNCIL_TITLE 31
-#define FVSTR_COUNCIL_NATION 32
-#define FVSTR_COUNCIL_PROVINCES 33
-#define FVSTR_COUNCIL_VOTED_FOR 34
-#define FVSTR_COUNCIL_ABSTAINED 35
-#define FVSTR_COUNCIL_VOTES_PREFIX 36
-#define FVSTR_COUNCIL_COLON 37
-#define FVSTR_COUNCIL_VICTORY_CONDITION 38
-#define FVSTR_COUNCIL_VICTORY_TARGET 39
-#define FVSTR_COUNCIL_WIN 40
-#define FVSTR_COUNCIL_ADVICE 41
+
+#define STR_COUNCIL_VOTES_PREFIX "Votes for "
+
 static const char* get_council_nation_name(unsigned char nation_index);
 static unsigned char get_council_provinces(unsigned char nation_index);
 static const char* get_council_vote_target(unsigned char nation_index);
@@ -66,7 +59,7 @@ static const char* get_council_vote_target(unsigned char nation_index) {
         return get_council_nation_name(nation_index);
     }
 
-    return get_final_victory_string(FVSTR_COUNCIL_ABSTAINED);
+    return "Abstained";
 }
 
 static unsigned char get_player_nation_council_votes(void) {
@@ -168,19 +161,30 @@ static void render_final_report(unsigned char player_nation_votes) {
     
 }
 
+void ask_continue_question() {
+    unsigned char key;
+
+    print(5, 21, "Quit?");
+    while (1) {
+        key = cgetc_at(10, 21);
+        if (key == 'Q' || key == 'q' || key == 'Y' || key == 'y') {
+            return;
+        }
+    }
+}
+
 void render_council_nations_screen(void) {
     unsigned char nation_index;
     unsigned char player_nation_votes;
     unsigned char victory_achieved;
-    unsigned char votes_for_name_x;
 
     clear_screen();
-    print(11, 0, get_final_victory_string(FVSTR_COUNCIL_TITLE));
+    print(11, 0, "Council of Nations");
 
-    box(0, 2, 39, 10);
-    print(2, 2, get_final_victory_string(FVSTR_COUNCIL_NATION));
-    print(12, 2, get_final_victory_string(FVSTR_COUNCIL_PROVINCES));
-    print(25, 2, get_final_victory_string(FVSTR_COUNCIL_VOTED_FOR));
+    box(0, 4, 39, 10);
+    print_inverted(2, 3, "Nation");
+    print_inverted(12, 3, "Provinces");
+    print_inverted(26, 3, "Voted for");
 
     for (nation_index = 0U; nation_index < COUNCIL_NATION_COUNT; ++nation_index) {
         unsigned char row_y;
@@ -195,23 +199,22 @@ void render_council_nations_screen(void) {
     player_nation_votes = get_player_nation_council_votes();
     victory_achieved = council_victory_achieved(player_nation_votes);
 
-    print(5, 12, get_final_victory_string(FVSTR_COUNCIL_VOTES_PREFIX));
-    votes_for_name_x = (unsigned char)(5U + strlen(get_final_victory_string(FVSTR_COUNCIL_VOTES_PREFIX)));
-    print(votes_for_name_x, 12, state.nation_name);
-    print((unsigned char)(votes_for_name_x + strlen(state.nation_name)), 12, get_final_victory_string(FVSTR_COUNCIL_COLON));
-    print_int_right_aligned(25, 12, player_nation_votes);
-    print(5, 13, get_final_victory_string(FVSTR_COUNCIL_VICTORY_CONDITION));
-    print(24, 13, get_final_victory_string(FVSTR_COUNCIL_VICTORY_TARGET));
+    print(5, 13, "Votes for ");
+    print(15, 13, state.nation_name);
+    print((unsigned char)(15 + strlen(state.nation_name)), 13, ":");
+    print_int_right_aligned(27, 13, player_nation_votes);
+    print(5, 15, "Victory Condition:");
+    print(27, 15, "24 votes");
 
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
     play_sound_alert();
     state.current_screen = SCREEN_MAIN;
     if (victory_achieved) {
-        print(5, 20, get_final_victory_string(FVSTR_COUNCIL_WIN));
-        wait_three_seconds_or_keypress();
+        print(5, 20, "You are victorious!");
+        ask_continue_question();
         render_final_report(player_nation_votes);
     } else {
-        print(5, 20, get_final_victory_string(FVSTR_COUNCIL_ADVICE));
-        wait_three_seconds_or_keypress();
+        print(5, 20, "Keep trading to improve relations.");
+        ask_continue_question();
     }
 }
