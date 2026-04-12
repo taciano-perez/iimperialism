@@ -156,11 +156,17 @@ This table maps logical row numbers (0-191) to their actual memory addresses.
 
 ## Step 7: Write the Drawing Function
 
-Create a function to draw any picture at any screen position:
+Create a function to draw any picture at any screen position. The drawing
+function accepts both an HGR byte column and a pixel offset within that byte:
 
 ```c
-void draw_picture(const unsigned char picture_index, const unsigned char x_byte, unsigned char y) {
+static const unsigned char HGR_X_OFFSET_MASKS[] = {
+    0x00, 0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F
+};
+
+void draw_picture(const unsigned char picture_index, const unsigned char x_byte, const unsigned char x_offset, unsigned char y) {
     unsigned char i;
+    unsigned char j;
 
     // Get pointer to the selected picture data
     const unsigned char *picture_data = PICTURES_DATA[picture_index];
@@ -176,8 +182,31 @@ void draw_picture(const unsigned char picture_index, const unsigned char x_byte,
         // Calculate screen address for this row
         unsigned int screen_addr = HGR_ROWS[y + i] + x_byte;
 
-        // Copy width bytes for this row
-        memcpy((void*)screen_addr, data_ptr, width);
+        if (x_offset == 0U) {
+            // Copy width bytes for this row
+            memcpy((void*)screen_addr, data_ptr, width);
+        } else {
+            unsigned char carry = 0U;
+            const unsigned char carry_shift = 7U - x_offset;
+            const unsigned char first_mask = HGR_X_OFFSET_MASKS[x_offset];
+            const unsigned char last_mask = 0x7FU ^ first_mask;
+            unsigned char *screen_ptr = (unsigned char*)screen_addr;
+
+            for (j = 0; j < width; ++j) {
+                const unsigned char source_byte = data_ptr[j];
+                const unsigned char pixels = source_byte & 0x7FU;
+                unsigned char shifted = ((pixels << x_offset) & 0x7FU) | carry;
+
+                if (j == 0U) {
+                    shifted = (screen_ptr[j] & first_mask) | shifted;
+                }
+
+                screen_ptr[j] = ((j == 0U) ? (screen_ptr[j] & 0x80U) : (source_byte & 0x80U)) | shifted;
+                carry = pixels >> carry_shift;
+            }
+
+            screen_ptr[width] = (screen_ptr[width] & (0x80U | last_mask)) | carry;
+        }
 
         // Advance to next row in data
         data_ptr += width;
@@ -188,7 +217,18 @@ void draw_picture(const unsigned char picture_index, const unsigned char x_byte,
 ### Function Parameters:
 - **picture_index:** Index into PICTURES_DATA array (use defined constants like WISEMAN_PORTRAIT)
 - **x_byte:** Horizontal position in bytes (0-39 for HGR's 40-byte width)
+- **x_offset:** Additional horizontal pixel offset within `x_byte` (0-6)
 - **y:** Vertical position in pixels (0-191)
+
+Apple II HGR stores 7 visible pixels per byte. To draw at an arbitrary pixel X:
+
+```c
+draw_picture(PICTURE_INDEX, pixel_x / 7U, pixel_x % 7U, y);
+```
+
+For compact cc65 output, `x_offset` is intentionally only the intra-byte offset
+`0..6`. If you need to move by 7 or more pixels, increase `x_byte` and pass the
+remainder as `x_offset`.
 
 ### How It Works:
 1. Uses picture_index to get the correct picture data from PICTURES_DATA array
@@ -196,7 +236,9 @@ void draw_picture(const unsigned char picture_index, const unsigned char x_byte,
 3. Skips the 2-byte header by starting at `&picture_data[2]`
 4. For each row:
    - Calculates the screen memory address using `HGR_ROWS[y + i] + x_byte`
-   - Copies `width` bytes from the data array to screen memory
+   - If `x_offset` is 0, copies `width` bytes from the data array to screen memory
+   - If `x_offset` is 1-6, shifts the 7 visible pixel bits into neighboring HGR bytes
+   - Preserves untouched edge pixels and their HGR color/palette bit so existing lines do not change color
    - Advances the data pointer by `width` to the next row
 
 ### Why This Approach?
@@ -218,11 +260,14 @@ int main(void) {
     tgi_install(a2_hi_tgi);
     tgi_init();
 
-    // Draw the wiseman portrait at position (2 bytes, 40 pixels)
-    draw_picture(WISEMAN_PORTRAIT, 2, 40);
+    // Draw the wiseman portrait at byte column 2, no pixel offset, row 40
+    draw_picture(WISEMAN_PORTRAIT, 2, 0, 40);
+
+    // Draw the same portrait four pixels into byte column 0
+    draw_picture(WISEMAN_PORTRAIT, 0, 4, 40);
 
     // Draw another picture (if you've added more)
-    // draw_picture(SOLDIER_PORTRAIT, 10, 80);
+    // draw_picture(SOLDIER_PORTRAIT, 10, 0, 80);
 
     // Wait for keypress
     cgetc();
@@ -242,7 +287,7 @@ To add a new picture:
 3. Copy the byte array data into `pictures.h` as `NEWPICTURE_DATA[]`
 4. Add `NEWPICTURE_DATA` to the `PICTURES_DATA[]` array
 5. Define a constant: `#define NEWPICTURE_INDEX 2` (or next available index)
-6. Use it: `draw_picture(NEWPICTURE_INDEX, x, y);`
+6. Use it: `draw_picture(NEWPICTURE_INDEX, x_byte, x_offset, y);`
 
 ## Common Issues and Solutions
 
@@ -257,6 +302,13 @@ To add a new picture:
 ### Issue: Image has wrong colors
 **Cause:** Copying wrong bytes from each row's data.
 **Solution:** Ensure you're copying all WISEMAN_WIDTH bytes starting from the correct offset.
+
+### Issue: Existing line changes color when drawing with x_offset
+**Cause:** Apple II HGR bit 7 controls the color phase for the byte. If a shifted
+draw overwrites bit 7 on a partially covered edge byte, existing pixels in that
+byte can change artifact color.
+**Solution:** Preserve bit 7 on the first and trailing edge bytes when
+`x_offset != 0`. Fully covered interior image bytes can use the image data's bit 7.
 
 ### Issue: Image appears as random lines
 **Cause:** Incorrect row width or data pointer advancement.
@@ -278,6 +330,18 @@ HGR screen memory ($2000-$3FFF) is organized in a complex pattern:
 - Each 8-row group is interleaved
 - Use the HGR_ROWS lookup table to find correct addresses
 
+### Pixel Offsets
+One HGR byte contains 7 visible pixels plus the high color/palette bit. The
+byte-aligned path is fastest and uses `memcpy`. The shifted path is larger and
+slower, but it allows pixel-resolution placement by splitting source bits across
+neighboring HGR bytes.
+
+Keep the API compact:
+
+- Use `x_byte` for whole 7-pixel HGR byte movement
+- Use `x_offset` only for the 0-6 pixel remainder
+- Preserve edge byte high bits when shifting so nearby graphics keep their color
+
 ### Byte Array Format
 The RAG format with "H F N" flags produces a compact format where:
 - Each row is consistently encoded as WISEMAN_WIDTH bytes
@@ -297,7 +361,9 @@ When helping users with Apple II HGR image display:
 5. **Skip the first 2 bytes of the array** - they're the header, not image data
 6. **Use memcpy to transfer data directly to screen memory** - it's the fastest method
 7. **The HGR_ROWS lookup table is essential** - HGR memory is not linear
-8. **Avoid over-engineering** - the RAG format with "H F N" flags is already optimized; just copy bytes directly
+8. **Keep pixel offsets byte-relative** - pass `x_offset` as 0-6 and fold larger movement into `x_byte`
+9. **Preserve HGR bit 7 on shifted edge bytes** - otherwise existing adjacent graphics can change artifact color
+10. **Avoid over-engineering** - the RAG format with "H F N" flags is already optimized; use the byte-copy path whenever possible
 
 ## References
 
