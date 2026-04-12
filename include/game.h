@@ -260,7 +260,7 @@ void print_int_right_aligned_currency(unsigned char x, unsigned char y, unsigned
 void print_signed_int_right_aligned_currency(unsigned char x, unsigned char y, int value);
 void print_int(unsigned char x, unsigned char y, unsigned int value);
 void draw_picture_at(const unsigned char picture_index, const unsigned char x_byte, unsigned char y);
-void draw_picture_offset_at(const unsigned char picture_index, const unsigned char x_byte, const unsigned x_offset, unsigned char y);
+void draw_picture_offset_at(const unsigned char picture_index, const unsigned char x_byte, const unsigned char x_offset, unsigned char y);
 void box (unsigned char x1, unsigned char y1, unsigned char x2, unsigned char y2);
 void wait_three_seconds_or_keypress(void);
 char cgetc_at(unsigned char x, unsigned char y);

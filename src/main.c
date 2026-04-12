@@ -201,7 +201,7 @@ void render_main_screen(void) {
 
     box(19, 3, 39, 9);
     print_inverted(20, 3, "Science Minister");
-    draw_picture_at(WISEMAN_PORTRAIT, 20, 5);
+    draw_picture_at(SCIENCE_PORTRAIT, 20, 5);
     print_rating_row(24, 6, 38, "Research:", get_science_rating_tier());
 
     box(0, 11, 39, 17);

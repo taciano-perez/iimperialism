@@ -188,7 +188,7 @@ void draw_picture_at(const unsigned char picture_index, const unsigned char x_by
     draw_picture(picture_index, x_byte, 0U, y*CHAR_HEIGHT);
 }
 
-void draw_picture_offset_at(const unsigned char picture_index, const unsigned char x_byte, const unsigned x_offset, unsigned char y) {
+void draw_picture_offset_at(const unsigned char picture_index, const unsigned char x_byte, const unsigned char x_offset, unsigned char y) {
     draw_picture(picture_index, x_byte, x_offset, y*CHAR_HEIGHT);
 }
 
