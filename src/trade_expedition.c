@@ -10,7 +10,7 @@ void render_trade_market(void) {
     clear_screen();
     print(0, 0, "The nation of");
     print(14, 0, state.foreign_nations[nation_index].name);
-    render_turn_funds_header();    
+    render_turn_funds_header();
 
     render_warehouse_box();
 
@@ -33,5 +33,4 @@ void render_trade_market(void) {
     print_int_right_aligned(29, PRICE_BOX_Y1+6, state.remaining_turn_capacity);
 
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
-    return;
 }

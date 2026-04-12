@@ -302,7 +302,7 @@ int main(void) {
                 continue; // skip input handling and go directly to next screen
 
             case SCREEN_TRADE_EXPEDITION:
-                run_overlay(OVL_TRADE_EXPEDITION);
+                render_trade_market();
                 run_overlay(OVL_TRADE_EXPEDITION_ACTION);
                 continue;
 

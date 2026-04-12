@@ -57,7 +57,6 @@ Current overlay files:
 - `TSCR` transport screen
 - `ASCR` admiralty screen and build flow
 - `DSCR` diplomacy screen
-- `TEXP` diplomacy trade expedition market screen
 - `TXAC` diplomacy trade expedition action flow
 - `BSCR` battle screen
 - `SSCR` science screen
@@ -108,7 +107,6 @@ compilation. Current examples:
 - `asm/ovl_industry_entry.s` -> `render_industry_screen()`
 - `asm/ovl_production_entry.s` -> `render_production_screen()`
 - `asm/ovl_transport_entry.s` -> `render_transport_screen()`
-- `asm/ovl_trade_expedition_entry.s` -> `render_trade_market()`
 - `asm/ovl_trade_expedition_action_entry.s` -> `handle_screen_trade_expedition()`
 - `asm/ovl_science_entry.s` -> `render_science_screen()`
 - `asm/ovl_game_menu_entry.s` -> `render_game_menu_screen()`
@@ -170,6 +168,9 @@ Current note:
   while `src/production.c` still provides resident `production_orders()` through JMPTAB
 - `src/ovl_industry.c` now also owns the ledger sub-screen, while resident code
   routes `SCREEN_LEDGER` back through `OVL_INDUSTRY`
+- `src/trade_expedition.c` owns the resident trade expedition market renderer;
+  the separate `TEXP` overlay was removed, and `SCREEN_TRADE_EXPEDITION` now
+  calls `render_trade_market()` before loading `TXAC`
 
 ## `_state` Address in Overlay Config
 

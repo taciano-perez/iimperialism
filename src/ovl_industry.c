@@ -37,7 +37,7 @@ static void render_ledger_screen(void) {
     print_signed_int_right_aligned_currency(38, 14, balance);
 
     draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
-    print(5, 20, "Quit ledger.");
+    print(5, 20, "Quit ledger?");
     cgetc_at(17, 20);
     state.current_screen = SCREEN_INDUSTRY;
 }

@@ -270,6 +270,7 @@ void play_sound_alert();
 // main.c (resident — accessible to overlays via jump table at $0821)
 void render_warehouse_box(void);
 void render_turn_funds_header(void);
+void render_trade_market(void);
 void start_new_game(void);
 const char* get_resource_name(unsigned char resource);
 const char* get_diplomacy_string(unsigned char index);

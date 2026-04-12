@@ -14,8 +14,10 @@ Science research unlocks higher trader capacity and warship firepower over time.
 The game runs within the Apple II's main 64KB memory map. It uses a custom memory layout to fit
 within the Apple II's constraints:
 
-- Screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`, `TSCR`,
-  `ASCR`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`, `MENU`, `CNSL`) loaded on demand.
+- Most screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`,
+  `TSCR`, `ASCR`, `DSCR`, `TXAC`, `BSCR`, `SSCR`, `MENU`, `CNSL`) loaded on demand.
+- The trade expedition market screen is resident code; only the buy/sell action
+  flow remains in the `TXAC` overlay.
 - The industry, transport, and production overlays now own their own input loops.
 - The industry overlay also owns the ledger sub-screen.
 - The transport screen is fully overlay-local.
@@ -70,12 +72,12 @@ nation's exports cheaper to buy and its imports more profitable to sell into.
 | `src/logic.c` | `init_game()`, `next_turn()`, final score calculation, and rank selection |
 | `src/gamestate.c` | Shared `GameState` declarations |
 | `src/overlay.c` | `init_overlays()`, `run_overlay()` |
+| `src/trade_expedition.c` | Resident diplomacy trade expedition market renderer |
 | `src/ovl_industry.c` | Industry screen overlay and ledger sub-screen (`iscr.bin`) |
 | `src/ovl_production.c` | Production screen overlay and top-level input loop (`pscr.bin`) |
 | `src/ovl_transport.c` | Transport screen overlay, input loop, and transport actions (`tscr.bin`) |
 | `src/ovl_admiralty.c` | Admiralty screen and build flow overlay (`ascr.bin`) |
 | `src/ovl_diplomacy.c` | Diplomacy screen overlay (`dscr.bin`) |
-| `src/ovl_trade_expedition.c` | Diplomacy trade expedition market overlay (`texp.bin`) |
 | `src/ovl_trade_expedition_action.c` | Diplomacy trade expedition action overlay (`txac.bin`) |
 | `src/ovl_science.c` | Science screen overlay (`sscr.bin`) |
 | `src/ovl_game_menu.c` | Game menu overlay and save/load flow (`menu.bin`) |
@@ -86,7 +88,6 @@ nation's exports cheaper to buy and its imports more profitable to sell into.
 | `asm/ovl_diplomacy_entry.s` | Fixed entry stub for diplomacy overlay |
 | `asm/ovl_production_entry.s` | Fixed entry stub for production overlay |
 | `asm/ovl_transport_entry.s` | Fixed entry stub for transport overlay |
-| `asm/ovl_trade_expedition_entry.s` | Fixed entry stub for trade expedition market overlay |
 | `asm/ovl_trade_expedition_action_entry.s` | Fixed entry stub for trade expedition action overlay |
 | `asm/ovl_science_entry.s` | Fixed entry stub for science overlay |
 | `asm/ovl_game_menu_entry.s` | Fixed entry stub for game menu overlay |

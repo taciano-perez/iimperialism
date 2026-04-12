@@ -13,12 +13,11 @@
 #define OVL_TRANSPORT  2
 #define OVL_ADMIRALTY  3
 #define OVL_DIPLOMACY 4
-#define OVL_TRADE_EXPEDITION 5
-#define OVL_TRADE_EXPEDITION_ACTION 6
-#define OVL_BATTLE 7
-#define OVL_SCIENCE 8
-#define OVL_GAME_MENU 9
-#define OVL_COUNCIL_NATIONS 10
+#define OVL_TRADE_EXPEDITION_ACTION 5
+#define OVL_BATTLE 6
+#define OVL_SCIENCE 7
+#define OVL_GAME_MENU 8
+#define OVL_COUNCIL_NATIONS 9
 
 /* Disk file names for the overlay binaries (ProDOS, uppercase, no extension) */
 #define OVL_FILE_INDUSTRY   "ISCR"
@@ -26,7 +25,6 @@
 #define OVL_FILE_TRANSPORT  "TSCR"
 #define OVL_FILE_ADMIRALTY  "ASCR"
 #define OVL_FILE_DIPLOMACY "DSCR"
-#define OVL_FILE_TRADE_EXPEDITION "TEXP"
 #define OVL_FILE_TRADE_EXPEDITION_ACTION "TXAC"
 #define OVL_FILE_BATTLE "BSCR"
 #define OVL_FILE_SCIENCE "SSCR"

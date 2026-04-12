@@ -6,28 +6,28 @@ This file is the current disk-space analysis for the Apple II floppy build.
 The goal is to reclaim real ProDOS blocks without changing game behavior or
 shortening user-visible text.
 
-This refresh is based on the current build as of `2026-04-11`, using:
+This refresh is based on the current build as of `2026-04-12`, using:
 
 - `make memory-usage`
 - `java -jar tools/ac.jar -l assets/iimperialism.dsk`
 - `build/iimperialism.map`
 - current sources in `src/`, `asm/`, and `docs/`
 
-This supersedes the earlier overlay-merge notes and the older
-`0 bytes free -> 1024 bytes free` snapshot. The disk is still tight enough that
-overlay-file count and resident block count both matter.
+This supersedes the earlier overlay-merge notes. The `TEXP` market overlay has
+now been removed: its small renderer lives in resident code, while the larger
+trade action flow remains in `TXAC`.
 
 ## Current State
 
 Current disk catalog:
 
-- `IIMPERIALISM` uses `65` ProDOS blocks
+- `IIMPERIALISM` uses `68` ProDOS blocks
 - `IIMP.SYSTEM` uses `1` ProDOS block
 - `PRODOS` uses `34` ProDOS blocks
-- there are now `11` overlay files on disk:
-  `ISCR`, `PSCR`, `TSCR`, `ASCR`, `DSCR`, `TEXP`, `TXAC`, `BSCR`, `SSCR`, `MENU`, `CNSL`
+- there are now `10` overlay files on disk:
+  `ISCR`, `PSCR`, `TSCR`, `ASCR`, `DSCR`, `TXAC`, `BSCR`, `SSCR`, `MENU`, `CNSL`
 - each overlay file still consumes `5` ProDOS blocks
-- disk free space is now `512 bytes`
+- disk free space is now `1536 bytes`
 
 Current resident / overlay occupancy from `make memory-usage`:
 
@@ -35,8 +35,8 @@ Current resident / overlay occupancy from `make memory-usage`:
 
 | Area | Used | Free |
 |------|-----:|-----:|
-| `LOWCODE` | 6008 | 22 |
-| `RESIDENT_MAIN_SAFE` | 16205 | 2227 |
+| `LOWCODE` | 5402 | 628 |
+| `RESIDENT_MAIN_SAFE` | 16915 | 1517 |
 | `LANGUAGE_CARD` | 2593 | 479 |
 
 ### Overlays
@@ -50,8 +50,7 @@ Current resident / overlay occupancy from `make memory-usage`:
 | `iscr.bin` | 1804 | 244 |
 | `menu.bin` | 917 | 1131 |
 | `pscr.bin` | 1391 | 657 |
-| `sscr.bin` | 1521 | 527 |
-| `texp.bin` | 832 | 1216 |
+| `sscr.bin` | 1665 | 383 |
 | `tscr.bin` | 1938 | 110 |
 | `txac.bin` | 2003 | 45 |
 
@@ -61,9 +60,9 @@ Important consequences:
 - floppy space is reclaimed only if:
   - the main binary drops enough to free one or more ProDOS blocks, or
   - two overlays are merged so one 2 KB overlay file disappears
-- compared with the earlier `1024 bytes free` snapshot, the current build still
-  carries the newer `CNSL` overlay file and a larger resident binary than the
-  earlier low-water mark
+- moving the former `TEXP` renderer into resident code grew the main binary from
+  `66` to `68` ProDOS blocks, but deleting the `TEXP` file removed a `5`-block
+  overlay, for a net recovery of `3` blocks
 - the Council victory report has been implemented inside the existing `CNSL`
   overlay
 - the victory report did not add a new overlay file or picture asset
@@ -72,10 +71,11 @@ Important consequences:
 
 ## Fresh Conclusions
 
-The best current options are no longer just "trim bytes somewhere."
-They fall into two separate buckets:
+The best current options are no longer just "trim bytes somewhere." The project
+has already taken the small-screen resident move for `TEXP`, so remaining work
+falls into two separate buckets:
 
-### A. Reclaim a whole overlay file
+### A. Reclaim another whole overlay file
 
 This is still the cleanest immediate disk-space win.
 
@@ -94,44 +94,14 @@ This is different from creating a brand-new overlay:
 - resident-only reductions or moves into existing files can reduce the main
   binary and avoid any new disk-file cost
 
-## Best Overlay Merge Candidates
+## Overlay Merge Candidates
 
-Current viable pairings by raw overlay occupancy:
+The previous best candidate, `MENU + TEXP`, is no longer available because
+`TEXP` has been deleted rather than merged. `MENU` still has substantial
+headroom, but it is intentionally left unmerged so it can grow its save/load and
+menu flow later.
 
-| Candidate | Combined UsedApprox | Headroom |
-|-----------|--------------------:|---------:|
-| `MENU + TEXP` | 1749 | 299 |
-| `ISCR + MENU` | 2721 | over |
-
-Now that ledger lives in `ISCR`, any pairing that depends on the older small
-industry overlay is no longer realistic.
-
-### 1. Best pure disk-space merge: `MENU + TEXP`
-
-Current sizes:
-
-- `menu.bin` = `917`
-- `texp.bin` = `832`
-- combined = `1749`
-
-Why this remains the best merge:
-
-- it still fits comfortably, with `299` bytes left for a dispatcher and minor growth
-- it deletes one overlay file from disk immediately
-
-Why it is still slightly awkward:
-
-- `MENU` is a transient `ESC` flow, not selected directly from
-  `state.current_screen`
-- the dispatcher has to key off something other than the normal screen value,
-  or `run_overlay()` has to map multiple overlay IDs to one file
-
-Current ranking:
-
-- best immediate disk-space win
-- lowest-risk merge that still deletes a file after the ledger move
-
-### 2. Pairings involving `CNSL`
+### Pairings involving `CNSL`
 
 `CNSL` is no longer a good merge candidate.
 
@@ -149,9 +119,10 @@ substantially rewritten or more space is reclaimed first.
 
 The resident-side result that matters now is simple:
 
-- `IIMPERIALISM` is down to `65` blocks
+- `IIMPERIALISM` is now `68` blocks after absorbing the trade market renderer
 - `ISCR` is up to about `1804` bytes used
-- `ISCR + TEXP` is no longer a realistic merge candidate
+- `TEXP` is gone, so future resident work should not assume it can be merged
+  with another overlay
 
 That means future resident work should focus on general resident reductions, not
 on undoing or re-litigating the completed industry/ledger refactor.
@@ -279,7 +250,8 @@ There are now two sensible paths, depending on whether the first priority is
 
 ### Path A: fastest disk recovery
 
-1. merge `MENU + TEXP`
+1. find another whole overlay file that can be deleted without consuming planned
+   `MENU` headroom
 2. re-run `make memory-usage` and disk catalog
 3. if more space is still needed, revisit loader-owned splash or another
    no-new-file resident reduction
@@ -287,24 +259,24 @@ There are now two sensible paths, depending on whether the first priority is
 
 Why this path ranks first:
 
-- it frees `5` blocks immediately
+- deleting one more overlay would free `5` blocks immediately
 - it is the clearest way off a completely full floppy
 
 ### Path B: resident-first cleanup
 
-1. verify future resident changes against the current `65`-block main binary
+1. verify future resident changes against the current `68`-block main binary
 2. pursue general resident reductions that do not add a new disk file
-3. if more space is still needed, merge `MENU + TEXP`
+3. if more space is still needed, identify a new overlay deletion candidate
 4. then revisit splash relocation without adding a new disk file
 
 Why this path is attractive:
 
-- it preserves the already-recovered resident block
+- it avoids adding files or consuming planned `MENU` headroom
 - it keeps future work focused on net wins rather than revisiting completed refactors
 
 Why I still rank it second:
 
-- a guaranteed `5`-block merge is still more valuable than another likely
+- a guaranteed `5`-block overlay deletion is still more valuable than another likely
   one-block resident drop
 
 ## Final Recommendation
@@ -312,7 +284,7 @@ Why I still rank it second:
 If I had to pick the best next move today, it would be:
 
 1. keep the implemented ledger move in `ISCR`
-2. merge `MENU + TEXP` next if more disk space is needed
+2. keep `MENU` available for planned menu growth
 3. revisit loader-owned splash if resident size still needs to come down
 
 The main screen can be reconsidered later, but only after startup / splash /
@@ -332,5 +304,5 @@ Also verify behavior:
 - boot still works
 - splash still preserves timed-`ESC` entropy if touched
 - industry can still open and close ledger correctly
-- merged overlays still dispatch to the correct screen
+- resident trade expedition market rendering still flows into `TXAC`
 - save/load still works if `MENU` is touched

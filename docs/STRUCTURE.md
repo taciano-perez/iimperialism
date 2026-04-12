@@ -33,8 +33,11 @@ build it shows:
 - `LC` in Language Card RAM at `$D400-$DD79`, currently including `src/ui.c`
 
 Current overlay binaries include `iscr.bin`, `pscr.bin`, `tscr.bin`, `ascr.bin`,
-`dscr.bin`, `texp.bin`, `txac.bin`, `bscr.bin`, `sscr.bin`, `menu.bin`, and
-`cnsl.bin`.
+`dscr.bin`, `txac.bin`, `bscr.bin`, `sscr.bin`, `menu.bin`, and `cnsl.bin`.
+
+The trade expedition market renderer is resident code in `src/trade_expedition.c`.
+The separate `TEXP` overlay was removed so the floppy no longer pays a fixed
+5-block file cost for that small screen.
 
 The menu overlay now owns its save/load flow internally, including its ProDOS
 MLI helper and fixed overlay entry stub.

@@ -326,7 +326,7 @@ config so overlays can reference `state` directly as an `extern`:
 4. Remove `#define state (*s)` from each overlay file.
 5. Update the dispatch in `overlay.c` to call `((void(*)(void))OVERLAY_SLOT)()`.
 
-This was applied to all 11 overlays and saved **~1,017 bytes** of overlay code with no
+This was applied to the overlay set and saved **~1,017 bytes** of overlay code with no
 BSS growth and no change in behavior. It is the highest-value single architectural
 change available in this codebase.
 

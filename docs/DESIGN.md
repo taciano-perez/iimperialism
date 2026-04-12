@@ -77,7 +77,7 @@ Resident main loop (`src/main.c`) dispatches by `state.current_screen`:
 - `SCREEN_ADMIRALTY` -> `OVL_ADMIRALTY` (`ASCR`)
 - `SCREEN_DIPLOMACY` -> `OVL_DIPLOMACY` (`DSCR`)
 - `SCREEN_SCIENCE` -> `OVL_SCIENCE` (`SSCR`)
-- `SCREEN_TRADE_EXPEDITION` -> `OVL_TRADE_EXPEDITION` then `OVL_TRADE_EXPEDITION_ACTION`
+- `SCREEN_TRADE_EXPEDITION` -> resident `render_trade_market()`, then `OVL_TRADE_EXPEDITION_ACTION`
 - `SCREEN_BATTLE` -> resident battle prelude, then `OVL_BATTLE` (`BSCR`)
 - `SCREEN_COUNCIL_NATIONS` -> `OVL_COUNCIL_NATIONS` (`CNSL`)
 - `SCREEN_LEDGER` -> `OVL_INDUSTRY` (`ISCR`) ledger sub-screen
@@ -100,8 +100,11 @@ input loop.
 Sub-flows are also overlays:
 
 - `OVL_GAME_MENU` (`MENU`) for new/load/save actions from `ESC`
-- `OVL_TRADE_EXPEDITION` (`TEXP`) for the trade expedition market screen
 - `OVL_TRADE_EXPEDITION_ACTION` (`TXAC`) for trade expedition input/actions
+
+The trade expedition market screen is resident code in `src/trade_expedition.c`.
+This avoids a separate 2 KB overlay file for a small read-only market renderer
+while leaving the larger buy/sell action flow in `TXAC`.
 
 ### Input Ownership
 
@@ -113,6 +116,7 @@ Sub-flows are also overlays:
 - `src/ovl_admiralty.c`: render admiralty and handle trader/warship builds
 - `src/ovl_game_menu.c`: handle `ESC` menu actions (new/load/save, return)
 - `src/ovl_diplomacy.c`: handle diplomacy input, trade expeditions, and alliance/colony offers
+- `src/trade_expedition.c`: resident trade expedition market renderer
 
 ## Council Victory And Final Report
 

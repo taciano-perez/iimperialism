@@ -19,7 +19,6 @@ Current catalog (from `ac -l`) includes:
 - `TSCR` (`BIN`, `A=$9800`) - transport overlay.
 - `ASCR` (`BIN`, `A=$A000`) - admiralty overlay.
 - `DSCR` (`BIN`, `A=$8800`) - diplomacy overlay.
-- `TEXP` (`BIN`, `A=$8800`) - diplomacy trade expedition market overlay.
 - `TXAC` (`BIN`, `A=$8800`) - diplomacy trade expedition action overlay.
 - `BSCR` (`BIN`, `A=$8800`) - battle overlay.
 - `SSCR` (`BIN`, `A=$8800`) - science overlay.
@@ -38,7 +37,8 @@ Boot sequence:
 1. ProDOS boots and runs the first `*.SYSTEM` file (`IIMP.SYSTEM`).
 2. `IIMP.SYSTEM` loads `IIMPERIALISM` (BIN) and jumps to its load address.
 3. `IIMPERIALISM` initializes game state and later loads screen overlays from disk
-   with direct ProDOS MLI reads.
+   with direct ProDOS MLI reads. The trade expedition market screen is resident
+   code; only its action flow is loaded from `TXAC`.
 4. The game menu overlay saves/loads `GAME.DATA` with direct ProDOS MLI calls.
 
 ## Loader Implementation

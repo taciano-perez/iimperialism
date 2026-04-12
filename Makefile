@@ -32,7 +32,7 @@ C_SOURCES  = \
 	$(SRC_DIR)/ovl_transport.c \
 	$(SRC_DIR)/ovl_admiralty.c \
 	$(SRC_DIR)/ovl_diplomacy.c \
-	$(SRC_DIR)/ovl_trade_expedition.c \
+	$(SRC_DIR)/trade_expedition.c \
 	$(SRC_DIR)/ovl_trade_expedition_action.c \
 	$(SRC_DIR)/ovl_battle.c \
 	$(SRC_DIR)/ovl_science.c \
@@ -59,6 +59,7 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/gamestate.o \
 	$(BUILD_DIR)/random.o \
 	$(BUILD_DIR)/logic.o \
+	$(BUILD_DIR)/trade_expedition.o \
 	$(BUILD_DIR)/overlay.o \
 	$(BUILD_DIR)/prodos_overlay_load.o \
 	$(BUILD_DIR)/jmptab.o
@@ -69,7 +70,6 @@ OVERLAY_OBJECTS = \
 	$(BUILD_DIR)/ovl_transport.o \
 	$(BUILD_DIR)/ovl_admiralty.o \
 	$(BUILD_DIR)/ovl_diplomacy.o \
-	$(BUILD_DIR)/ovl_trade_expedition.o \
 	$(BUILD_DIR)/ovl_trade_expedition_action.o \
 	$(BUILD_DIR)/ovl_battle.o \
 	$(BUILD_DIR)/ovl_science.o \
@@ -100,6 +100,7 @@ disk: iimperialism overlays $(BUILD_DIR)/loader.system
 	-$(AC) -d $(DISK) BASIC.SYSTEM
 	-$(AC) -d $(DISK) IIMPERIALISM.SYSTEM
 	-$(AC) -d $(DISK) IIMPERIALISM.SY
+	-$(AC) -d $(DISK) TEXP
 	-$(AC) -d $(DISK) $(LOADER_SYSTEM)
 	$(AC) -p $(DISK) $(LOADER_SYSTEM) SYS < $(BUILD_DIR)/loader.system
 	-$(AC) -d $(DISK) IIMPERIALISM
@@ -114,8 +115,6 @@ disk: iimperialism overlays $(BUILD_DIR)/loader.system
 	$(AC) -p $(DISK) ASCR BIN 0xA000 < $(BUILD_DIR)/ascr.bin
 	-$(AC) -d $(DISK) DSCR
 	$(AC) -p $(DISK) DSCR BIN 0x8800 < $(BUILD_DIR)/dscr.bin
-	-$(AC) -d $(DISK) TEXP
-	$(AC) -p $(DISK) TEXP BIN 0x8800 < $(BUILD_DIR)/texp.bin
 	-$(AC) -d $(DISK) TXAC
 	$(AC) -p $(DISK) TXAC BIN 0x8800 < $(BUILD_DIR)/txac.bin
 	-$(AC) -d $(DISK) BSCR
@@ -128,7 +127,7 @@ disk: iimperialism overlays $(BUILD_DIR)/loader.system
 	$(AC) -p $(DISK) CNSL BIN 0x8800 < $(BUILD_DIR)/cnsl.bin
 	$(AC) -l $(DISK)
 
-overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/texp.bin $(BUILD_DIR)/txac.bin $(BUILD_DIR)/bscr.bin $(BUILD_DIR)/sscr.bin $(BUILD_DIR)/menu.bin $(BUILD_DIR)/cnsl.bin
+overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/txac.bin $(BUILD_DIR)/bscr.bin $(BUILD_DIR)/sscr.bin $(BUILD_DIR)/menu.bin $(BUILD_DIR)/cnsl.bin
 
 iimperialism: $(MAIN_OBJECTS) | $(BUILD_DIR)
 	$(CC) $(LDFLAGS) -o $(BUILD_DIR)/iimperialism -m $(BUILD_DIR)/iimperialism.map $(MAIN_OBJECTS)
@@ -174,9 +173,6 @@ $(BUILD_DIR)/ascr.bin: $(BUILD_DIR)/ovl_admiralty.o $(OVL_CFG) | $(BUILD_DIR)
 $(BUILD_DIR)/dscr.bin: $(BUILD_DIR)/ovl_diplomacy_entry.o $(BUILD_DIR)/ovl_diplomacy.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/ovl_diplomacy_entry.o $(BUILD_DIR)/ovl_diplomacy.o
 
-$(BUILD_DIR)/texp.bin: $(BUILD_DIR)/ovl_trade_expedition_entry.o $(BUILD_DIR)/ovl_trade_expedition.o $(OVL_CFG) | $(BUILD_DIR)
-	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/texp.bin $(BUILD_DIR)/ovl_trade_expedition_entry.o $(BUILD_DIR)/ovl_trade_expedition.o
-
 $(BUILD_DIR)/txac.bin: $(BUILD_DIR)/ovl_trade_expedition_action_entry.o $(BUILD_DIR)/ovl_trade_expedition_action.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/txac.bin $(BUILD_DIR)/ovl_trade_expedition_action_entry.o $(BUILD_DIR)/ovl_trade_expedition_action.o
 
@@ -197,9 +193,6 @@ $(BUILD_DIR)/ovl_diplomacy_entry.o: $(ASM_DIR)/ovl_diplomacy_entry.s | $(BUILD_D
 
 $(BUILD_DIR)/ovl_industry_entry.o: $(ASM_DIR)/ovl_industry_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_industry_entry.s -o $(BUILD_DIR)/ovl_industry_entry.o
-
-$(BUILD_DIR)/ovl_trade_expedition_entry.o: $(ASM_DIR)/ovl_trade_expedition_entry.s | $(BUILD_DIR)
-	ca65 $(ASM_DIR)/ovl_trade_expedition_entry.s -o $(BUILD_DIR)/ovl_trade_expedition_entry.o
 
 $(BUILD_DIR)/ovl_production_entry.o: $(ASM_DIR)/ovl_production_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_production_entry.s -o $(BUILD_DIR)/ovl_production_entry.o
