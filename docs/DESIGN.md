@@ -52,6 +52,10 @@ The same nation-naming prompt is also reused by the game menu's `New Game` actio
 - Traders and frigates are built in admiralty workflows
 - Science research increases `capacity_per_trader` and `guns_per_frigate`,
   which affect trade-expedition capacity and battle firepower
+- New trader material costs scale with the trader-capacity multiplier; new
+  frigate gun costs scale with the guns-per-frigate multiplier. These costs are
+  derived in the Admiralty overlay from the existing cached science-adjusted
+  stats, avoiding extra game-state fields.
 
 ### Turn Progression
 

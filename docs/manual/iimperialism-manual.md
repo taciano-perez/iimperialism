@@ -205,10 +205,17 @@ From this screen, press:
 - `W` to build Warships
 - `Q` to return to the Main Screen
 
-Costs are:
+Base costs are:
 
 - Trader: 1 Lumber, 1 Fabric, and 1 Worker
 - Warship: 1 Lumber, 1 Fabric, 1 Gun, and 1 Worker
+
+Science upgrades can raise these costs for newly built ships:
+
+- At 2x trader capacity, a new Trader costs 2 Lumber, 2 Fabric, and 1 Worker.
+- At 4x trader capacity, a new Trader costs 4 Lumber, 4 Fabric, and 1 Worker.
+- At 2x guns per warship, a new Warship costs 1 Lumber, 1 Fabric, 2 Guns, and 1 Worker.
+- At 4x guns per warship, a new Warship costs 1 Lumber, 1 Fabric, 4 Guns, and 1 Worker.
 
 Traders determine how much cargo you can carry on trade expeditions. Warships protect those expeditions and provide strength in battle.
 
@@ -239,8 +246,8 @@ The current research ladder is:
 The direct gameplay upgrades are:
 
 - Forestry, Sheep Breeding, Shaft Mining, and Coal Pumps increase raw-material output from provinces
-- Carronade and Shell guns increase guns per warship
-- Clipper Ships and Steel Hulls increase trader capacity
+- Carronade and Shell guns increase guns per warship and proportionally increase the Gun cost of new warships
+- Clipper Ships and Steel Hulls increase trader capacity and proportionally increase the Lumber and Fabric cost of new traders
 
 Research is expensive, but these upgrades can greatly improve your industry, trade capacity, and naval combat power.
 
@@ -417,6 +424,7 @@ General advice:
 - Do not ignore upkeep. A large fleet and workforce can bankrupt you.
 - Tools and Guns are advanced goods, but you must first sustain Steel production.
 - Trade capacity is precious. Buy and sell only what gives useful profits or supports your production chain.
+- Advanced traders and warships are stronger, but their shipyard costs rise with their science bonuses.
 - Research that improves raw-material output, trader capacity, and naval guns has a large long-term payoff.
 - A colony or alliance is often worth more than a short-term trade gain because it helps secure Council votes.
 

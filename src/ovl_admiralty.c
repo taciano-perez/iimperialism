@@ -8,6 +8,7 @@
 void render_admiralty_screen(void) {
     unsigned int max_units;
     unsigned int units_to_build;
+    unsigned char build_cost;
     char key;
 
     while (1) {
@@ -50,12 +51,17 @@ void render_admiralty_screen(void) {
             case 't':
             case 'T':
                 clear_input_area();
-                max_units = MIN(MIN(state.resources[RESOURCE_LUMBER], state.resources[RESOURCE_FABRIC]), state.available_workers);
+                build_cost = state.capacity_per_trader / CAPACITY_PER_TRADER_BASE;
+                max_units = MIN(MIN(state.resources[RESOURCE_LUMBER] / build_cost,
+                                    state.resources[RESOURCE_FABRIC] / build_cost),
+                                state.available_workers);
 
                 while (1) {
                     clear_input_area();
-                    print(5, 20, "Trader cost: 1 lumber, 1 fabric &");
-                    print(5, 21, "1 worker.");
+                    print(5, 20, "Trader cost:   lumber,   fabric");
+                    print_int_right_aligned(18, 20, build_cost);
+                    print_int_right_aligned(28, 20, build_cost);
+                    print(5, 21, "& 1 worker.");
                     print(5, 22, "Build how many (Max:    )?");
                     print_int_right_aligned(28, 22, max_units);
                     units_to_build = scan_uint(30, 22, 3);
@@ -63,8 +69,8 @@ void render_admiralty_screen(void) {
                         continue;
                     }
 
-                    state.resources[RESOURCE_LUMBER] -= units_to_build;
-                    state.resources[RESOURCE_FABRIC] -= units_to_build;
+                    state.resources[RESOURCE_LUMBER] -= units_to_build * build_cost;
+                    state.resources[RESOURCE_FABRIC] -= units_to_build * build_cost;
                     state.available_workers -= units_to_build;
                     state.traders += units_to_build;
                     break;
@@ -74,13 +80,16 @@ void render_admiralty_screen(void) {
             case 'w':
             case 'W':
                 clear_input_area();
-                max_units = MIN(MIN(MIN(state.resources[RESOURCE_LUMBER], state.resources[RESOURCE_FABRIC]), state.resources[RESOURCE_GUNS]),
+                build_cost = state.guns_per_frigate / GUNS_PER_FRIGATE_BASE;
+                max_units = MIN(MIN(MIN(state.resources[RESOURCE_LUMBER], state.resources[RESOURCE_FABRIC]),
+                                    state.resources[RESOURCE_GUNS] / build_cost),
                                 state.available_workers);
 
                 while (1) {
                     clear_input_area();
                     print(5, 20, "Warship cost: 1 lumber, 1 fabric,");
-                    print(5, 21, "1 gun & 1 worker.");
+                    print(5, 21, "  gun(s) & 1 worker.");
+                    print_int_right_aligned(5, 21, build_cost);
                     print(5, 22, "Build how many (Max:    )?");
                     print_int_right_aligned(28, 22, max_units);
 
@@ -91,7 +100,7 @@ void render_admiralty_screen(void) {
 
                     state.resources[RESOURCE_LUMBER] -= units_to_build;
                     state.resources[RESOURCE_FABRIC] -= units_to_build;
-                    state.resources[RESOURCE_GUNS] -= units_to_build;
+                    state.resources[RESOURCE_GUNS] -= units_to_build * build_cost;
                     state.available_workers -= units_to_build;
                     state.frigates += units_to_build;
                     break;

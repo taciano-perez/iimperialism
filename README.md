@@ -7,7 +7,8 @@ This project is inspired by Imperialism and Taipan!. It is a turn-based resource
 management game where players manage a supply chain from raw materials through
 production stages to finished goods while managing cash and foreign trade prices
 that shift with each nation's current relations.
-Science research unlocks higher trader capacity and warship firepower over time.
+Science research unlocks higher trader capacity and warship firepower over time,
+with new shipbuilding costs scaling to match those stronger vessels.
 
 ## Overview
 
@@ -251,7 +252,6 @@ overlays are relinked.
 Core Features
 - Post-victory flow: nation name
 - Avoid money saturation
-- Admiralty improvement: increase cost of traders and warships according to science level
 - Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
 - Balance game for all stages (beginning, mid, and end)
 
@@ -265,11 +265,11 @@ Performance/Maintanability Improvements
 - Attempt to replace ProDOS by RWTS
 
 Nice to have features
-- Add event alerts (e.g. war, degrading relations, random events) at turn's end, use overlay for event strings if needed
-- Consider adding land battles
+- Random events (positive and negative) at turn's end
 
-Discarded ideas:
-- Consider adding map screen - difficult to squeeze inside one floppy
+Discarded ideas (difficult to squeeze in without requiring extra floppies):
+- Map screen
+- Land battles
 
 Packaging goodies
 - Manual
