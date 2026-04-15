@@ -254,8 +254,6 @@ Core Features
 - Balance game for all stages (beginning, mid, and end)
 
 Performance/Maintanability Improvements
-- If needed, simplify rank score considering only # provinces and # turns
-- Reduce HGR table and drawing contracts
 - Rename relations constants
 - Rename wiseman portrait
 - Rename frigate to warship

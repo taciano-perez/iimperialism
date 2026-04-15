@@ -436,14 +436,11 @@ IImperialism! is won in diplomacy, backed by industry and trade.
 
 Build a strong economy, keep the sea lanes open, turn commerce into influence, and enter the Council of Nations with enough allies and colonies to command 24 votes.
 
-After victory, the game presents a final score and historical rating. The score rewards a balanced empire:
+After victory, the game presents a final score and historical rating. The score rewards three things:
 
-- foreign relations, measured as friendly provinces that voted for your nation
-- treasury
-- naval firepower
-- merchant-fleet carrying capacity
-- scientific progress
+- diplomacy beyond the bare 24-vote victory
 - speed of victory
+- treasury
 
 The final report shows `Your score is ...` in inverted text, then compares your campaign to a rank ladder of nineteenth-century European heads of state:
 

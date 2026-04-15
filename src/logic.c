@@ -13,11 +13,8 @@ static char* append_uint_decimal(char* buffer, unsigned int value);
 static unsigned int get_final_score(void);
 static unsigned char get_final_friendly_provinces(void);
 static unsigned char get_final_treasury_score(void);
-static unsigned char get_final_navy_score(void);
-static unsigned char get_final_merchant_score(void);
-static unsigned char get_final_science_score(void);
 static unsigned char get_final_diplomacy_score(void);
-static unsigned int get_speed_multiplier_factor(void);
+static unsigned char get_final_speed_score(void);
 
 static unsigned char get_resource_base_price(unsigned char resource) {
     static const unsigned char base_prices[] = {
@@ -164,7 +161,15 @@ static unsigned char get_final_friendly_provinces(void) {
 }
 
 static unsigned char get_final_diplomacy_score(void) {
-    return (unsigned char)((get_final_friendly_provinces() * 100U) / COUNCIL_TOTAL_PROVINCES);
+    unsigned char friendly_provinces;
+
+    friendly_provinces = get_final_friendly_provinces();
+    if (friendly_provinces <= COUNCIL_VICTORY_VOTES) {
+        return 0U;
+    }
+
+    return (unsigned char)(((friendly_provinces - COUNCIL_VICTORY_VOTES) * 100U)
+                         / (COUNCIL_TOTAL_PROVINCES - COUNCIL_VICTORY_VOTES));
 }
 
 static unsigned char get_final_treasury_score(void) {
@@ -187,50 +192,24 @@ static unsigned char get_final_treasury_score(void) {
     return 10U;
 }
 
-static unsigned char get_final_navy_score(void) {
-    unsigned int navy_power;
-
-    navy_power = state.frigates * state.guns_per_frigate;
-    if (navy_power >= SCORE_NAVY_POWER_TARGET) {
-        return 100U;
-    }
-
-    return (unsigned char)((navy_power * 100U) / SCORE_NAVY_POWER_TARGET);
-}
-
-static unsigned char get_final_merchant_score(void) {
-    unsigned int merchant_power;
-
-    merchant_power = state.traders * state.capacity_per_trader;
-    if (merchant_power >= SCORE_MERCHANT_POWER_TARGET) {
-        return 100U;
-    }
-
-    return (unsigned char)((merchant_power * 100U) / SCORE_MERCHANT_POWER_TARGET);
-}
-
-static unsigned char get_final_science_score(void) {
-    return (unsigned char)((state.science_level * 100U) / (SCIENCE_LEVEL_COUNT - 1U));
-}
-
-static unsigned int get_speed_multiplier_factor(void) {
+static unsigned char get_final_speed_score(void) {
     if (state.turn_number <= SCORE_SPEED_TURN_1) {
-        return SCORE_SPEED_FACTOR_1;
+        return SCORE_SPEED_SCORE_1;
     }
     if (state.turn_number <= SCORE_SPEED_TURN_2) {
-        return SCORE_SPEED_FACTOR_2;
+        return SCORE_SPEED_SCORE_2;
     }
     if (state.turn_number <= SCORE_SPEED_TURN_3) {
-        return SCORE_SPEED_FACTOR_3;
+        return SCORE_SPEED_SCORE_3;
     }
     if (state.turn_number <= SCORE_SPEED_TURN_4) {
-        return SCORE_SPEED_FACTOR_4;
+        return SCORE_SPEED_SCORE_4;
     }
     if (state.turn_number <= SCORE_SPEED_TURN_5) {
-        return SCORE_SPEED_FACTOR_5;
+        return SCORE_SPEED_SCORE_5;
     }
 
-    return SCORE_SPEED_FACTOR_6;
+    return SCORE_SPEED_SCORE_6;
 }
 
 static unsigned int get_final_score(void) {
@@ -238,11 +217,9 @@ static unsigned int get_final_score(void) {
 
     weighted_score = (unsigned int)(get_final_diplomacy_score() * SCORE_WEIGHT_DIPLOMACY)
                    + (unsigned int)(get_final_treasury_score() * SCORE_WEIGHT_TREASURY)
-                   + (unsigned int)(get_final_navy_score() * SCORE_WEIGHT_NAVY)
-                   + (unsigned int)(get_final_merchant_score() * SCORE_WEIGHT_MERCHANT)
-                   + (unsigned int)(get_final_science_score() * SCORE_WEIGHT_SCIENCE);
+                   + (unsigned int)(get_final_speed_score() * SCORE_WEIGHT_SPEED);
     weighted_score /= 100U;
-    return weighted_score * get_speed_multiplier_factor();
+    return weighted_score * SCORE_SCALE_FACTOR;
 }
 
 void build_final_score_line(char* buffer) {

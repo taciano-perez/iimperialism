@@ -163,24 +163,21 @@ the overlay.
 
 The score inputs are normalized to `0..100`:
 
-- diplomacy: friendly provinces divided by total council provinces
+- diplomacy: friendly provinces above the 24-vote victory threshold, divided by
+  the remaining possible friendly provinces
 - treasury: threshold bands from `SCORE_TREASURY_1` through `SCORE_TREASURY_5`
-- navy: firepower divided by `SCORE_NAVY_POWER_TARGET`
-- merchant marine: total carrying capacity divided by `SCORE_MERCHANT_POWER_TARGET`
-- science: current `science_level` divided by the highest science level
+- speed: threshold bands from `SCORE_SPEED_TURN_1` through `SCORE_SPEED_TURN_5`
 
 Category weights:
 
 - diplomacy: `SCORE_WEIGHT_DIPLOMACY`
 - treasury: `SCORE_WEIGHT_TREASURY`
-- navy: `SCORE_WEIGHT_NAVY`
-- merchant marine: `SCORE_WEIGHT_MERCHANT`
-- science: `SCORE_WEIGHT_SCIENCE`
+- speed: `SCORE_WEIGHT_SPEED`
 
-The weighted score is divided by `100` and then multiplied by a speed factor.
-The speed factor is selected from `SCORE_SPEED_FACTOR_*` by comparing the current
-`turn_number` to `SCORE_SPEED_TURN_*`. The real campaign turn count starts at
-turn `1`, so no offset is applied.
+The weighted score is divided by `100` and then multiplied by
+`SCORE_SCALE_FACTOR`. Speed uses `SCORE_SPEED_SCORE_*` bands selected by
+comparing the current `turn_number` to `SCORE_SPEED_TURN_*`. The real campaign
+turn count starts at turn `1`, so no offset is applied.
 
 The target result is a large Taipan-style number, with exceptional wins reaching
 `50,000` or more while still fitting in an `unsigned int`.

@@ -2,32 +2,34 @@
 
 ## Scope
 
-This file is the current disk-space analysis for the Apple II floppy build.
-The goal is to reclaim real ProDOS blocks without changing game behavior or
-shortening user-visible text.
+This file tracks the remaining disk-space and memory-refactor options for the
+Apple II floppy build. The goal is to reclaim real ProDOS blocks without changing
+game behavior or shortening user-visible text.
 
-This refresh is based on the current build as of `2026-04-12`, using:
+This refresh is based on the current build as of `2026-04-15`, after the final
+score was simplified to diplomacy, speed, and treasury only. The checks used were:
 
 - `make memory-usage`
 - `java -jar tools/ac.jar -l assets/iimperialism.dsk`
-- `build/iimperialism.map`
-- current sources in `src/`, `asm/`, and `docs/`
+- `od65 --dump-segments` on the current resident and overlay objects
+- current sources in `src/`, `asm/`, `config/`, and `docs/`
 
-This supersedes the earlier overlay-merge notes. The `TEXP` market overlay has
-now been removed: its small renderer lives in resident code, while the larger
-trade action flow remains in `TXAC`.
+This supersedes the older notes that still treated `MENU` as a large spare-space
+overlay and `CNSL` as a possible merge target. Those assumptions are no longer
+true in the current tree.
 
 ## Current State
 
 Current disk catalog:
 
-- `IIMPERIALISM` uses `68` ProDOS blocks
-- `IIMP.SYSTEM` uses `1` ProDOS block
+- `IIMPERIALISM` uses `68` ProDOS blocks and is `34,134` bytes long
+- `IIMP.SYSTEM` uses `1` ProDOS block and is `469` bytes long
 - `PRODOS` uses `34` ProDOS blocks
-- there are now `10` overlay files on disk:
+- there are `10` overlay files on disk:
   `ISCR`, `PSCR`, `TSCR`, `ASCR`, `DSCR`, `TXAC`, `BSCR`, `SSCR`, `MENU`, `CNSL`
-- each overlay file still consumes `5` ProDOS blocks
-- disk free space is now `1536 bytes`
+- each overlay file is still padded to exactly `2,048` bytes and consumes
+  `5` ProDOS blocks
+- disk free space is `1,536` bytes
 
 Current resident / overlay occupancy from `make memory-usage`:
 
@@ -35,20 +37,42 @@ Current resident / overlay occupancy from `make memory-usage`:
 
 | Area | Used | Free |
 |------|-----:|-----:|
-| `LOWCODE` | 5402 | 628 |
-| `RESIDENT_MAIN_SAFE` | 16915 | 1517 |
-| `LANGUAGE_CARD` | 2593 | 479 |
+| `LOWCODE` | 5271 | 759 |
+| `RESIDENT_MAIN_SAFE` | 17166 | 1266 |
+| `LANGUAGE_CARD` | 2635 | 437 |
+
+High main pool breakdown:
+
+| Segment | Size |
+|---------|-----:|
+| `CODE` | 8227 |
+| `RODATA` | 8343 |
+| `DATA` | 262 |
+| `INIT` | 30 |
+| `ONCE` | 304 |
+| `BSS` | 264 |
+
+Selected resident object contributions:
+
+| Object | Notable contribution |
+|--------|---------------------:|
+| `main.o` | `2460` CODE, `601` RODATA, `187` BSS |
+| `logic.o` | `4086` LOWCODE, `194` RODATA |
+| `strings.o` | `184` CODE, `1225` RODATA |
+| `trade_expedition.o` | `577` CODE, `67` RODATA |
+| `ui.o` | `2635` LC, `4471` RODATA, `461` CODE |
+| `text_hgr.o` | `516` LOWCODE, `176` RODATA |
 
 ### Overlays
 
 | Overlay | UsedApprox | FreeApprox |
 |--------|-----------:|-----------:|
-| `ascr.bin` | 1659 | 389 |
+| `ascr.bin` | 2043 | 5 |
 | `bscr.bin` | 1992 | 56 |
-| `cnsl.bin` | 1765 | 283 |
+| `cnsl.bin` | 2004 | 44 |
 | `dscr.bin` | 1978 | 70 |
-| `iscr.bin` | 1804 | 244 |
-| `menu.bin` | 917 | 1131 |
+| `iscr.bin` | 1809 | 239 |
+| `menu.bin` | 1836 | 212 |
 | `pscr.bin` | 1391 | 657 |
 | `sscr.bin` | 1665 | 383 |
 | `tscr.bin` | 1938 | 110 |
@@ -56,239 +80,259 @@ Current resident / overlay occupancy from `make memory-usage`:
 
 Important consequences:
 
-- shrinking an overlay by 100 bytes does not reclaim floppy space by itself
-- floppy space is reclaimed only if:
-  - the main binary drops enough to free one or more ProDOS blocks, or
-  - two overlays are merged so one 2 KB overlay file disappears
-- moving the former `TEXP` renderer into resident code grew the main binary from
-  `66` to `68` ProDOS blocks, but deleting the `TEXP` file removed a `5`-block
-  overlay, for a net recovery of `3` blocks
-- the Council victory report has been implemented inside the existing `CNSL`
-  overlay
-- the victory report did not add a new overlay file or picture asset
-- it did consume Council-overlay headroom and added a small resident
-  helper/string surface
+- shrinking an overlay by 100 bytes does not reclaim floppy space while overlays
+  are padded to `2048` bytes
+- deleting one overlay file still reclaims `5` ProDOS blocks, or `2560` bytes
+- shrinking `IIMPERIALISM` can reclaim space only when it crosses a ProDOS block
+  boundary
+- the current main binary is close to such a boundary:
+  - `34,134` bytes means `67` data blocks plus `1` index block = `68` blocks
+  - to drop to `67` total blocks, it must fit in `66` data blocks
+  - `66 * 512 = 33,792`
+  - target reduction is therefore about `342` bytes; use `350+` bytes as the
+    practical target
 
 ## Fresh Conclusions
 
-The best current options are no longer just "trim bytes somewhere." The project
-has already taken the small-screen resident move for `TEXP`, so remaining work
-falls into two separate buckets:
+The remaining good options are more specific than "trim bytes somewhere."
 
-### A. Reclaim another whole overlay file
+The current project is constrained in three different ways:
 
-This is still the cleanest immediate disk-space win.
+1. The disk is tight, but not every byte saved becomes disk space.
+2. Several overlays are now effectively full.
+3. The main binary is close enough to a block boundary that a modest resident
+   reduction is now valuable.
 
-One successful merge removes one `5`-block overlay file from disk. That is
-`2560` bytes of real floppy space.
+The most important change from the previous analysis is that another overlay
+merge no longer looks like the best first move. `MENU` is no longer mostly empty
+because it owns save/load and the ProDOS game-state I/O helper. `CNSL` is almost
+full because it owns both the Council vote table and the final victory report.
+`ASCR`, `TXAC`, `CNSL`, `DSCR`, and `BSCR` all have less than 100 bytes free.
 
-### B. Shrink the resident main binary without adding files
+## Recommended Options
 
-This matters when the resident main binary is sitting on the wrong side of a
-ProDOS block boundary, which it currently is.
+### 1. Best near-term target: save one main-binary block
 
-This is different from creating a brand-new overlay:
+This is now the cleanest practical target.
 
-- moving code into a new overlay can reduce the main binary but still lose on
-  disk because the new file also costs `5` blocks
-- resident-only reductions or moves into existing files can reduce the main
-  binary and avoid any new disk-file cost
+Goal:
 
-## Overlay Merge Candidates
+- reduce `IIMPERIALISM` by at least `350` bytes
+- keep the file count unchanged
+- confirm the catalog drops from `68` blocks to `67` blocks
 
-The previous best candidate, `MENU + TEXP`, is no longer available because
-`TEXP` has been deleted rather than merged. `MENU` still has substantial
-headroom, but it is intentionally left unmerged so it can grow its save/load and
-menu flow later.
+Why this is attractive:
 
-### Pairings involving `CNSL`
+- the reduction needed is modest
+- it avoids adding another overlay file
+- it does not depend on finding a whole-screen merge
+- resident headroom is currently acceptable:
+  - `LOWCODE` has `759` bytes free
+  - `RESIDENT_MAIN_SAFE` has `1266` bytes free
+  - `LANGUAGE_CARD` has `437` bytes free
 
-`CNSL` is no longer a good merge candidate.
+Likely places to inspect first:
 
-Reason:
+- `src/main.c`: still owns splash, startup, nation naming, the main hub,
+  resident helper exports, and battle prelude text
+- `src/strings.c`: now holds diplomacy and final-report strings for constrained
+  overlays; worthwhile to audit, but do not move strings back into `DSCR` or
+  `CNSL` without measuring those overlays
+- `src/logic.c`: still the largest LOWCODE object, though the score simplification
+  already removed the obvious final-score dead weight
+- `src/trade_expedition.c`: resident by design after deleting `TEXP`; moving it
+  back into a new file would probably lose disk space, so only local shrinking is
+  attractive
+- UI picture/font RODATA in `ui.o`: large, but higher risk because it touches the
+  shared drawing asset path
 
-- it now owns both the Council vote table and the final victory report
-- the victory report deliberately uses resident strings and helpers to stay under
-  the 2 KB overlay limit
-- future endgame polish is likely to need the remaining `CNSL` headroom
+This should be preferred over a new overlay. A new overlay can shrink the main
+binary while still losing disk space because the new file costs `5` blocks.
 
-Do not plan on merging another screen into `CNSL` unless the victory report is
-substantially rewritten or more space is reclaimed first.
+### 2. Strong disk-space candidate: variable-length overlays
 
-## Resident Strategy
+Today every overlay binary is forced to exactly `2048` bytes by
+`config/apple2-ovl.cfg`:
 
-The resident-side result that matters now is simple:
+```text
+OVL: file = %O, start = $8800, size = $0800, fillval = $00, fill = yes;
+```
 
-- `IIMPERIALISM` is now `68` blocks after absorbing the trade market renderer
-- `ISCR` is up to about `1804` bytes used
-- `TEXP` is gone, so future resident work should not assume it can be merged
-  with another overlay
+The loader also expects exactly `2048` bytes:
 
-That means future resident work should focus on general resident reductions, not
-on undoing or re-litigating the completed industry/ledger refactor.
+- `asm/prodos_overlay_load.s` reads up to `OVERLAY_SIZE`
+- `src/overlay.c` treats any read count other than `OVERLAY_SIZE` as failure
 
-### Main screen: not the first resident screen to move
+That is simple and safe, but it means a small overlay still consumes the same
+`5` ProDOS blocks as a nearly full one.
 
-The user specifically called out the main screen. I do not think it is the best
-first move.
+The current `PSCR` overlay uses about `1391` bytes. If overlays were stored
+without padding, `PSCR` should fit below `1536` bytes, which would use:
+
+- `3` data blocks
+- `1` ProDOS index block
+- `4` total blocks instead of `5`
+
+That is a likely `512` byte disk recovery from `PSCR` alone.
+
+Required implementation shape:
+
+- stop padding overlay files in the overlay linker config
+- clear the full `$8800-$8FFF` overlay slot before each read, or otherwise zero
+  the unread tail after a short read
+- remove or relax the exact `overlay_bytes_read == OVERLAY_SIZE` check
+- preserve the maximum read count of `2048` bytes
+- test every overlay path, because stale bytes in the overlay slot would be a
+  serious failure mode
+
+Why this is worth considering:
+
+- it can reclaim disk space without deleting features
+- it scales with future overlay shrinking
+- it makes local overlay optimizations more meaningful
+
+Why it is not entirely free:
+
+- the loader needs a little more resident code
+- the fixed-size read check currently catches malformed overlay files
+- only overlays that cross a 512-byte ProDOS threshold reclaim actual blocks
+
+Current expected immediate winner:
+
+- `PSCR`: likely saves `1` block
+
+Potential future winners if optimized below thresholds:
+
+- overlays below `1536` bytes save `1` block
+- overlays below `1024` bytes save `2` blocks, but no current nontrivial overlay
+  is close to this except the menu C object alone, not the full `MENU` binary
+
+### 3. Maintain overlay headroom before adding features
+
+Several overlays are now too tight for comfortable feature work:
+
+- `ASCR`: `5` bytes free
+- `TXAC`: `45` bytes free
+- `CNSL`: `44` bytes free
+- `BSCR`: `56` bytes free
+- `DSCR`: `70` bytes free
+
+This does not directly free disk space while overlays are padded, but it is still
+advisable maintenance. Without this, even small future behavior fixes can fail to
+link.
+
+Good local candidates:
+
+- `ASCR`: repeated merchant/navy build prompt structure and similar resource
+  deduction branches
+- `TXAC`: trade action flow, likely branch consolidation and narrower locals
+- `BSCR`: battle flow, especially repeated clear/print/sound sequences
+- `TSCR`: repeated resource-row and transport-order selection logic
+
+Keep these optimizations local first. Moving more helper code into resident memory
+should be reserved for cases where the overlay cannot be made to fit locally.
+
+### 4. Loader-owned splash remains plausible, but not first
+
+The splash screen is still a resident-only startup cost:
+
+- it is used once at boot
+- it draws `SHIP_SPLASH`
+- it participates in the timed `ESC` entropy path
+
+A loader-owned splash could remove startup-only code and text from the main
+binary without adding another overlay file. That remains a real option.
+
+However, it is more fragile than the one-block resident cleanup or the
+variable-length overlay idea because it crosses the loader/game boundary and must
+preserve the current entropy handoff.
+
+Recommended stance:
+
+- keep it as a second-phase resident reduction
+- do not create a dedicated splash overlay
+- only pursue it after easier main-binary savings have been measured
+
+### 5. ProDOS replacement is strategic, not near-term
+
+Replacing ProDOS with RWTS or a custom disk path would free the largest amount of
+space on paper because `PRODOS` uses `34` blocks.
+
+It is not a tactical optimization:
+
+- overlay loading depends on ProDOS MLI today
+- save/load depends on ProDOS MLI today
+- the boot path and file layout would change substantially
+- validation cost would be much higher than code-size tuning
+
+Keep this as a long-term distribution/bootloader project, not the next refactor.
+
+## Options To Avoid For Now
+
+### Do not chase another overlay merge first
+
+A whole-overlay deletion would still be the biggest single win, but the current
+pairing options are poor.
 
 Why:
 
-- `src/main.c` does much more than render the main screen
-- it also owns startup flow, splash timing, nation naming, the resident screen
-  dispatch loop, helper exports like `render_warehouse_box()` and
-  `render_turn_funds_header()`, and the resident battle prelude
-- several small rating helpers are tightly coupled to `render_main_screen()`
-- the current `main.o` contribution is already large:
-  - `CODE` = `0x0990` = `2448` bytes
-  - `RODATA` = `0x0258` = `600` bytes
+- `MENU` has only `212` bytes free once save/load support and
+  `prodos_gamestate_io.o` are linked into it
+- `CNSL` has only `44` bytes free and owns the full endgame flow
+- `PSCR` has room, but no current overlay is small enough to fit inside it
+- the tight overlays would need major rewrites before they could absorb or be
+  absorbed by another screen
 
-That does not mean the whole main screen is bigger than 2 KB by itself, but it
-does mean "move main.c into an overlay" is not a real option.
+Conclusion:
 
-A practical main-screen extraction would first need to split:
+- do not plan around deleting another overlay until the overlay set has been
+  deliberately reshaped
 
-- splash / startup work
+### Do not move the main screen wholesale into an overlay
+
+`src/main.c` is not just the main screen.
+
+It also owns:
+
+- startup and splash flow
 - nation-name prompt
-- generic resident helpers needed by overlays
-- resident dispatch loop
-- battle prelude
+- resident screen dispatch
+- helper exports used by overlays, including `render_warehouse_box()` and
+  `render_turn_funds_header()`
+- the battle prelude
+- main-screen rating helpers
 
-Only after that split would it be clear whether the remaining hub screen is
-small enough and cohesive enough to live in an overlay.
+The current object is large (`2460` CODE plus `601` RODATA), but extracting a
+hub-screen overlay would require disentangling several resident responsibilities
+first. That may become worthwhile later, but it is not a clean disk-space move
+today.
 
-Current recommendation:
+### Do not create a new trade-market overlay
 
-- do not start with the main screen
-- revisit the main screen only after splash and startup responsibilities are
-  disentangled
+The former `TEXP` overlay was removed because keeping the small market renderer
+resident and retaining only `TXAC` as an overlay recovered net disk space.
 
-## Splash Screen Reassessment
+Bringing that screen back as a separate file would add another `5`-block overlay
+cost. It should not be reconsidered unless multiple trade-related screens are
+being merged into a different file-count strategy.
 
-The earlier document was correct that the splash is still one of the largest
-resident-only feature costs, because `SHIP_SPLASH` is only used once at boot.
+### Do not move final-report strings back into `CNSL`
 
-That remains true, but the disk-space context has changed:
-
-- adding a new splash overlay right now would cost another `5` blocks on a disk
-  with only `512 bytes free`
-- so a standalone splash overlay is no longer a good first move for floppy space
-
-Re-ranked options:
-
-### 1. Best disk-aware option: loader-owned splash
-
-Move splash rendering and timed `ESC` capture into `IIMP.SYSTEM`, then pass the
-measured entropy into the main program before launch.
-
-Why it now ranks first:
-
-- removes the splash from the main binary
-- does not add a new overlay file
-- preserves the current entropy model if the handoff is done carefully
-
-Cost:
-
-- loader work is more fragile than normal game-code work
-
-### 2. Best non-loader option: piggyback splash on an existing overlay file
-
-If splash logic is moved out of resident code, do not create a twelfth overlay
-file just for it.
-
-Instead:
-
-- piggyback the splash onto some existing low-occupancy overlay file, with a
-  dispatcher
-- or merge splash work into some startup-only path that does not increase file
-  count
-
-This is more awkward than a dedicated splash overlay, but it respects the
-actual disk constraint.
-
-### 3. Dedicated splash overlay
-
-This is now lower priority.
-
-It still helps resident size, but it is a poor disk-space move while the floppy
-is already full.
-
-## Lower-Value Or Deferred Resident Work
-
-These remain valid, but they are not the first thing I would do under the
-current low-free-space pressure.
-
-### Replace the 192-entry `HGR_ROWS[]` table
-
-Still plausible resident win:
-
-- about `300+` bytes feels realistic
-
-But today it is behind:
-
-- one-file overlay merge
-- splash relocation that does not add a file
-
-### Revisit resident-only strings
-
-This has already produced useful savings and is still worth asking:
-
-- are any resident strings only serving one overlay that already has room
-
-But this is now a secondary tuning pass, not the primary strategy. One current
-exception is the victory report: its strings intentionally remain resident because
-`CNSL` is the constrained side of the tradeoff.
-
-### Bold font derivation / picture compression
-
-Still potentially useful, but still higher risk than the options above.
+`CNSL` has only `44` bytes free. The resident final-report string/helper split is
+still the right tradeoff for keeping the endgame report inside the existing
+Council overlay.
 
 ## Recommended Order
 
-There are now two sensible paths, depending on whether the first priority is
-"free the most blocks quickly" or "keep shrinking resident further."
-
-### Path A: fastest disk recovery
-
-1. find another whole overlay file that can be deleted without consuming planned
-   `MENU` headroom
-2. re-run `make memory-usage` and disk catalog
-3. if more space is still needed, revisit loader-owned splash or another
-   no-new-file resident reduction
-4. revisit splash relocation without adding a new disk file
-
-Why this path ranks first:
-
-- deleting one more overlay would free `5` blocks immediately
-- it is the clearest way off a completely full floppy
-
-### Path B: resident-first cleanup
-
-1. verify future resident changes against the current `68`-block main binary
-2. pursue general resident reductions that do not add a new disk file
-3. if more space is still needed, identify a new overlay deletion candidate
-4. then revisit splash relocation without adding a new disk file
-
-Why this path is attractive:
-
-- it avoids adding files or consuming planned `MENU` headroom
-- it keeps future work focused on net wins rather than revisiting completed refactors
-
-Why I still rank it second:
-
-- a guaranteed `5`-block overlay deletion is still more valuable than another likely
-  one-block resident drop
-
-## Final Recommendation
-
-If I had to pick the best next move today, it would be:
-
-1. keep the implemented ledger move in `ISCR`
-2. keep `MENU` available for planned menu growth
-3. revisit loader-owned splash if resident size still needs to come down
-
-The main screen can be reconsidered later, but only after startup / splash /
-dispatch responsibilities are peeled away from `src/main.c`.
+1. Try to save `350+` bytes from the main binary without adding files.
+2. If that succeeds, verify `IIMPERIALISM` drops from `68` to `67` blocks.
+3. Prototype variable-length overlays and confirm whether `PSCR` drops from `5`
+   to `4` blocks.
+4. Add local headroom to the tight overlays, especially `ASCR`, `TXAC`, `CNSL`,
+   `BSCR`, and `DSCR`.
+5. Revisit loader-owned splash only after the easier block-boundary work has been
+   measured.
+6. Treat ProDOS replacement as a separate long-term project.
 
 ## Validation Checklist
 
@@ -296,13 +340,17 @@ After each candidate change:
 
 1. run `make memory-usage`
 2. run `java -jar tools/ac.jar -l assets/iimperialism.dsk`
-3. check `IIMPERIALISM` block count
-4. check whether an overlay file actually disappeared from the disk catalog
+3. check `IIMPERIALISM` block count and byte length
+4. check every overlay's used/free bytes
+5. check whether any overlay file actually disappeared or crossed a 512-byte
+   ProDOS block threshold
 
-Also verify behavior:
+Behavior checks:
 
-- boot still works
+- boot still works from the disk image
 - splash still preserves timed-`ESC` entropy if touched
-- industry can still open and close ledger correctly
-- resident trade expedition market rendering still flows into `TXAC`
-- save/load still works if `MENU` is touched
+- every overlay loads and returns correctly
+- production, transport, admiralty, diplomacy, trade expedition, battle, science,
+  menu, save/load, and Council report flows still work
+- if variable-length overlays are used, repeated overlay loads must not show stale
+  graphics, text, state, or code behavior from a previous larger overlay
