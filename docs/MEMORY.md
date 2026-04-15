@@ -275,6 +275,8 @@ The implementation splits responsibilities to keep `cnsl.bin` under 2 KB:
 - final-report strings live in resident `src/strings.c` and are exposed through
   `get_final_victory_string()`
 - all score tuning constants live in `include/game.h`
+- final score inputs are limited to diplomacy, speed, and treasury; sea power,
+  merchant capacity, and science are displayed report values only
 
 This is a deliberate size tradeoff. Moving score formatting into the overlay was
 larger than using the resident `build_final_score_line()` helper, so the helper is

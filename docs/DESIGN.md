@@ -152,6 +152,9 @@ The final report currently shows:
 - a boxed five-rank table with the achieved rank printed inverted
 - a two-line humorous judgment for the achieved rank
 
+Sea power, merchant capacity, and science remain important gameplay values, but
+they are report/context values only; they are not final score inputs.
+
 The screen deliberately remains text-first. It does not introduce a new overlay
 or new bitmap asset.
 
@@ -160,6 +163,9 @@ or new bitmap asset.
 The score is calculated in resident logic and presented by the Council overlay.
 All tuning values live as named constants in `include/game.h`, not as literals in
 the overlay.
+
+The score deliberately considers only three factors: diplomacy, speed, and
+treasury. Navy, merchant marine, and science no longer contribute directly.
 
 The score inputs are normalized to `0..100`:
 

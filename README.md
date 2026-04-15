@@ -26,6 +26,8 @@ within the Apple II's constraints:
   table to preserve overlay space.
 - The Council of Nations overlay owns the endgame flow, including the final
   report, score display, and historical rank table.
+- The final score now uses only three factors: diplomacy beyond the bare
+  24-vote victory, speed of victory, and treasury.
 - Overlay binaries are loaded at runtime with direct ProDOS MLI `OPEN` / `READ` /
   `CLOSE` calls instead of `stdio`.
 - Save/load also use direct ProDOS MLI calls instead of `fopen()` / `fread()` /

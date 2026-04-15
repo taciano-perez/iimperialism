@@ -45,5 +45,6 @@ MLI helper and fixed overlay entry stub.
 The Council overlay (`cnsl.bin`) owns both the Council of Nations vote table and
 the final victory report. Resident code in `src/logic.c` owns the score
 calculation and rank selection so the overlay can stay within its 2 KB slot.
+The score calculation currently uses only diplomacy, speed, and treasury.
 
 Use `make disk` to update `assets/iimperialism.dsk` with current binaries.

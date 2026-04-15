@@ -442,6 +442,10 @@ After victory, the game presents a final score and historical rating. The score 
 - speed of victory
 - treasury
 
+The final report may still list your fleet, firepower, and merchant capacity as
+part of the campaign summary, but those values no longer add directly to the
+final score.
+
 The final report shows `Your score is ...` in inverted text, then compares your campaign to a rank ladder of nineteenth-century European heads of state:
 
 - Queen Victoria: `50,000 and over`
