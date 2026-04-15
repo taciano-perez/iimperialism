@@ -262,9 +262,9 @@ Relations are displayed as:
 - Fair
 - Good
 - Great
-- Ally or Colony
+- Ally (Great Power) or Colony (minor nation)
 
-Arrows are displayed to indicate if the relations status with a nation are trending up or down.
+Arrows to the right of this field indicate if the relations status with a nation are trending up or down.
 
 The first two nations are the other Great Powers. The remaining three are minor nations. Great Powers import raw materials and export processed goods, whereas minor nations export raw materials and import processed goods. Great Powers can become allies, and minor nations can be turned into colonies.
 
@@ -296,6 +296,8 @@ If the offer succeeds:
 
 - A Great Power becomes an Ally.
 - A minor nation becomes a Colony.
+
+Once the offer is accepted, the relationship becomes permanent, not degrading over time.
 
 These special relationships are important because allied or colonial nations vote for you in the Council of Nations.
 

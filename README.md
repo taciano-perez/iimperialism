@@ -250,8 +250,7 @@ overlays are relinked.
 ## TODO
 
 Core Features
-- Post-victory flow: nation name
-- Avoid money saturation
+- Avoid money (and other increments) saturation
 - Allow multiple slots for saves/loads, introduce "Are you sure (Y/N)?" guard
 - Balance game for all stages (beginning, mid, and end)
 

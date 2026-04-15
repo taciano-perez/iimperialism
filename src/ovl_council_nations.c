@@ -99,42 +99,42 @@ static void render_final_report(unsigned char player_nation_votes) {
 
     clear_screen();
 
-    text = get_final_victory_string(FRSTR_TITLE);
-    print((unsigned char)((40U - strlen(text)) / 2U), 0, text);
+    print(7, 0, get_final_victory_string(FRSTR_TITLE));
+    print_bold((unsigned char)((40U - strlen(state.nation_name)) / 2U), 1, state.nation_name);
 
-    print(0, 2, get_final_victory_string(FRSTR_TREASURY_LABEL));
-    print_int_right_aligned_currency(24, 2, state.money);
+    print(0, 3, get_final_victory_string(FRSTR_TREASURY_LABEL));
+    print_int_right_aligned_currency(24, 3, state.money);
 
     firepower = state.frigates * state.guns_per_frigate;
-    print(0, 3, get_final_victory_string(FRSTR_SEA_POWER_LABEL));
-    print_int(19, 3, firepower);
-    print(22, 3, get_final_victory_string(FRSTR_FIREPOWER_SUFFIX));
+    print(0, 4, get_final_victory_string(FRSTR_SEA_POWER_LABEL));
+    print_int(19, 4, firepower);
+    print(22, 4, get_final_victory_string(FRSTR_FIREPOWER_SUFFIX));
 
     merchant_capacity = state.traders * state.capacity_per_trader;
-    print(0, 4, get_final_victory_string(FRSTR_MERCHANT_LABEL));
-    print_int(19, 4, state.traders);
-    print(22, 4, get_final_victory_string(FRSTR_SHIPS_SUFFIX));
-    print_int(29, 4, merchant_capacity);
-    print(32, 4, get_final_victory_string(FRSTR_CAPACITY_SUFFIX));
+    print(0, 5, get_final_victory_string(FRSTR_MERCHANT_LABEL));
+    print_int(19, 5, state.traders);
+    print(22, 5, get_final_victory_string(FRSTR_SHIPS_SUFFIX));
+    print_int(29, 5, merchant_capacity);
+    print(32, 5, get_final_victory_string(FRSTR_CAPACITY_SUFFIX));
 
-    print(0, 5, get_final_victory_string(FRSTR_FOREIGN_LABEL));
-    print_int(19, 5, player_nation_votes);
-    print(22, 5, get_final_victory_string(FRSTR_FRIENDLY_SUFFIX));
+    print(0, 6, get_final_victory_string(FRSTR_FOREIGN_LABEL));
+    print_int(19, 6, player_nation_votes);
+    print(22, 6, get_final_victory_string(FRSTR_FRIENDLY_SUFFIX));
 
-    print(0, 7, get_final_victory_string(FRSTR_TRIUMPHS_PREFIX));
-    print_int(19, 7, state.turn_number);
-    print(22, 7, get_final_victory_string(FRSTR_TRIUMPHS_SUFFIX));
+    print(0, 8, get_final_victory_string(FRSTR_TRIUMPHS_PREFIX));
+    print_int(19, 8, state.turn_number);
+    print(22, 8, get_final_victory_string(FRSTR_TRIUMPHS_SUFFIX));
 
     build_final_score_line(score_line);
-    print_inverted((unsigned char)((40U - strlen(score_line)) / 2U), 9, score_line);
+    print_inverted((unsigned char)((40U - strlen(score_line)) / 2U), 10, score_line);
 
-    box(0, 11, 39, 19);
+    box(0, 12, 39, 19);
 
     rank_index = get_final_rank_index();
     for (row = 0U; row < SCORE_RANK_COUNT; ++row) {
         unsigned char y;
 
-        y = (unsigned char)(12U + row);
+        y = (unsigned char)(13U + row);
         if (row == rank_index) {
             print_inverted(2, y, get_final_victory_string((unsigned char)(FRSTR_RANK_NAME_BASE + row)));
         } else {
@@ -164,10 +164,10 @@ static void render_final_report(unsigned char player_nation_votes) {
 void ask_continue_question() {
     unsigned char key;
 
-    print(5, 21, "Quit?");
+    print(5, 21, "Proceed?");
     while (1) {
-        key = cgetc_at(10, 21);
-        if (key == 'Q' || key == 'q' || key == 'Y' || key == 'y') {
+        key = cgetc_at(13, 21);
+        if (key == 'P' || key == 'p' || key == 'Y' || key == 'y') {
             return;
         }
     }
@@ -204,7 +204,7 @@ void render_council_nations_screen(void) {
     print((unsigned char)(15 + strlen(state.nation_name)), 13, ":");
     print_int_right_aligned(27, 13, player_nation_votes);
     print(5, 15, "Victory Condition:");
-    print(27, 15, "24 votes");
+    print(26, 15, "24 votes");
 
     draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
     play_sound_alert();

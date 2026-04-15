@@ -56,7 +56,7 @@ static const char* const STR_FINAL_VICTORY[] = {
     "where the sun never sets.",
     "Your skill forged an Empire",
     "never to be forgotten.",
-    "You reigned confidently,",
+    "You reigned resolutely,",
     "though not always wisely.",
     "Your court looked grander",
     "than your results.",
