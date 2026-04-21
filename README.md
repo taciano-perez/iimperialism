@@ -255,8 +255,8 @@ Core Features
 - Balance game for all stages (beginning, mid, and end)
 
 Performance/Maintanability Improvements
-- Rename frigate to warship
 - Attempt to replace ProDOS by RWTS
+- Update OPTIMIZE_REFACTOR.md
 
 Discarded ideas (difficult to squeeze in without requiring extra floppies):
 - Check memory size, if >64K, copy overlays from disk into memory at load time

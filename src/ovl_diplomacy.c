@@ -84,7 +84,7 @@ void render_diplomacy_screen(void) {
         switch (key) {
             case 't':
             case 'T':
-                if (state.frigates == 0) {
+                if (state.warships == 0) {
                     print(5, 22, DSTR(DSTR_NEED_WARSHIPS));
                     play_sound_alert();
                     wait_three_seconds_or_keypress();

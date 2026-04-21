@@ -373,7 +373,7 @@ If you fight and win:
 
 If you lose warships in battle:
 
-- Your frigate total falls.
+- Your warship total falls.
 
 If traders are hit:
 

@@ -404,9 +404,9 @@ void init_game() {
     state.available_workers = 6;
 
     state.traders = 2;
-    state.frigates = 2;
+    state.warships = 2;
     state.capacity_per_trader = CAPACITY_PER_TRADER_BASE;
-    state.guns_per_frigate = GUNS_PER_FRIGATE_BASE;
+    state.guns_per_warship = GUNS_PER_WARSHIP_BASE;
     state.money = 250UL;
     state.science_level = 0U;
 
@@ -461,7 +461,7 @@ void next_turn() {
     unsigned char i;
     unsigned int upkeep = ((unsigned int)state.available_workers * UPKEEP_COST_PER_WORKER)
                         + ((unsigned int)state.traders * UPKEEP_COST_PER_TRADER)
-                        + ((unsigned int)state.frigates * UPKEEP_COST_PER_WARSHIP);
+                        + ((unsigned int)state.warships * UPKEEP_COST_PER_WARSHIP);
 
     // Update resources based on transport orders
     add_resource_saturating(RESOURCE_TIMBER, state.transport_timber);

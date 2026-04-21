@@ -105,7 +105,7 @@ static void render_final_report(unsigned char player_nation_votes) {
     print(0, 3, get_final_victory_string(FRSTR_TREASURY_LABEL));
     print_int_right_aligned_currency(24, 3, state.money);
 
-    firepower = state.frigates * state.guns_per_frigate;
+    firepower = state.warships * state.guns_per_warship;
     print(0, 4, get_final_victory_string(FRSTR_SEA_POWER_LABEL));
     print_int(19, 4, firepower);
     print(22, 4, get_final_victory_string(FRSTR_FIREPOWER_SUFFIX));

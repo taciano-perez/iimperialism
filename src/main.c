@@ -138,7 +138,7 @@ static unsigned char get_merchant_marine_rating_tier(void) {
 }
 
 static unsigned char get_navy_rating_tier(void) {
-    return get_rating_tier(state.frigates, 12U);
+    return get_rating_tier(state.warships, 12U);
 }
 
 static unsigned char get_diplomacy_rating_tier(void) {

@@ -241,7 +241,7 @@ Measured but rejected because of the three-block floppy reserve:
 
 - trade buy cap by remaining warehouse room
 - saturating treasury gains on trade sells and battle bounty
-- admiralty build caps for `traders` and `frigates`
+- admiralty build caps for `traders` and `warships`
 
 ### 4. Loader-owned splash remains plausible, but not first
 

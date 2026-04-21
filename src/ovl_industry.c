@@ -9,7 +9,7 @@
 static void render_ledger_screen(void) {
     int labor_upkeep = (int)state.available_workers * UPKEEP_COST_PER_WORKER * -1;
     int merchant_upkeep = (int)state.traders * UPKEEP_COST_PER_TRADER * -1;
-    int navy_upkeep = ((int)state.frigates * UPKEEP_COST_PER_WARSHIP) * -1;
+    int navy_upkeep = ((int)state.warships * UPKEEP_COST_PER_WARSHIP) * -1;
     int balance = (int)state.trade_revenue + (int)state.turn_booty + (int)labor_upkeep
                 + (int)merchant_upkeep + (int)navy_upkeep - (int)state.trade_expenses;
 

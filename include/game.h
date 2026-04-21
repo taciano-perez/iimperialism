@@ -79,7 +79,7 @@
  * ============================================================================
  */
 #define CAPACITY_PER_TRADER_BASE 2
-#define GUNS_PER_FRIGATE_BASE 2
+#define GUNS_PER_WARSHIP_BASE 2
 #define TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT 50U
 #define TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT 50U
 #define BATTLE_TRADER_HIT_CHANCE_PERCENT 5U
@@ -207,10 +207,10 @@ typedef struct {
 
     /* Navy */
     unsigned char traders;
-    unsigned char frigates;
+    unsigned char warships;
     /* Cached science-adjusted navy stats used by overlays and turn logic. */
     unsigned char capacity_per_trader;
-    unsigned char guns_per_frigate;
+    unsigned char guns_per_warship;
 
     /* Foreign nations */
     ForeignNation foreign_nations[FOREIGN_NATION_COUNT];

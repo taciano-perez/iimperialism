@@ -14,7 +14,7 @@ static void render_firepower(unsigned char is_enemy, unsigned char ship_count) {
 
     clear_x = is_enemy ? 35 : 12;
     clear_area(clear_x, 1, 4, 1);
-    print_int_right_aligned(clear_x + 3, 1, ship_count * state.guns_per_frigate);
+    print_int_right_aligned(clear_x + 3, 1, ship_count * state.guns_per_warship);
 }
 
 static void get_ship_position(unsigned char is_enemy,
@@ -109,7 +109,7 @@ void render_battle_screen(void) {
     max_ships = base_ships + (base_ships / 2U);
     enemy_ships = rand_range(min_ships, max_ships);
 
-    visible_friendly_ships = MIN(state.frigates, MAX_VISIBLE_SHIPS);
+    visible_friendly_ships = MIN(state.warships, MAX_VISIBLE_SHIPS);
     visible_enemy_ships = MIN(enemy_ships, MAX_VISIBLE_SHIPS);
 
     // Render player's navy
@@ -172,7 +172,7 @@ void render_battle_screen(void) {
                         print(5, 22, STR_FIGHT);
                     }
                     if (visible_friendly_ships != previous_friendly_ships) {
-                        --state.frigates;
+                        --state.warships;
                     }
                     if (visible_friendly_ships == 0) {
                         clear_input_area();

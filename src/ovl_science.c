@@ -96,7 +96,7 @@ void render_science_screen(void) {
                         } else if (next_level == 2U) {
                             state.wool_yield_per_province *= 2U;
                         } else if (next_level == 3U) {
-                            state.guns_per_frigate = GUNS_PER_FRIGATE_BASE * 2U;
+                            state.guns_per_warship = GUNS_PER_WARSHIP_BASE * 2U;
                         } else if (next_level == 4U) {
                             state.coal_yield_per_province *= 2U;
                         } else if (next_level == 5U) {
@@ -104,7 +104,7 @@ void render_science_screen(void) {
                         } else if (next_level == 6U) {
                             state.iron_yield_per_province *= 2U;
                         } else if (next_level == 7U) {
-                            state.guns_per_frigate = GUNS_PER_FRIGATE_BASE * 4U;
+                            state.guns_per_warship = GUNS_PER_WARSHIP_BASE * 4U;
                         } else if (next_level == 8U) {
                             state.capacity_per_trader = CAPACITY_PER_TRADER_BASE * 4U;
                         }

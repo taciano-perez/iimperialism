@@ -31,11 +31,11 @@ void render_admiralty_screen(void) {
         box(BOX_X1+19, BOX_Y1+1, BOX_X2, BOX_Y2);
         print_inverted((BOX_X1+19), BOX_Y1, "Navy");
         print((BOX_X1+20), (BOX_Y1+1), "Warships:");
-        print_int_right_aligned((BOX_X1+36), (BOX_Y1+1), state.frigates);
+        print_int_right_aligned((BOX_X1+36), (BOX_Y1+1), state.warships);
         print((BOX_X1+20), (BOX_Y1+2), "Guns/ship:");
-        print_int_right_aligned((BOX_X1+36), (BOX_Y1+2), state.guns_per_frigate);
+        print_int_right_aligned((BOX_X1+36), (BOX_Y1+2), state.guns_per_warship);
         print((BOX_X1+20), (BOX_Y1+4), "Firepower:");
-        print_int_right_aligned((BOX_X1+36), (BOX_Y1+4), state.frigates * state.guns_per_frigate);
+        print_int_right_aligned((BOX_X1+36), (BOX_Y1+4), state.warships * state.guns_per_warship);
 
         print(1, 14, "Available workers:");
         print_int_right_aligned(24, 14, state.available_workers);
@@ -80,11 +80,11 @@ void render_admiralty_screen(void) {
             case 'w':
             case 'W':
                 clear_input_area();
-                build_cost = state.guns_per_frigate / GUNS_PER_FRIGATE_BASE;
+                build_cost = state.guns_per_warship / GUNS_PER_WARSHIP_BASE;
                 max_units = MIN(MIN(MIN(state.resources[RESOURCE_LUMBER], state.resources[RESOURCE_FABRIC]),
                                     state.resources[RESOURCE_GUNS] / build_cost),
                                 state.available_workers);
-                max_units = MIN(max_units, MAX_UCHAR - state.frigates);
+                max_units = MIN(max_units, MAX_UCHAR - state.warships);
 
                 while (1) {
                     clear_input_area();
@@ -103,7 +103,7 @@ void render_admiralty_screen(void) {
                     state.resources[RESOURCE_FABRIC] -= units_to_build;
                     state.resources[RESOURCE_GUNS] -= units_to_build * build_cost;
                     state.available_workers -= units_to_build;
-                    state.frigates += units_to_build;
+                    state.warships += units_to_build;
                     break;
                 }
                 break;

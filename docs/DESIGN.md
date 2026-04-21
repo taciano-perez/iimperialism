@@ -8,7 +8,7 @@ The current playable loop focuses on:
 - resource extraction and transport
 - production planning and workforce management
 - trade expeditions driven by foreign market prices
-- naval expansion (traders and frigates)
+- naval expansion (traders and warships)
 
 The player cycles through screen overlays to adjust orders, then advances the turn.
 The campaign ends through the Council of Nations: when the player commands enough
@@ -49,11 +49,11 @@ The same nation-naming prompt is also reused by the game menu's `New Game` actio
 
 - Wagons limit transport throughput
 - Workers limit production throughput
-- Traders and frigates are built in admiralty workflows
-- Science research increases `capacity_per_trader` and `guns_per_frigate`,
+- Traders and warships are built in admiralty workflows
+- Science research increases `capacity_per_trader` and `guns_per_warship`,
   which affect trade-expedition capacity and battle firepower
 - New trader material costs scale with the trader-capacity multiplier; new
-  frigate gun costs scale with the guns-per-frigate multiplier. These costs are
+  warship gun costs scale with the guns-per-warship multiplier. These costs are
   derived in the Admiralty overlay from the existing cached science-adjusted
   stats, avoiding extra game-state fields.
 
@@ -144,7 +144,7 @@ game's imperial tone with the concise ranking-screen rhythm of Apple II `Taipan!
 The final report currently shows:
 
 - net treasury
-- sea power as `frigates * guns_per_frigate`
+- sea power as `warships * guns_per_warship`
 - merchant fleet as trader count and total capacity
 - foreign relations as the number of friendly provinces that voted for the player
 - winning turn count
@@ -220,8 +220,8 @@ Global `GameState state` (see `include/game.h`) includes:
 - province yields
 - transport orders and available wagons
 - production orders and available workers
-- navy counts (`traders`, `frigates`)
-- derived navy stats (`capacity_per_trader`, `guns_per_frigate`)
+- navy counts (`traders`, `warships`)
+- derived navy stats (`capacity_per_trader`, `guns_per_warship`)
 - science progression (`science_level`)
 - metadata (`turn_number`, `nation_name`, `current_screen`)
 - turn-specific trade state (`remaining_turn_capacity`)
@@ -266,7 +266,7 @@ below three ProDOS blocks:
 
 - trade buy cap by remaining warehouse room
 - saturating treasury gains on trade sells and battle bounty
-- admiralty build caps for `traders` and `frigates`
+- admiralty build caps for `traders` and `warships`
 
 See `docs/MEMORY.md` for exact map and loader flow.
 
