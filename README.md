@@ -255,7 +255,6 @@ Core Features
 - Balance game for all stages (beginning, mid, and end)
 
 Performance/Maintanability Improvements
-- Rename wiseman portrait
 - Rename frigate to warship
 - Attempt to replace ProDOS by RWTS
 

@@ -77,7 +77,7 @@ void render_diplomacy_screen(void) {
             y = (unsigned char)(y + ROW_HEIGHT);
         }
 
-        draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
+        draw_picture_at(CHANCELLOR_PORTRAIT, 0, 20);
         print(5, 20, DSTR(DSTR_PROMPT_1));
         print(5, 21, DSTR(DSTR_PROMPT_2));
         key = cgetc_at(37, 21);

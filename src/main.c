@@ -213,7 +213,7 @@ void render_main_screen(void) {
 
     box(19, 11, 39, 17);
     print_inverted(20, 11, "Chancellor");
-    draw_picture_at(WISEMAN_PORTRAIT, 20, 13);
+    draw_picture_at(CHANCELLOR_PORTRAIT, 20, 13);
     print_rating_row(24, 13, 38, "Diplomacy:", get_diplomacy_rating_tier());
 
     print(0, 20, "Visit Ministry of Industry, Patent");

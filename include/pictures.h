@@ -14,8 +14,8 @@
  * Portraits are 28x28 pixels (4 bytes × 28 rows)
  */
 
-/* Generated from wiseman.bmp */
-static const unsigned char WISEMAN_DATA[] = {
+/* Generated from chancellor.bmp */
+static const unsigned char CHANCELLOR_DATA[] = {
   0x04, 0x1c, 0x80, 0xd0, 0x82, 0x80, 0x80, 0x84, 0x88, 0x80, 0x80, 0x84,
   0x88, 0x80, 0x80, 0x81, 0xa0, 0x80, 0x80, 0x81, 0xa0, 0x80, 0x80, 0x81,
   0xa0, 0x80, 0xa0, 0x86, 0x8c, 0x81, 0xe0, 0x99, 0xb3, 0x81, 0xe0, 0x99,
@@ -268,7 +268,7 @@ static const unsigned char SHIP_SPLASH_DATA[] = {
  * Array of pointers to all available pictures
  */
 static const unsigned char* PICTURES_DATA[] = {
-    WISEMAN_DATA,     // Index 0
+    CHANCELLOR_DATA,  // Index 0
     INDUSTRY_DATA,    // Index 1
     ADMIRAL_DATA,     // Index 2
     SCIENCE_DATA,     // Index 3

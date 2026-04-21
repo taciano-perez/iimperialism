@@ -14,7 +14,7 @@
  * ============================================================================
  * Use these constants to reference pictures by name
  */
-#define WISEMAN_PORTRAIT 0
+#define CHANCELLOR_PORTRAIT 0
 #define INDUSTRY_PORTRAIT 1
 #define ADMIRAL_PORTRAIT 2
 #define SCIENCE_PORTRAIT 3

@@ -32,5 +32,5 @@ void render_trade_market(void) {
     print(1, PRICE_BOX_Y1+6, "Fleet trade capacity:");
     print_int_right_aligned(29, PRICE_BOX_Y1+6, state.remaining_turn_capacity);
 
-    draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
+    draw_picture_at(CHANCELLOR_PORTRAIT, 0, 20);
 }

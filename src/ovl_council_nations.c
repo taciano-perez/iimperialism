@@ -206,7 +206,7 @@ void render_council_nations_screen(void) {
     print(5, 15, "Victory Condition:");
     print(26, 15, "24 votes");
 
-    draw_picture_at(WISEMAN_PORTRAIT, 0, 20);
+    draw_picture_at(CHANCELLOR_PORTRAIT, 0, 20);
     play_sound_alert();
     state.current_screen = SCREEN_MAIN;
     if (victory_achieved) {

@@ -11,7 +11,7 @@ The process involves three main steps:
 
 ## Step 1: Create Your Bitmap
 
-Create a bitmap image (`.bmp` file) with your desired content. For example, `wiseman.bmp` is a small sprite image.
+Create a bitmap image (`.bmp` file) with your desired content. For example, `chancellor.bmp` is a small sprite image.
 
 **Important sizing notes:**
 - Apple II HGR screen is 280×192 pixels
@@ -25,7 +25,7 @@ Create a bitmap image (`.bmp` file) with your desired content. For example, `wis
 Use the `bmp2dhr` tool (also called `b2d`) to convert your bitmap to Apple II format:
 
 ```bash
-b2d wiseman.bmp H F N
+b2d chancellor.bmp H F N
 ```
 
 ### Flag Explanations:
@@ -38,7 +38,7 @@ b2d wiseman.bmp H F N
 
 ### Output:
 
-This creates `WISEMAN.RAG` - a binary file containing:
+This creates `CHANCELLOR.RAG` - a binary file containing:
 - 2-byte header: `[width_in_bytes, total_data_bytes_or_height]`
 - Image data: Each row is encoded as multiple bytes
 
@@ -47,12 +47,12 @@ This creates `WISEMAN.RAG` - a binary file containing:
 Use `xxd` to convert the binary RAG file to a C-compatible byte array:
 
 ```bash
-xxd -i WISEMAN.RAG > temp_wiseman.h
+xxd -i CHANCELLOR.RAG > temp_chancellor.h
 ```
 
 This creates a temporary header file with content like:
 ```c
-unsigned char WISEMAN_RAG[] = {
+unsigned char CHANCELLOR_RAG[] = {
   0x04, 0x1c, 0x80, 0xd0, 0x82, 0x80, ...
 };
 ```
@@ -60,13 +60,13 @@ unsigned char WISEMAN_RAG[] = {
 ### Adding to pictures.h:
 
 1. **Copy the byte array data** from the temporary file into `pictures.h`
-2. **Rename the array** to follow the naming convention (e.g., `WISEMAN_DATA`)
+2. **Rename the array** to follow the naming convention (e.g., `CHANCELLOR_DATA`)
 3. **Make it static const** for better optimization:
 
 ```c
 /* Wiseman portrait - 28x28 pixels (4 bytes × 28 rows) */
-/* Generated from wiseman.bmp using: b2d H F N wiseman.bmp */
-static const unsigned char WISEMAN_DATA[] = {
+/* Generated from chancellor.bmp using: b2d H F N chancellor.bmp */
+static const unsigned char CHANCELLOR_DATA[] = {
   0x04, 0x1c, 0x80, 0xd0, 0x82, 0x80, ...
 };
 ```
@@ -85,7 +85,7 @@ For each picture, create a separate data array:
 
 ```c
 /* Wiseman portrait */
-static const unsigned char WISEMAN_DATA[] = {
+static const unsigned char CHANCELLOR_DATA[] = {
   0x04, 0x1c, 0x80, 0xd0, 0x82, 0x80, /* ... data ... */
 };
 
@@ -101,7 +101,7 @@ Create an array of pointers to all pictures:
 
 ```c
 static const unsigned char* PICTURES_DATA[] = {
-    WISEMAN_DATA,   // Index 0
+    CHANCELLOR_DATA,   // Index 0
     SOLDIER_DATA,   // Index 1
     /* Add more pictures here */
 };
@@ -112,7 +112,7 @@ static const unsigned char* PICTURES_DATA[] = {
 Create named constants for easy reference:
 
 ```c
-#define WISEMAN_PORTRAIT 0
+#define CHANCELLOR_PORTRAIT 0
 #define SOLDIER_PORTRAIT 1
 /* Add more picture indices here */
 ```
@@ -215,7 +215,7 @@ void draw_picture(const unsigned char picture_index, const unsigned char x_byte,
 ```
 
 ### Function Parameters:
-- **picture_index:** Index into PICTURES_DATA array (use defined constants like WISEMAN_PORTRAIT)
+- **picture_index:** Index into PICTURES_DATA array (use defined constants like CHANCELLOR_PORTRAIT)
 - **x_byte:** Horizontal position in bytes (0-39 for HGR's 40-byte width)
 - **x_offset:** Additional horizontal pixel offset within `x_byte` (0-6)
 - **y:** Vertical position in pixels (0-191)
@@ -243,7 +243,7 @@ remainder as `x_offset`.
 
 ### Why This Approach?
 - **Flexible:** Works with any number of pictures without code changes
-- **Self-documenting:** Picture names are clear (WISEMAN_PORTRAIT vs. magic number 0)
+- **Self-documenting:** Picture names are clear (CHANCELLOR_PORTRAIT vs. magic number 0)
 - **Automatic:** Width and height are read from headers, so the function adapts to different image sizes
 - **Scalable:** Easy to add new pictures - just add data, pointer, and constant
 
@@ -260,11 +260,11 @@ int main(void) {
     tgi_install(a2_hi_tgi);
     tgi_init();
 
-    // Draw the wiseman portrait at byte column 2, no pixel offset, row 40
-    draw_picture(WISEMAN_PORTRAIT, 2, 0, 40);
+    // Draw the chancellor portrait at byte column 2, no pixel offset, row 40
+    draw_picture(CHANCELLOR_PORTRAIT, 2, 0, 40);
 
     // Draw the same portrait four pixels into byte column 0
-    draw_picture(WISEMAN_PORTRAIT, 0, 4, 40);
+    draw_picture(CHANCELLOR_PORTRAIT, 0, 4, 40);
 
     // Draw another picture (if you've added more)
     // draw_picture(SOLDIER_PORTRAIT, 10, 0, 80);
@@ -296,12 +296,12 @@ To add a new picture:
 **Solution:** Reconvert without the "S" flag: `b2d H F N yourimage.bmp`
 
 ### Issue: Image appears doubled horizontally
-**Cause:** Copying too many bytes per row (WISEMAN_WIDTH too large).
-**Solution:** Verify the first header byte and adjust WISEMAN_WIDTH accordingly.
+**Cause:** Copying too many bytes per row (CHANCELLOR_WIDTH too large).
+**Solution:** Verify the first header byte and adjust CHANCELLOR_WIDTH accordingly.
 
 ### Issue: Image has wrong colors
 **Cause:** Copying wrong bytes from each row's data.
-**Solution:** Ensure you're copying all WISEMAN_WIDTH bytes starting from the correct offset.
+**Solution:** Ensure you're copying all CHANCELLOR_WIDTH bytes starting from the correct offset.
 
 ### Issue: Existing line changes color when drawing with x_offset
 **Cause:** Apple II HGR bit 7 controls the color phase for the byte. If a shifted
@@ -312,7 +312,7 @@ byte can change artifact color.
 
 ### Issue: Image appears as random lines
 **Cause:** Incorrect row width or data pointer advancement.
-**Solution:** Verify WISEMAN_WIDTH matches the first header byte, and that you're advancing data_ptr correctly.
+**Solution:** Verify CHANCELLOR_WIDTH matches the first header byte, and that you're advancing data_ptr correctly.
 
 ## Technical Notes
 
@@ -344,7 +344,7 @@ Keep the API compact:
 
 ### Byte Array Format
 The RAG format with "H F N" flags produces a compact format where:
-- Each row is consistently encoded as WISEMAN_WIDTH bytes
+- Each row is consistently encoded as CHANCELLOR_WIDTH bytes
 - The format includes the raw pixel data that can be directly copied to HGR screen memory
 - No additional decompression or decoding is needed
 
