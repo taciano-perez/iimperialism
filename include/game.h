@@ -5,6 +5,7 @@
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MAX_UINT 65535U
 #define MAX_ULONG 4294967295UL
+#define MAX_UCHAR 255U
 #define TRUE 1U
 #define FALSE 0U
 
@@ -102,6 +103,13 @@
 #define UPKEEP_COST_PER_WORKER 2U
 #define UPKEEP_COST_PER_TRADER 5U
 #define UPKEEP_COST_PER_WARSHIP 5U
+
+#define DSTR_BUY_SELL_QUIT 21U
+#define DSTR_COMMODITY_BUY 22U
+#define DSTR_COMMODITY_SELL 23U
+#define DSTR_HOW_MANY 24U
+#define DSTR_WARSHIP_COST 25U
+#define DSTR_WARSHIP_GUNS_WORKER 26U
 
 /* ============================================================================
  * Council of Nations constants
@@ -217,9 +225,9 @@ typedef struct {
 
     /* turn-specific data */
     unsigned char remaining_turn_capacity;
-    unsigned char trade_expenses;
-    unsigned char trade_revenue;
-    unsigned char turn_booty;
+    unsigned int trade_expenses;
+    unsigned int trade_revenue;
+    unsigned int turn_booty;
     unsigned char attacker_index; // INDEX_PIRATES or index of foreign nation attacking in battle screen
 } GameState;
 

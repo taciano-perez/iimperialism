@@ -25,10 +25,20 @@ Current catalog (from `ac -l`) includes:
 - `MENU` (`BIN`, `A=$8800`) - game menu overlay.
 - `CNSL` (`BIN`, `A=$8800`) - Council of Nations and final victory report overlay.
 
+Current size-sensitive entries from the verified build:
+
+- `IIMPERIALISM` uses `68` ProDOS blocks and is `34,166` bytes long.
+- Each overlay is still padded to exactly `2,048` bytes and uses `5` ProDOS
+  blocks.
+- The disk currently has `1,536` bytes free, exactly three ProDOS blocks. Keep at
+  least this much free after future changes.
+
 Not present on the game disk:
 
 - `BASIC.SYSTEM`
 - `STARTUP`
+- `GAME.DATA` (runtime save container; `make disk` removes it from the packaged
+  image so the shipped floppy keeps its three-block reserve)
 
 ## Autoboot Behavior
 
@@ -94,3 +104,9 @@ Expected boot-critical entries:
 - `PRODOS`
 - `IIMP.SYSTEM`
 - `IIMPERIALISM`
+
+The final catalog should report at least:
+
+```text
+ProDOS format; 1.536 bytes free
+```

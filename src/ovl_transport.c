@@ -15,6 +15,7 @@ void render_transport_screen(void) {
         signed int delta;
         unsigned int max_transport;
         unsigned int wagons_to_build;
+        unsigned int new_transport_order;
 
         clear_screen();
         print(0, 0, "Transport Orders");
@@ -55,6 +56,7 @@ void render_transport_screen(void) {
             case 'B':
                 clear_input_area();
                 max_transport = MIN(state.resources[RESOURCE_LUMBER], state.resources[RESOURCE_STEEL]);
+                max_transport = MIN(max_transport, MAX_UCHAR - state.available_wagons);
                 while (1) {
                     print(5, 20, "Build how many wagons (Max:    )?");
                     print_int_right_aligned(35, 20, max_transport);
@@ -110,6 +112,7 @@ void render_transport_screen(void) {
                             continue;
                     }
 
+                    max_transport = MIN(max_transport, MAX_UCHAR);
                     while (1) {
                         old_order = *transport_order;
                         clear_input_area();
@@ -117,11 +120,12 @@ void render_transport_screen(void) {
                         print(33, 20, resource_name);
                         print(5, 21, "per turn (Max:    )?");
                         print_int_right_aligned(22, 21, max_transport);
-                        *transport_order = scan_uint(25, 21, 5);
-                        if (*transport_order > max_transport) {
+                        new_transport_order = scan_uint(25, 21, 5);
+                        if (new_transport_order > max_transport) {
                             continue;
                         }
 
+                        *transport_order = new_transport_order;
                         delta = (signed int)*transport_order - (signed int)old_order;
                         state.available_wagons -= delta;
                         break;

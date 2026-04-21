@@ -41,11 +41,10 @@ void render_admiralty_screen(void) {
         print_int_right_aligned(24, 14, state.available_workers);
 
         draw_picture_at(ADMIRAL_PORTRAIT, 0, 20);
-        print(5, 20, "Awaiting orders, sir.");
-        print(5, 21, "Build Trading vessel, Warship,");
-        print(5, 22, "or Quit?");
+        print(5, 20, "Build Trader, Warship,");
+        print(5, 21, "or Quit?");
 
-        key = cgetc_at(13, 22);
+        key = cgetc_at(13, 21);
 
         switch (key) {
             case 't':
@@ -55,6 +54,7 @@ void render_admiralty_screen(void) {
                 max_units = MIN(MIN(state.resources[RESOURCE_LUMBER] / build_cost,
                                     state.resources[RESOURCE_FABRIC] / build_cost),
                                 state.available_workers);
+                max_units = MIN(max_units, MAX_UCHAR - state.traders);
 
                 while (1) {
                     clear_input_area();
@@ -84,11 +84,12 @@ void render_admiralty_screen(void) {
                 max_units = MIN(MIN(MIN(state.resources[RESOURCE_LUMBER], state.resources[RESOURCE_FABRIC]),
                                     state.resources[RESOURCE_GUNS] / build_cost),
                                 state.available_workers);
+                max_units = MIN(max_units, MAX_UCHAR - state.frigates);
 
                 while (1) {
                     clear_input_area();
-                    print(5, 20, "Warship cost: 1 lumber, 1 fabric,");
-                    print(5, 21, "  gun(s) & 1 worker.");
+                    print(5, 20, get_diplomacy_string(DSTR_WARSHIP_COST));
+                    print(5, 21, get_diplomacy_string(DSTR_WARSHIP_GUNS_WORKER));
                     print_int_right_aligned(5, 21, build_cost);
                     print(5, 22, "Build how many (Max:    )?");
                     print_int_right_aligned(28, 22, max_units);

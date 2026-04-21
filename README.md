@@ -252,7 +252,7 @@ overlays are relinked.
 ## TODO
 
 Core Features
-- Avoid money (and other increments) saturation
+- Audit any newly added counters for overflow before release
 - Balance game for all stages (beginning, mid, and end)
 
 Performance/Maintanability Improvements
@@ -262,10 +262,8 @@ Performance/Maintanability Improvements
 - Check memory size, if >64K, copy overlays from disk into memory at load time
 - Attempt to replace ProDOS by RWTS
 
-Nice to have features
-- Random events (positive and negative) at turn's end
-
 Discarded ideas (difficult to squeeze in without requiring extra floppies):
+- Random events (positive and negative) at turn's end
 - Map screen
 - Land battles
 

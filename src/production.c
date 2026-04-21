@@ -66,6 +66,7 @@ void production_orders(void) {
                 continue;
         }
 
+        max_production = MIN(max_production, MAX_UCHAR);
         while (1) {
             old_order = *production_order;
             clear_input_area();

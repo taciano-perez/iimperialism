@@ -64,7 +64,7 @@ The same nation-naming prompt is also reused by the game menu's `New Game` actio
 1. applies transport orders to warehouse totals
 2. applies production conversions
 3. clamps production orders to available resources
-4. increments turn counter
+4. increments turn counter, saturating at `MAX_UINT`
 
 Every tenth turn, the Council of Nations meets. A player victory at the council
 branches into the final report screen instead of returning directly to the Main
@@ -225,6 +225,8 @@ Global `GameState state` (see `include/game.h`) includes:
 - science progression (`science_level`)
 - metadata (`turn_number`, `nation_name`, `current_screen`)
 - turn-specific trade state (`remaining_turn_capacity`)
+- per-turn ledger totals (`trade_expenses`, `trade_revenue`, `turn_booty`) stored
+  as `unsigned int` so they do not wrap during active trade/battle turns
 
 Persistence is owned entirely by the game menu overlay and uses a local
 direct-ProDOS MLI helper for `GAME.DATA` rather than `stdio`.
@@ -244,6 +246,27 @@ direct-ProDOS MLI helper for `GAME.DATA` rather than `stdio`.
 - After changing the jump table or resident layout, rebuild overlays so the
   generated `build/apple2-ovl.cfg` picks up the current `_state` address and
   resident helper entry points.
+
+### Overflow Guard Status
+
+The current build keeps only guards that fit while preserving at least three
+free ProDOS blocks on the packaged floppy:
+
+- resource production uses saturating warehouse adds
+- `turn_number` saturates at `MAX_UINT`
+- per-turn ledger totals are `unsigned int`
+- battle bounty is calculated as `unsigned int`
+- production orders and transport orders are capped before assigning into
+  `unsigned char` fields
+- worker and wagon builds are capped against their destination storage limits
+
+The following guards were measured but not kept because they either overflowed
+their 2KB overlay or required resident helper code that reduced disk free space
+below three ProDOS blocks:
+
+- trade buy cap by remaining warehouse room
+- saturating treasury gains on trade sells and battle bounty
+- admiralty build caps for `traders` and `frigates`
 
 See `docs/MEMORY.md` for exact map and loader flow.
 

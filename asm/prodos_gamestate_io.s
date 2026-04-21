@@ -7,7 +7,7 @@
 ;     1 byte  save version
 ;     N bytes serialized GameState payload
 ;
-; With the current 183-byte GameState, the file uses 934 bytes and fits in
+; With the current 186-byte GameState, the file uses 949 bytes and fits in
 ; two 512-byte ProDOS blocks. New or invalid containers are explicitly filled
 ; with zero records so empty slot probes never depend on sparse-file behavior.
 
@@ -35,14 +35,14 @@ PRODOS_IO_BUFFER    := $8400
 
 SLOT_COUNT          := 5
 CONTAINER_SIZE      := 4
-RECORD_SIZE         := 186
+RECORD_SIZE         := 189
 SAVE_FILE_SIZE      := CONTAINER_SIZE + RECORD_SIZE * SLOT_COUNT
 SAVE_HEADER_SIZE    := 3
-CONTAINER_VERSION   := 2
+CONTAINER_VERSION   := 3
 
 ; Offsets into the raw GameState payload. These are deliberately duplicated
 ; here instead of computed by C so the menu can read slot summaries without
-; loading an entire 183-byte save into live game state.
+; loading an entire 186-byte save into live game state.
 TURN_OFFSET         := 150
 NATION_NAME_OFFSET  := 157
 
@@ -127,7 +127,7 @@ CONTAINER_HEADER:
 SAVE_HEADER:
     ; Persisted ahead of every occupied slot's GameState payload.
     .word   $4947
-    .byte   $03
+    .byte   $04
 
 HEADER_BUFFER:
     ; Large enough for either the 4-byte container header or 3-byte slot header.
@@ -138,7 +138,7 @@ SAVE_PATH:
     .byte   "GAME.DATA"
 
 SLOT_OFFSET_LO:
-    ; Precomputed slot starts avoid multiplying by 186 on the 6502.
+    ; Precomputed slot starts avoid multiplying by 189 on the 6502.
     .byte   <(CONTAINER_SIZE + RECORD_SIZE * 0)
     .byte   <(CONTAINER_SIZE + RECORD_SIZE * 1)
     .byte   <(CONTAINER_SIZE + RECORD_SIZE * 2)
@@ -153,7 +153,7 @@ SLOT_OFFSET_HI:
 
 ZERO_RECORD:
     ; One zero-filled slot record. init_container writes this five times after
-    ; the container header, producing a deterministic 934-byte file.
+    ; the container header, producing a deterministic 949-byte file.
     .res    RECORD_SIZE
 
 INIT_COUNT:
@@ -500,9 +500,9 @@ set_mark:
     rts
 
 init_container:
-    ; Build the whole 934-byte save container by writing:
+    ; Build the whole 949-byte save container by writing:
     ;   4-byte container header
-    ;   5 zero-filled 186-byte slot records
+    ;   5 zero-filled 189-byte slot records
     ; This makes all unsaved slots real bytes on disk and avoids hanging while
     ; probing unwritten space on some ProDOS/emulator combinations.
     jsr     set_mark_start
@@ -603,7 +603,7 @@ read_save_header:
     cmp     #>$4947
     bne     read_header_bad
     lda     HEADER_BUFFER+2
-    cmp     #$03
+    cmp     #$04
     bne     read_header_bad
     clc
     rts

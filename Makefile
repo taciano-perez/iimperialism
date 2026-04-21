@@ -120,6 +120,7 @@ disk: iimperialism overlays $(BUILD_DIR)/loader.system
 	$(AC) -p $(DISK) MENU BIN 0x8800 < $(BUILD_DIR)/menu.bin
 	-$(AC) -d $(DISK) CNSL
 	$(AC) -p $(DISK) CNSL BIN 0x8800 < $(BUILD_DIR)/cnsl.bin
+	-$(AC) -d $(DISK) GAME.DATA
 	$(AC) -l $(DISK)
 
 overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/txac.bin $(BUILD_DIR)/bscr.bin $(BUILD_DIR)/sscr.bin $(BUILD_DIR)/menu.bin $(BUILD_DIR)/cnsl.bin

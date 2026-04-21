@@ -543,7 +543,9 @@ void next_turn() {
     }
 
     // update turn number
-    ++state.turn_number;
+    if (state.turn_number < MAX_UINT) {
+        ++state.turn_number;
+    }
 
     if ((state.turn_number % 10U) == 0U) {
         state.current_screen = SCREEN_COUNCIL_NATIONS;

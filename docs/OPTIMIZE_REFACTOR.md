@@ -7,7 +7,9 @@ Apple II floppy build. The goal is to reclaim real ProDOS blocks without changin
 game behavior or shortening user-visible text.
 
 This refresh is based on the current build as of `2026-04-15`, after the final
-score was simplified to diplomacy, speed, and treasury only. The checks used were:
+score was simplified to diplomacy, speed, and treasury, and after retaining only
+the overflow guards that fit while keeping three free ProDOS blocks. The checks
+used were:
 
 - `make memory-usage`
 - `java -jar tools/ac.jar -l assets/iimperialism.dsk`
@@ -22,14 +24,14 @@ true in the current tree.
 
 Current disk catalog:
 
-- `IIMPERIALISM` uses `68` ProDOS blocks and is `34,134` bytes long
+- `IIMPERIALISM` uses `68` ProDOS blocks and is `34,166` bytes long
 - `IIMP.SYSTEM` uses `1` ProDOS block and is `469` bytes long
 - `PRODOS` uses `34` ProDOS blocks
 - there are `10` overlay files on disk:
   `ISCR`, `PSCR`, `TSCR`, `ASCR`, `DSCR`, `TXAC`, `BSCR`, `SSCR`, `MENU`, `CNSL`
 - each overlay file is still padded to exactly `2,048` bytes and consumes
   `5` ProDOS blocks
-- disk free space is `1,536` bytes
+- disk free space is `1,536` bytes, exactly the required three-block reserve
 
 Current resident / overlay occupancy from `make memory-usage`:
 
@@ -37,15 +39,15 @@ Current resident / overlay occupancy from `make memory-usage`:
 
 | Area | Used | Free |
 |------|-----:|-----:|
-| `LOWCODE` | 5271 | 759 |
-| `RESIDENT_MAIN_SAFE` | 17166 | 1266 |
+| `LOWCODE` | 5306 | 724 |
+| `RESIDENT_MAIN_SAFE` | 17198 | 1234 |
 | `LANGUAGE_CARD` | 2635 | 437 |
 
 High main pool breakdown:
 
 | Segment | Size |
 |---------|-----:|
-| `CODE` | 8227 |
+| `CODE` | 8259 |
 | `RODATA` | 8343 |
 | `DATA` | 262 |
 | `INIT` | 30 |
@@ -68,15 +70,15 @@ Selected resident object contributions:
 | Overlay | UsedApprox | FreeApprox |
 |--------|-----------:|-----------:|
 | `ascr.bin` | 2043 | 5 |
-| `bscr.bin` | 1992 | 56 |
+| `bscr.bin` | 2018 | 30 |
 | `cnsl.bin` | 2004 | 44 |
 | `dscr.bin` | 1978 | 70 |
 | `iscr.bin` | 1809 | 239 |
 | `menu.bin` | 1836 | 212 |
-| `pscr.bin` | 1391 | 657 |
+| `pscr.bin` | 1512 | 536 |
 | `sscr.bin` | 1665 | 383 |
-| `tscr.bin` | 1938 | 110 |
-| `txac.bin` | 2003 | 45 |
+| `tscr.bin` | 1960 | 88 |
+| `txac.bin` | 2017 | 31 |
 
 Important consequences:
 
@@ -86,10 +88,10 @@ Important consequences:
 - shrinking `IIMPERIALISM` can reclaim space only when it crosses a ProDOS block
   boundary
 - the current main binary is close to such a boundary:
-  - `34,134` bytes means `67` data blocks plus `1` index block = `68` blocks
+  - `34,166` bytes means `67` data blocks plus `1` index block = `68` blocks
   - to drop to `67` total blocks, it must fit in `66` data blocks
   - `66 * 512 = 33,792`
-  - target reduction is therefore about `342` bytes; use `350+` bytes as the
+  - target reduction is therefore about `374` bytes; use `400+` bytes as the
     practical target
 
 ## Fresh Conclusions
@@ -99,15 +101,15 @@ The remaining good options are more specific than "trim bytes somewhere."
 The current project is constrained in three different ways:
 
 1. The disk is tight, but not every byte saved becomes disk space.
-2. Several overlays are now effectively full.
+2. Several overlays are still effectively full.
 3. The main binary is close enough to a block boundary that a modest resident
    reduction is now valuable.
 
-The most important change from the previous analysis is that another overlay
-merge no longer looks like the best first move. `MENU` is no longer mostly empty
-because it owns save/load and the ProDOS game-state I/O helper. `CNSL` is almost
-full because it owns both the Council vote table and the final victory report.
-`ASCR`, `TXAC`, `CNSL`, `DSCR`, and `BSCR` all have less than 100 bytes free.
+The most important change from the previous analysis is that resident guard
+helpers are not currently affordable: they recover local overlay headroom, but
+they spend a main-binary block and drop the disk below the required three-block
+reserve. Future changes should either stay size-neutral or first recover at
+least one ProDOS block.
 
 ## Recommended Options
 
@@ -117,7 +119,7 @@ This is now the cleanest practical target.
 
 Goal:
 
-- reduce `IIMPERIALISM` by at least `350` bytes
+- reduce `IIMPERIALISM` by at least `400` bytes
 - keep the file count unchanged
 - confirm the catalog drops from `68` blocks to `67` blocks
 
@@ -127,8 +129,8 @@ Why this is attractive:
 - it avoids adding another overlay file
 - it does not depend on finding a whole-screen merge
 - resident headroom is currently acceptable:
-  - `LOWCODE` has `759` bytes free
-  - `RESIDENT_MAIN_SAFE` has `1266` bytes free
+  - `LOWCODE` has `724` bytes free
+  - `RESIDENT_MAIN_SAFE` has `1234` bytes free
   - `LANGUAGE_CARD` has `437` bytes free
 
 Likely places to inspect first:
@@ -212,9 +214,10 @@ Potential future winners if optimized below thresholds:
 Several overlays are now too tight for comfortable feature work:
 
 - `ASCR`: `5` bytes free
-- `TXAC`: `45` bytes free
 - `CNSL`: `44` bytes free
-- `BSCR`: `56` bytes free
+- `TXAC`: `31` bytes free
+- `TSCR`: `88` bytes free
+- `BSCR`: `30` bytes free
 - `DSCR`: `70` bytes free
 
 This does not directly free disk space while overlays are padded, but it is still
@@ -228,9 +231,17 @@ Good local candidates:
 - `TXAC`: trade action flow, likely branch consolidation and narrower locals
 - `BSCR`: battle flow, especially repeated clear/print/sound sequences
 - `TSCR`: repeated resource-row and transport-order selection logic
+- `DSCR`: diplomacy proposal and trade-expedition setup flow
+- `CNSL`: final report rendering and repeated string/number layout
 
 Keep these optimizations local first. Moving more helper code into resident memory
 should be reserved for cases where the overlay cannot be made to fit locally.
+
+Measured but rejected because of the three-block floppy reserve:
+
+- trade buy cap by remaining warehouse room
+- saturating treasury gains on trade sells and battle bounty
+- admiralty build caps for `traders` and `frigates`
 
 ### 4. Loader-owned splash remains plausible, but not first
 
@@ -324,12 +335,13 @@ Council overlay.
 
 ## Recommended Order
 
-1. Try to save `350+` bytes from the main binary without adding files.
-2. If that succeeds, verify `IIMPERIALISM` drops from `68` to `67` blocks.
+1. Try to save `400+` bytes from the main binary without adding files.
+2. If that succeeds, verify `IIMPERIALISM` drops from `68` to `67` blocks and
+   disk free space rises above the three-block reserve.
 3. Prototype variable-length overlays and confirm whether `PSCR` drops from `5`
    to `4` blocks.
 4. Add local headroom to the tight overlays, especially `ASCR`, `TXAC`, `CNSL`,
-   `BSCR`, and `DSCR`.
+   `DSCR`, `TSCR`, and `BSCR`.
 5. Revisit loader-owned splash only after the easier block-boundary work has been
    measured.
 6. Treat ProDOS replacement as a separate long-term project.

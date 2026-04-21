@@ -96,7 +96,7 @@ void render_battle_screen(void) {
     unsigned char base_ships;
     unsigned char enemy_ships;
     unsigned char i;
-    unsigned char bounty;
+    unsigned int bounty;
     unsigned char modifier_percent;
     unsigned char min_ships;
     unsigned char max_ships;

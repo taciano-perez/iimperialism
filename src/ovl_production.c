@@ -12,6 +12,7 @@ static void train_new_workers(void) {
 
     clear_input_area();
     max_workers = MIN(state.resources[RESOURCE_FURNITURE], state.resources[RESOURCE_CLOTHES]);
+    max_workers = MIN(max_workers, MAX_UINT - state.available_workers);
     while (1) {
         print(5, 20, "Training workers requires");
         print(5, 21, "1 furniture and 1 clothes each.");

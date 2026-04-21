@@ -262,17 +262,16 @@ int main(void) {
     print(2, 4, "expansion of the 1900's");
     draw_picture_at(SHIP_SPLASH, 1, 10);
     print(28, 6, "Created By:");
-    print(29, 7, "Taciano");
-    print(29, 8, "Dreckmann");
-    print(29, 9, "Perez");
+    print(29, 8, "Taciano D.");
+    print(30, 9, "Perez");
     print_bold(28, 11, "===========");
     print(29, 13, "Copyright");
-    print(31, 14, "2026");
+    print(29, 14, "(c) 2026");
     print_bold(28, 16, "===========");
-    print(29, 17, "Press the");
-    print_bold(29, 18, "`ESC`");
-    print(34, 18, "key");
-    print(29, 19, "to start.");
+    print(29, 18, "Press the");
+    print_bold(29, 19, "`ESC`");
+    print(34, 19, "key");
+    print(29, 20, "to start.");
     seed_random(wait_for_splash_escape());
     start_new_game();
 

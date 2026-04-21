@@ -384,6 +384,11 @@ correctly even when the build succeeds.
 One current example is the diplomacy overlay: it uses a resident
 `get_diplomacy_string()` helper through `JMPTAB` to keep `dscr.bin` under 2 KB.
 
+Recent measurement note: moving saturation/build-cap helpers for `ASCR`, `TXAC`,
+and `BSCR` into resident code made those overlays fit comfortably, but it pushed
+the packaged floppy below the required three-block reserve. Keep such helpers
+overlay-local unless the main binary first recovers at least one ProDOS block.
+
 ## Rule of Thumb
 
 The safest wins usually come from:

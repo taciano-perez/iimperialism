@@ -3,11 +3,6 @@
 #define TRADE_MODE_BUY  0
 #define TRADE_MODE_SELL 1
 
-static const char STR_BUY_SELL_QUIT[] = "Buy, Sell or Quit?";
-static const char STR_COMMODITY_BUY[] = "Commodity to buy?";
-static const char STR_COMMODITY_SELL[] = "Commodity to sell?";
-static const char STR_HOW_MANY[] = "How many units (Max:    )?";
-
 static void trade_commodities(unsigned char nation_index, unsigned char mode);
 
 void handle_screen_trade_expedition(void) {
@@ -25,7 +20,7 @@ void handle_screen_trade_expedition(void) {
         print_int_right_aligned(29, 15, state.remaining_turn_capacity);
 
         clear_input_area();
-        print(5, 20, STR_BUY_SELL_QUIT);
+        print(5, 20, get_diplomacy_string(DSTR_BUY_SELL_QUIT));
         key = (unsigned char)(cgetc_at(23, 20) & 0xDF);
         if (key == 'B') {
             trade_commodities(nation_index, TRADE_MODE_BUY);
@@ -65,7 +60,7 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
 
     while (1) {
         clear_input_area();
-        print(5, 20, mode == TRADE_MODE_BUY ? STR_COMMODITY_BUY : STR_COMMODITY_SELL);
+        print(5, 20, get_diplomacy_string(mode == TRADE_MODE_BUY ? DSTR_COMMODITY_BUY : DSTR_COMMODITY_SELL));
 
         for (i = 0; i < FOREIGN_TRADE_ENTRY_COUNT; ++i) {
             print_int((i * 12) + 5, 21, i + menu_base);
@@ -81,6 +76,9 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
                 if (mode == TRADE_MODE_BUY) {
                     price = nation->export_prices[i];
                     max_quantity = MIN(state.remaining_turn_capacity, state.money / price);
+                    if ((unsigned int)max_quantity > (MAX_UINT - state.resources[resource])) {
+                        max_quantity = (unsigned char)(MAX_UINT - state.resources[resource]);
+                    }
                 } else {
                     price = nation->import_prices[i];
                     max_quantity = MIN(state.remaining_turn_capacity, state.resources[resource]);
@@ -88,7 +86,7 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
 
                 while (1) {
                     clear_area(28, 22, 3, 1);
-                    print(5, 22, STR_HOW_MANY);
+                    print(5, 22, get_diplomacy_string(DSTR_HOW_MANY));
                     print_int_right_aligned(28, 22, max_quantity);
                     quantity = scan_uint(31, 22, 3);
                     if (quantity <= max_quantity) {

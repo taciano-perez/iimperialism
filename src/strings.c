@@ -28,7 +28,13 @@ static const char* const STR_DIPLOMACY[] = {
     "colony status to a minor nation.",
     "Which nation to trade (1-5)?",
     "Sailing to the Sea of",
-    "..."
+    "...",
+    "Buy, Sell or Quit?",
+    "Commodity to buy?",
+    "Commodity to sell?",
+    "How many units (Max:    )?",
+    "Warship cost: 1 lumber, 1 fabric,",
+    "  gun(s) & 1 worker."
 };
 static const char* const STR_FINAL_VICTORY[] = {
     "Final Report To The Crown",

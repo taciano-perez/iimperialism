@@ -99,6 +99,14 @@ use direct MLI `CREATE` / `OPEN` / `READ` / `WRITE` / `CLOSE` calls for
 `GAME.DATA` instead of linking the heavier `stdio` file I/O path into resident
 code.
 
+Current save-container details:
+
+- `GameState` payload size is `186` bytes.
+- Each slot record is `189` bytes: a 3-byte slot header plus the payload.
+- The five-slot file is `949` bytes total: a 4-byte container header plus five
+  189-byte slot records. It still fits in two 512-byte ProDOS blocks.
+- Container version is `3`; per-slot save header version is `4`.
+
 For overlays with helper functions, use an explicit assembly entry stub so the
 intended entry point stays at `$8800` even if function ordering changes during
 compilation. Current examples:
@@ -254,7 +262,7 @@ If the overlay needs a resident function not in JMPTAB, append a new JMP entry i
 `asm/jmptab.s`, export it from `config/apple2-ovl.cfg`, and declare it in
 `include/game.h`. Current examples include `clear_area(int x, int y, int width, int height)`
 at `$0839`, `print_bold(unsigned char x, unsigned char y, const char* text)` at `$084B`,
-`print_inverted(unsigned char x, unsigned char y, const char* text)` at `$0863`, and
+`print_inverted(unsigned char x, unsigned char y, const char* text)` at `$0860`, and
 `get_diplomacy_string(unsigned char index)` at `$0863`,
 `print_signed_int_right_aligned_currency(unsigned char x, unsigned char y, int value)`
 at `$0866`, and the Council final-report helpers
