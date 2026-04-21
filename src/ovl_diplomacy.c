@@ -120,7 +120,7 @@ static void diplomatic_proposal(unsigned char is_alliance) {
     x = FIRST_COL_X;
     for (; nation_index < end_index; ++nation_index) {
         nation = &state.foreign_nations[nation_index];
-        if (nation->relations < RELATION_EXCELLENT || nation->relations == RELATION_ALLY_COLONY) {
+        if (nation->relations < RELATION_GREAT || nation->relations == RELATION_ALLY_COLONY) {
             continue;
         }
 
@@ -147,7 +147,7 @@ static void diplomatic_proposal(unsigned char is_alliance) {
             if (nation_index == 255U) { // user typed 0 to quit
                 break; 
             }
-            if (nation_index < FOREIGN_NATION_COUNT && state.foreign_nations[nation_index].relations >= RELATION_EXCELLENT) {
+            if (nation_index < FOREIGN_NATION_COUNT && state.foreign_nations[nation_index].relations >= RELATION_GREAT) {
                 clear_input_area();
                 if (rand_range(1U, 100U) <= DIPLOMATIC_OVERTURE_CHANCE_PERCENT) {
                     state.foreign_nations[nation_index].relations = RELATION_ALLY_COLONY;
@@ -193,7 +193,7 @@ static void trade_expedition(void) {
         } else {
             unsigned char i;
             for (i = 0; i < FOREIGN_NATION_COUNT; ++i) {
-                if (state.foreign_nations[i].relations == RELATION_TERRIBLE && rand_range(1U, 100U) <= TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT) {
+                if (state.foreign_nations[i].relations == RELATION_BAD && rand_range(1U, 100U) <= TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT) {
                     state.attacker_index = i;
                     state.current_screen = SCREEN_BATTLE;
                     return;

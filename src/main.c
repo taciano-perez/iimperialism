@@ -165,11 +165,11 @@ static unsigned char get_diplomacy_rating_tier(void) {
 
 static const char* get_rating_name(unsigned char tier) {
     switch (tier) {
-        case 0U: return STR_RELATION_TERRIBLE;
-        case 1U: return STR_RELATION_BAD;
-        case 2U: return STR_RELATION_NEUTRAL;
+        case 0U: return STR_RELATION_BAD;
+        case 1U: return STR_RELATION_POOR;
+        case 2U: return STR_RELATION_FAIR;
         case 3U: return STR_RELATION_GOOD;
-        default: return STR_RELATION_EXCELLENT;
+        default: return STR_RELATION_GREAT;
     }
 }
 

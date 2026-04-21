@@ -1,10 +1,10 @@
 #include "game.h"
 
-const char STR_RELATION_TERRIBLE[] = "Bad";
-const char STR_RELATION_BAD[] = "Poor";
-const char STR_RELATION_NEUTRAL[] = "Fair";
+const char STR_RELATION_BAD[] = "Bad";
+const char STR_RELATION_POOR[] = "Poor";
+const char STR_RELATION_FAIR[] = "Fair";
 const char STR_RELATION_GOOD[] = "Good";
-const char STR_RELATION_EXCELLENT[] = "Great";
+const char STR_RELATION_GREAT[] = "Great";
 const char STR_RELATION_ALLY[] = "Ally";
 const char STR_RELATION_COLONY[] = "Colony";
 static const char* const STR_DIPLOMACY[] = {
@@ -101,19 +101,19 @@ const char* get_final_victory_string(unsigned char index) {
 }
 
 const char* get_relation_name(unsigned char relation, unsigned char nation_index) {
-    if (relation < RELATION_BAD) {
-        return STR_RELATION_TERRIBLE;
-    }
-
-    if (relation < RELATION_NEUTRAL) {
+    if (relation < RELATION_POOR) {
         return STR_RELATION_BAD;
     }
 
-    if (relation < RELATION_GOOD) {
-        return STR_RELATION_NEUTRAL;
+    if (relation < RELATION_FAIR) {
+        return STR_RELATION_POOR;
     }
 
-    if (relation < RELATION_EXCELLENT) {
+    if (relation < RELATION_GOOD) {
+        return STR_RELATION_FAIR;
+    }
+
+    if (relation < RELATION_GREAT) {
         return STR_RELATION_GOOD;
     }
     if (relation == RELATION_ALLY_COLONY) {
@@ -124,5 +124,5 @@ const char* get_relation_name(unsigned char relation, unsigned char nation_index
         }
     }
 
-    return STR_RELATION_EXCELLENT;
+    return STR_RELATION_GREAT;
 }

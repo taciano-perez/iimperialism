@@ -103,7 +103,7 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
                         // improve trade relations proportionally to the trade * multiplier, but only if not already an ally/colony
                         if (nation->relations != RELATION_ALLY_COLONY) {
                             nation->relations_previous_turn = nation->relations;
-                            nation->relations = MIN((unsigned int)nation->relations + (quantity * TRADE_RELATIONS_MULTIPLIER), RELATION_EXCELLENT);
+                            nation->relations = MIN((unsigned int)nation->relations + (quantity * TRADE_RELATIONS_MULTIPLIER), RELATION_GREAT);
                         }
                         return;
                     }

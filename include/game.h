@@ -62,11 +62,11 @@
  * Diplomacy Constants
  * ============================================================================
  */
-#define RELATION_TERRIBLE 0
-#define RELATION_BAD 50
-#define RELATION_NEUTRAL 100  
+#define RELATION_BAD 0
+#define RELATION_POOR 50
+#define RELATION_FAIR 100  
 #define RELATION_GOOD 150
-#define RELATION_EXCELLENT 200
+#define RELATION_GREAT 200
 #define RELATION_ALLY_COLONY 255
 
 #define RELTYPE_COLONY 0U

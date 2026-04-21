@@ -252,17 +252,15 @@ overlays are relinked.
 ## TODO
 
 Core Features
-- Audit any newly added counters for overflow before release
 - Balance game for all stages (beginning, mid, and end)
 
 Performance/Maintanability Improvements
-- Rename relations constants
 - Rename wiseman portrait
 - Rename frigate to warship
-- Check memory size, if >64K, copy overlays from disk into memory at load time
 - Attempt to replace ProDOS by RWTS
 
 Discarded ideas (difficult to squeeze in without requiring extra floppies):
+- Check memory size, if >64K, copy overlays from disk into memory at load time
 - Random events (positive and negative) at turn's end
 - Map screen
 - Land battles

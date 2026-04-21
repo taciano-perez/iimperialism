@@ -39,11 +39,11 @@ static unsigned char get_resource_base_price(unsigned char resource) {
 }
 
 unsigned char get_relation_tier(unsigned char relations) {
-    if (relations < RELATION_BAD) {
+    if (relations < RELATION_POOR) {
         return 0U;
     }
 
-    if (relations < RELATION_NEUTRAL) {
+    if (relations < RELATION_FAIR) {
         return 1U;
     }
 
@@ -51,7 +51,7 @@ unsigned char get_relation_tier(unsigned char relations) {
         return 2U;
     }
 
-    if (relations < RELATION_EXCELLENT) {
+    if (relations < RELATION_GREAT) {
         return 3U;
     }
 
@@ -441,7 +441,7 @@ void init_game() {
             nation->exports[2] = rand_resource_excluding(RESOURCE_LUMBER, RESOURCE_STEEL, import_mid);
         }
 
-        nation->relations = RELATION_NEUTRAL;
+        nation->relations = RELATION_FAIR;
         nation->relations_previous_turn = nation->relations;
         update_foreign_nation_prices(nation);
     }
@@ -533,9 +533,9 @@ void next_turn() {
         if (nation->relations != RELATION_ALLY_COLONY) {
             nation->relations_previous_turn = nation->relations;
             if (state.money == 0) {
-                nation->relations = RELATION_TERRIBLE;
+                nation->relations = RELATION_BAD;
             } else if (nation->relations <= RELATIONS_LOSS_PER_TURN) {
-                nation->relations = RELATION_TERRIBLE;
+                nation->relations = RELATION_BAD;
             } else {
                 nation->relations = (unsigned char)(nation->relations - RELATIONS_LOSS_PER_TURN);
             }
