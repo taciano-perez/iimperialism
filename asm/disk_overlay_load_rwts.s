@@ -19,13 +19,18 @@ _disk_overlay_bytes_read:
     .segment "LOWCODE"
 
 PRORWTS_STATUS  := $F3
+PRORWTS_REQCMD  := $F8
+PRORWTS_LDRLO   := $F9
+PRORWTS_LDRHI   := $FA
 PRORWTS_NAMLO   := $FB
 PRORWTS_NAMHI   := $FC
-PRORWTS_OPENDIR := $BD00
+PRORWTS_OPENDIR := $BC00
+PRORWTS_CMDREAD := $01
+OVERLAY_SLOT    := $8800
 OVERLAY_SIZE    := $0800
 
 _disk_get_capabilities:
-    lda     #$00
+    lda     #DISK_CAP_SAVE_LOAD
     ldx     #$00
     rts
 
@@ -43,6 +48,13 @@ _disk_load_overlay:
     rts
 
 @valid_overlay:
+    lda     #PRORWTS_CMDREAD
+    sta     PRORWTS_REQCMD
+    lda     #<OVERLAY_SLOT
+    sta     PRORWTS_LDRLO
+    lda     #>OVERLAY_SLOT
+    sta     PRORWTS_LDRHI
+
     lda     OVL_NAME_LO,x
     sta     PRORWTS_NAMLO
     lda     OVL_NAME_HI,x

@@ -29,9 +29,9 @@
                 ;options
                 enable_floppy = 1       ; build script override
                 poll_drive   = 0        ;set to 1 to check if disk is in drive
-                override_adr = 0        ;set to 1 to require an explicit load address
+                override_adr = 1       ; build script override
                 aligned_read = 0        ;set to 1 if all reads can be a multiple of block size
-                enable_write = 0        ;set to 1 to enable write support
+                enable_write = 1       ; build script override
                                         ;file must exist already and its size cannot be altered
                                         ;writes occur in multiples of block size (256 bytes for floppy, 512 bytes for HDD)
                 allow_multi  = 0        ;set to 1 to allow multiple floppies

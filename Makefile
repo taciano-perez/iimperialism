@@ -95,6 +95,7 @@ AC = java -jar $(TOOLS_DIR)/ac.jar
 DISK ?= $(BASE_DISK)
 LOADER_SYSTEM = IIMP.SYSTEM
 MAIN_DISK_NAME = IIMP
+RWTS_SAVE_IMAGE = $(BUILD_DIR)/game.data.bin
 
 all: $(BUILD_DIR) iimperialism overlays $(BUILD_DIR)/loader.system
 
@@ -134,6 +135,8 @@ endif
 	$(AC) -p $(DISK) CNSL BIN 0x8800 < $(BUILD_DIR)/cnsl.bin
 	-$(AC) -d $(DISK) GAME.DATA
 ifeq ($(DISK_BACKEND),rwts)
+	python tools/build_rwts_save.py --output $(RWTS_SAVE_IMAGE)
+	$(AC) -p $(DISK) GAME.DATA BIN 0x0000 < $(RWTS_SAVE_IMAGE)
 	python tools/build_rwts_boot.py --root $(ROOT_DIR) --build $(BUILD_DIR) --disk $(DISK)
 endif
 	$(AC) -l $(DISK)

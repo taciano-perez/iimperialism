@@ -4,7 +4,7 @@
 !cpu 6502
 !to "qboot",plain
 *=$800
-        sectors   = $08         ; build script override
+        sectors   = $09         ; build script override
         firsttrk  = $22         ; build script override
         firstsec  = $00         ; build script override
         address   = $04         ; build script override

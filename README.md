@@ -193,10 +193,16 @@ This produces `assets/iimperialism-rwts.dsk` from a separate `build-rwts`
 directory, compiles the game with `RWTS_EXPERIMENTAL=1`, and links the
 experimental `rwts` disk backend. It now has a custom qboot/ProRWTS boot path:
 
-- save/load are disabled in the menu
 - boot no longer depends on `PRODOS` or `IIMP.SYSTEM`
 - overlay reads go through resident ProRWTS instead of ProDOS MLI
-- the runtime path is still read-only; `GAME.DATA` save/load is not implemented
+- `GAME.DATA` is preallocated as a fixed-size RWTS save container
+- save/load now use resident ProRWTS read/write access instead of ProDOS MLI
+
+Current RWTS save/load note:
+
+- the RWTS backend updates a fixed 1024-byte `GAME.DATA` image in place
+- unlike the default ProDOS backend, it does not create or resize save files at runtime
+- RWTS save support should be treated as experimental until it has been exercised on hardware/emulators
 
 To clean artifacts:
 

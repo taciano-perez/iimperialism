@@ -17,10 +17,14 @@
         page1_switch                 = $c054
         home_clear                   = $fc58
         prorwts_init                 = $0800
-        prorwts_open                 = $bd00
+        prorwts_open                 = $bc00
         prodos_status                = $f3
+        reqcmd                       = $f8
+        ldrlo                        = $f9
+        ldrhi                        = $fa
         namlo                        = $fb
         namhi                        = $fc
+        cmdread                      = $01
         boot_hang_dst                = relocate_dst + (boot_hang - relocated_code)
         game_name_dst                = relocate_dst + (game_name - relocated_code)
         zerobss_wrapper_dst          = relocate_dst + (zerobss_wrapper - relocated_code)
@@ -43,6 +47,13 @@ relocated_code:
         jsr     home_clear
 
         jsr     prorwts_init
+
+        lda     #cmdread
+        sta     reqcmd
+        lda     #<game_entry
+        sta     ldrlo
+        lda     #>game_entry
+        sta     ldrhi
 
         lda     #<game_name_dst
         sta     namlo

@@ -13,5 +13,5 @@ ui_init_entry         = $D400
 clear_screen_entry    = $D412
 print_bold_entry      = $D505
 draw_picture_at_entry = $D793
-beep_entry            = $1CEC
+beep_entry            = $1CF8
 himem_entry           = $9600

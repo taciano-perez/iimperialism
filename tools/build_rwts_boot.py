@@ -215,6 +215,8 @@ def main() -> None:
         configured_prorwts,
         {
             "enable_floppy": "                enable_floppy = 1       ; build script override",
+            "override_adr": "                override_adr = 1       ; build script override",
+            "enable_write": "                enable_write = 1       ; build script override",
             "might_exist": "                might_exist  = 1       ; build script override",
         },
     )

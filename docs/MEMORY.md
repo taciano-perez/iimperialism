@@ -102,9 +102,9 @@ Current backends:
 - `asm/disk_overlay_load_rwts.s` / `asm/disk_gamestate_io_rwts.s`
 
 The default backend still uses ProDOS MLI `CREATE` / `OPEN` / `READ` /
-`WRITE` / `CLOSE`. The RWTS backend now uses resident ProRWTS for read-only
-overlay loading after the experimental qboot boot path has initialized it.
-Save/load remains stubbed in the RWTS build.
+`WRITE` / `CLOSE`. The RWTS backend now uses resident ProRWTS for overlay
+loading and fixed-size `GAME.DATA` save/load after the experimental qboot boot
+path has initialized it.
 
 Current save-container details:
 
