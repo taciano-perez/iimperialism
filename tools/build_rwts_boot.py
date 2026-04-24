@@ -146,6 +146,8 @@ def rewrite_lines(src: Path, dst: Path, replacements: dict[str, str]) -> None:
     out_lines: list[str] = []
     for raw_line in src.read_text().splitlines():
         stripped = raw_line.lstrip()
+        if stripped.startswith("!to "):
+            continue
         replaced = False
         for key, new_line in replacements.items():
             if stripped.startswith(key):

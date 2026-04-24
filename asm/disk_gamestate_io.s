@@ -1,11 +1,11 @@
-; Disk fixed-slot game-state persistence, RWTS backend.
+; Disk fixed-slot game-state persistence.
 ;
-; This backend uses the write-capable ProRWTS build left resident by the RWTS
-; bootstrap. Because ProRWTS writes fixed 256-byte pages on floppy and cannot
-; create/resize files, GAME.DATA is preallocated on the disk image as a fixed
-; 1024-byte container. The menu overlay reads the full container into hidden
-; text-page memory ($0400-$07FF), updates one slot, and writes the whole image
-; back out.
+; The shipped build uses the write-capable resident ProRWTS runtime left in
+; memory by the qboot/ProRWTS bootstrap. Because ProRWTS writes fixed 256-byte
+; pages on floppy and cannot create or resize files, GAME.DATA is preallocated
+; on disk as a fixed 1024-byte container. The menu overlay reads the full
+; container into hidden text-page memory ($0400-$07FF), updates one slot, and
+; writes the whole image back.
 
     .include "zeropage.inc"
     .include "disk.inc"

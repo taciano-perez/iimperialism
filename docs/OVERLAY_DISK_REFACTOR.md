@@ -294,8 +294,7 @@ Bottom-line answer:
 Repo-local:
 
 - [src/overlay.c](src/overlay.c)
-- [asm/disk_overlay_load_prodos.s](asm/disk_overlay_load_prodos.s)
-- [asm/disk_overlay_load_rwts.s](asm/disk_overlay_load_rwts.s)
+- [asm/disk_overlay_load.s](asm/disk_overlay_load.s)
 - [include/overlay.h](include/overlay.h)
 - [docs/MEMORY.md](docs/MEMORY.md)
 - [docs/FLOPPY.md](docs/FLOPPY.md)

@@ -1,5 +1,12 @@
 # RWTS / ProDOS Replacement Feasibility
 
+Status: completed. The shipped disk now boots through qboot + ProRWTS, uses
+resident ProRWTS for overlay loading, and uses resident ProRWTS read/write
+access for the fixed-size `GAME.DATA` save container. The remaining value of
+this document is historical: it captures the design tradeoffs and the key
+runtime issue encountered during the migration, namely cc65 startup assumptions
+that depended on a ProDOS launch environment.
+
 ## Short Conclusion
 
 Replacing `PRODOS` with a custom RWTS layer is technically feasible and would

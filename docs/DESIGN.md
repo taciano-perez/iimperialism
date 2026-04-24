@@ -229,7 +229,7 @@ Global `GameState state` (see `include/game.h`) includes:
   as `unsigned int` so they do not wrap during active trade/battle turns
 
 Persistence is owned entirely by the game menu overlay and uses a local
-direct-ProDOS MLI helper for `GAME.DATA` rather than `stdio`.
+ProRWTS helper for `GAME.DATA` rather than `stdio`.
 
 ## Runtime Architecture
 
@@ -274,16 +274,16 @@ See `docs/MEMORY.md` for exact map and loader flow.
 
 The floppy image (`assets/iimperialism.dsk`) autoboots through:
 
-1. `PRODOS`
-2. `IIMP.SYSTEM` (loader)
-3. `IIMPERIALISM` (main BIN)
+1. qboot
+2. the stage-2 ProRWTS continuation
+3. `IIMP` (main BIN)
 
 See `docs/FLOPPY.md` for details.
 
 ## Build Targets
 
-- `make` builds main binary, overlays, and loader artifacts.
-- `make disk` updates the ProDOS disk image.
+- `make` builds the main binary and overlays.
+- `make disk` updates the shipped qboot/ProRWTS disk image.
 - `make clean` removes build artifacts.
 
 On some Windows environments, `make SHELL=cmd disk` is required.

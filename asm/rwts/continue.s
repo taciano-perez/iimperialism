@@ -1,4 +1,4 @@
-; Continuation code for the experimental qboot -> ProRWTS boot path.
+; Continuation code for the shipped qboot -> ProRWTS boot path.
 ;
 ; qboot loads this blob at $0400 and returns directly here. Because $0400 is
 ; also text-screen memory on the Apple II, the bootstrap first relocates itself

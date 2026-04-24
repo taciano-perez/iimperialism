@@ -1,8 +1,8 @@
-; Disk overlay loader, RWTS experimental backend.
+; Disk overlay loader.
 ;
-; This backend expects the experimental qboot/ProRWTS boot path to have run
-; already. The boot loader leaves ProRWTS relocated at $BD00, which gives us a
-; tiny file loader for the resident runtime without keeping ProDOS in memory.
+; The shipped build uses the resident ProRWTS runtime initialized by the
+; qboot/ProRWTS bootstrap. Overlays are loaded directly into the fixed overlay
+; slot without relying on ProDOS MLI.
 
     .include "disk.inc"
     .include "disk_overlay_table.inc"

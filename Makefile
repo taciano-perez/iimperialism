@@ -8,16 +8,13 @@ CONFIG_DIR = $(ROOT_DIR)/config
 ASSETS_DIR = $(ROOT_DIR)/assets
 TOOLS_DIR  = $(ROOT_DIR)/tools
 BUILD_DIR ?= $(ROOT_DIR)/build
-LOADER_DIR = $(ROOT_DIR)/asm/loader
-BASE_DISK  := $(ASSETS_DIR)/iimperialism.dsk
-RWTS_DISK  := $(ASSETS_DIR)/iimperialism-rwts.dsk
-DISK_BACKEND ?= prodos
+DISK ?= $(ASSETS_DIR)/iimperialism.dsk
 
 ifeq ($(OS),Windows_NT)
-CLEAN_CMD = powershell.exe -NoProfile -Command "if (Test-Path '$(BUILD_DIR)') { Remove-Item -Recurse -Force -ErrorAction SilentlyContinue '$(BUILD_DIR)' }; Remove-Item -Force -ErrorAction SilentlyContinue '$(SRC_DIR)/*.o','$(ASM_DIR)/*.o'"
+CLEAN_CMD = powershell.exe -NoProfile -Command "if (Test-Path '$(BUILD_DIR)') { Remove-Item -Recurse -Force -ErrorAction SilentlyContinue '$(BUILD_DIR)' }; if (Test-Path '$(ROOT_DIR)/build-rwts') { Remove-Item -Recurse -Force -ErrorAction SilentlyContinue '$(ROOT_DIR)/build-rwts' }; Remove-Item -Force -ErrorAction SilentlyContinue '$(SRC_DIR)/*.o','$(ASM_DIR)/*.o'"
 else
 MKDIR_P  = mkdir -p
-CLEAN_CMD = rm -rf $(BUILD_DIR) $(SRC_DIR)/*.o $(ASM_DIR)/*.o
+CLEAN_CMD = rm -rf $(BUILD_DIR) $(ROOT_DIR)/build-rwts $(SRC_DIR)/*.o $(ASM_DIR)/*.o
 endif
 
 C_SOURCES  = \
@@ -64,7 +61,7 @@ MAIN_OBJECTS = \
 	$(BUILD_DIR)/logic.o \
 	$(BUILD_DIR)/trade_expedition.o \
 	$(BUILD_DIR)/overlay.o \
-	$(BUILD_DIR)/disk_overlay_load_$(DISK_BACKEND).o \
+	$(BUILD_DIR)/disk_overlay_load.o \
 	$(BUILD_DIR)/jmptab.o
 
 OVERLAY_OBJECTS = \
@@ -92,26 +89,16 @@ OVL_LDFLAGS = -t apple2 -C $(OVL_CFG) -Oirs
 
 # Disk image tool (AppleCommander)
 AC = java -jar $(TOOLS_DIR)/ac.jar
-DISK ?= $(BASE_DISK)
-LOADER_SYSTEM = IIMP.SYSTEM
 MAIN_DISK_NAME = IIMP
-RWTS_SAVE_IMAGE = $(BUILD_DIR)/game.data.bin
+SAVE_IMAGE = $(BUILD_DIR)/game.data.bin
 
-all: $(BUILD_DIR) iimperialism overlays $(BUILD_DIR)/loader.system
+all: $(BUILD_DIR) iimperialism overlays
 
-.PHONY: all disk overlays iimperialism clean memory-usage disk-rwts prepare-rwts-disk patch-rwts-boot
+.PHONY: all disk overlays iimperialism clean memory-usage
 
 # Update disk image with latest binaries (run after 'make all')
-disk: iimperialism overlays $(BUILD_DIR)/loader.system
-ifeq ($(DISK_BACKEND),rwts)
-	-$(AC) -d $(DISK) IIMP.SYSTEM
-	-$(AC) -d $(DISK) PRODOS
-else
-	-$(AC) -d $(DISK) $(LOADER_SYSTEM)
-	$(AC) -p $(DISK) $(LOADER_SYSTEM) SYS < $(BUILD_DIR)/loader.system
-endif
+disk: iimperialism overlays
 	-$(AC) -d $(DISK) $(MAIN_DISK_NAME)
-	-$(AC) -d $(DISK) IIMPERIALISM
 	$(AC) -p $(DISK) $(MAIN_DISK_NAME) BIN 0x0803 < $(BUILD_DIR)/iimperialism
 	-$(AC) -d $(DISK) ISCR
 	$(AC) -p $(DISK) ISCR BIN 0x8800 < $(BUILD_DIR)/iscr.bin
@@ -134,22 +121,10 @@ endif
 	-$(AC) -d $(DISK) CNSL
 	$(AC) -p $(DISK) CNSL BIN 0x8800 < $(BUILD_DIR)/cnsl.bin
 	-$(AC) -d $(DISK) GAME.DATA
-ifeq ($(DISK_BACKEND),rwts)
-	python tools/build_rwts_save.py --output $(RWTS_SAVE_IMAGE)
-	$(AC) -p $(DISK) GAME.DATA BIN 0x0000 < $(RWTS_SAVE_IMAGE)
+	python tools/build_rwts_save.py --output $(SAVE_IMAGE)
+	$(AC) -p $(DISK) GAME.DATA BIN 0x0000 < $(SAVE_IMAGE)
 	python tools/build_rwts_boot.py --root $(ROOT_DIR) --build $(BUILD_DIR) --disk $(DISK)
-endif
 	$(AC) -l $(DISK)
-
-disk-rwts: prepare-rwts-disk
-	"$(MAKE)" BUILD_DIR=$(ROOT_DIR)/build-rwts DISK=$(RWTS_DISK) DISK_BACKEND=rwts EXTRA_CFLAGS=-DRWTS_EXPERIMENTAL=1 disk
-
-prepare-rwts-disk:
-ifeq ($(OS),Windows_NT)
-	powershell.exe -NoProfile -Command "Copy-Item -LiteralPath '$(BASE_DISK)' -Destination '$(RWTS_DISK)' -Force"
-else
-	cp -f $(BASE_DISK) $(RWTS_DISK)
-endif
 
 overlays: $(BUILD_DIR)/iscr.bin $(BUILD_DIR)/pscr.bin $(BUILD_DIR)/tscr.bin $(BUILD_DIR)/ascr.bin $(BUILD_DIR)/dscr.bin $(BUILD_DIR)/txac.bin $(BUILD_DIR)/bscr.bin $(BUILD_DIR)/sscr.bin $(BUILD_DIR)/menu.bin $(BUILD_DIR)/cnsl.bin
 
@@ -206,8 +181,8 @@ $(BUILD_DIR)/bscr.bin: $(BUILD_DIR)/ovl_battle_entry.o $(BUILD_DIR)/ovl_battle.o
 $(BUILD_DIR)/sscr.bin: $(BUILD_DIR)/ovl_science_entry.o $(BUILD_DIR)/ovl_science.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/sscr.bin $(BUILD_DIR)/ovl_science_entry.o $(BUILD_DIR)/ovl_science.o
 
-$(BUILD_DIR)/menu.bin: $(BUILD_DIR)/ovl_game_menu_entry.o $(BUILD_DIR)/ovl_game_menu.o $(BUILD_DIR)/disk_gamestate_io_$(DISK_BACKEND).o $(OVL_CFG) | $(BUILD_DIR)
-	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/menu.bin $(BUILD_DIR)/ovl_game_menu_entry.o $(BUILD_DIR)/ovl_game_menu.o $(BUILD_DIR)/disk_gamestate_io_$(DISK_BACKEND).o
+$(BUILD_DIR)/menu.bin: $(BUILD_DIR)/ovl_game_menu_entry.o $(BUILD_DIR)/ovl_game_menu.o $(BUILD_DIR)/disk_gamestate_io.o $(OVL_CFG) | $(BUILD_DIR)
+	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/menu.bin $(BUILD_DIR)/ovl_game_menu_entry.o $(BUILD_DIR)/ovl_game_menu.o $(BUILD_DIR)/disk_gamestate_io.o
 
 $(BUILD_DIR)/cnsl.bin: $(BUILD_DIR)/ovl_council_nations_entry.o $(BUILD_DIR)/ovl_council_nations.o $(OVL_CFG) | $(BUILD_DIR)
 	$(OVL_CC) $(OVL_LDFLAGS) -o $(BUILD_DIR)/cnsl.bin $(BUILD_DIR)/ovl_council_nations_entry.o $(BUILD_DIR)/ovl_council_nations.o
@@ -238,12 +213,6 @@ $(BUILD_DIR)/ovl_game_menu_entry.o: $(ASM_DIR)/ovl_game_menu_entry.s | $(BUILD_D
 
 $(BUILD_DIR)/ovl_council_nations_entry.o: $(ASM_DIR)/ovl_council_nations_entry.s | $(BUILD_DIR)
 	ca65 $(ASM_DIR)/ovl_council_nations_entry.s -o $(BUILD_DIR)/ovl_council_nations_entry.o
-
-$(BUILD_DIR)/loader.o: $(LOADER_DIR)/loader.s | $(BUILD_DIR)
-	ca65 $(LOADER_DIR)/loader.s -o $(BUILD_DIR)/loader.o
-
-$(BUILD_DIR)/loader.system: $(BUILD_DIR)/loader.o $(LOADER_DIR)/loader.cfg | $(BUILD_DIR)
-	ld65 -C $(LOADER_DIR)/loader.cfg -o $(BUILD_DIR)/loader.system $(BUILD_DIR)/loader.o
 
 clean:
 	$(CLEAN_CMD)

@@ -28,10 +28,10 @@ within the Apple II's constraints:
   report, score display, and historical rank table.
 - The final score now uses only three factors: diplomacy beyond the bare
   24-vote victory, speed of victory, and treasury.
-- Overlay binaries are loaded at runtime with direct ProDOS MLI `OPEN` / `READ` /
-  `CLOSE` calls instead of `stdio`.
-- Save/load also use direct ProDOS MLI calls instead of `fopen()` / `fread()` /
-  `fwrite()`.
+- Overlay binaries are loaded at runtime with resident ProRWTS file reads
+  instead of `stdio`.
+- Save/load also use resident ProRWTS read/write access instead of `fopen()` /
+  `fread()` / `fwrite()`.
 - On first launch, the splash screen waits for `ESC`, uses that human-timed delay
   to seed gameplay randomness, and then prompts for a nation name (up to 10 chars).
 - After a new game starts, play enters the resident Main Screen, which acts as the
@@ -43,8 +43,8 @@ within the Apple II's constraints:
   - `JMPTAB` at `$080F-$0871` for overlay-callable entry points
   - `LOWCODE` at `$0872-$1FFF` for compact main-RAM helpers such as the HGR text blitters
   - `LC` at `$D400-$DD79` for `src/ui.c` UI code placed in the Language Card
-- Disk autoboot uses ProDOS `SYS` loader `IIMP.SYSTEM` to launch `IIMPERIALISM`
-  directly (no `BASIC.SYSTEM` dependency).
+- Disk autoboot uses a qboot + ProRWTS bootstrap that loads `IIMP` directly
+  from the floppy filesystem.
 
 See `docs/MEMORY.md` for memory and overlay details.
 See `docs/FLOPPY.md` for floppy contents and autoboot behavior.
@@ -85,10 +85,8 @@ nation's exports cheaper to buy and its imports more profitable to sell into.
 | `src/ovl_science.c` | Science screen overlay (`sscr.bin`) |
 | `src/ovl_game_menu.c` | Game menu overlay and save/load flow (`menu.bin`) |
 | `src/ovl_council_nations.c` | Council of Nations overlay and Taipan-inspired final report (`cnsl.bin`) |
-| `asm/disk_overlay_load_prodos.s` | Resident disk overlay loader, ProDOS backend |
-| `asm/disk_overlay_load_rwts.s` | Resident disk overlay loader, experimental ProRWTS read-only backend |
-| `asm/disk_gamestate_io_prodos.s` | Menu-overlay disk save/load helper for `GAME.DATA`, ProDOS backend |
-| `asm/disk_gamestate_io_rwts.s` | Menu-overlay disk save/load helper, RWTS experimental stub backend |
+| `asm/disk_overlay_load.s` | Resident ProRWTS overlay loader |
+| `asm/disk_gamestate_io.s` | Menu-overlay ProRWTS save/load helper for `GAME.DATA` |
 | `asm/ovl_industry_entry.s` | Fixed entry stub for industry overlay |
 | `asm/ovl_diplomacy_entry.s` | Fixed entry stub for diplomacy overlay |
 | `asm/ovl_production_entry.s` | Fixed entry stub for production overlay |
@@ -100,16 +98,15 @@ nation's exports cheaper to buy and its imports more profitable to sell into.
 | `asm/text_hgr.s` | Aligned opaque HGR text blitters used by `print()`, `print_bold()`, and `print_inverted()` |
 | `asm/jmptab.s` | Resident jump table used by overlays |
 | `asm/werner.s` | Reserves HGR segment |
-| `asm/loader/loader.s` | Vendored cc65 loader source (patched for fixed target BIN) |
-| `asm/loader/loader.cfg` | Linker config for loader system file |
+| `asm/rwts/continue.s` | Stage-2 continuation loaded by qboot |
 | `include/game.h` | `GameState` and shared declarations |
 | `include/ui_buffers.h` | Shared UI buffer declarations |
 | `include/overlay.h` | Overlay IDs, filenames, and loader constants |
 | `config/apple2-hgr.cfg` | Main linker config |
 | `config/apple2-ovl.cfg` | Overlay linker config template |
 | `build/apple2-ovl.cfg` | Generated overlay linker config with current `_state` address |
-| `assets/iimperialism.dsk` | ProDOS disk image |
-| `Makefile` | Build rules for main binary, overlay entry stubs, overlays, loader, and disk |
+| `assets/iimperialism.dsk` | Shipping qboot/ProRWTS disk image |
+| `Makefile` | Build rules for the main binary, overlays, RWTS boot path, and disk image |
 | `build-run.sh` | Build + disk update + emulator launch helper |
 | `tools/ac.jar` | AppleCommander utility |
 
@@ -121,17 +118,20 @@ Documentation: `docs/FLOPPY.md`, `docs/MEMORY.md`, `docs/DESIGN.md`,
 
 - **cc65** cross-development package
 - **Java** (for AppleCommander)
+- **Git** and a MinGW-compatible `make` (`mingw32-make` or `make`) if you need
+  to recreate `third_party/` from scratch
 
 ## Runtime Requirements
 
-The default build targets a **64 KB Apple II family machine with ProDOS support**.
+The shipped build targets a **64 KB Apple II family machine with HGR and a
+compatible 5.25-inch floppy controller path**.
 
 Supported in principle:
 
 - Apple IIe
 - Apple IIc
-- Apple IIgs running Apple II compatible ProDOS software
-- Apple II / Apple II Plus class machines only if they have enough RAM and hardware support to run ProDOS correctly
+- Apple IIgs running Apple II compatible 6502 software
+- Apple II / Apple II Plus class machines only if they have enough RAM and compatible Disk II-style boot/runtime support
 
 Not supported:
 
@@ -141,7 +141,7 @@ Not supported:
 Why:
 
 - the game uses the main 64 KB Apple II memory map
-- the default disk relies on ProDOS 8 boot/loading and direct ProDOS MLI calls
+- the shipped disk uses a custom qboot + ProRWTS boot/runtime path
 - it uses HGR graphics mode and loads 2 KB overlays into main RAM at runtime
 
 ### Windows
@@ -168,7 +168,8 @@ sudo apt-get install cc65
 make disk
 ```
 
-This builds the main binary, all overlays, and loader system file, then updates
+This builds the main binary, all overlays, regenerates the fixed `GAME.DATA`
+container, patches the qboot/ProRWTS boot sectors, and updates
 `assets/iimperialism.dsk`.
 
 On some Windows setups, use:
@@ -183,31 +184,23 @@ To build without updating the disk image:
 make
 ```
 
-Experimental RWTS staging build:
-
-```bash
-make SHELL=cmd disk-rwts
-```
-
-This produces `assets/iimperialism-rwts.dsk` from a separate `build-rwts`
-directory, compiles the game with `RWTS_EXPERIMENTAL=1`, and links the
-experimental `rwts` disk backend. It now has a custom qboot/ProRWTS boot path:
-
-- boot no longer depends on `PRODOS` or `IIMP.SYSTEM`
-- overlay reads go through resident ProRWTS instead of ProDOS MLI
-- `GAME.DATA` is preallocated as a fixed-size RWTS save container
-- save/load now use resident ProRWTS read/write access instead of ProDOS MLI
-
-Current RWTS save/load note:
+Current save/load note:
 
 - the RWTS backend updates a fixed 1024-byte `GAME.DATA` image in place
-- unlike the default ProDOS backend, it does not create or resize save files at runtime
-- RWTS save support should be treated as experimental until it has been exercised on hardware/emulators
+- it does not create or resize save files at runtime
+- the shipping disk includes the preallocated `GAME.DATA` container so save/load works immediately
 
 To clean artifacts:
 
 ```bash
 make clean
+```
+
+If `third_party/` is missing and you need to recreate the vendored qboot,
+ProRWTS, and ACME toolchain, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/rebuild_third_party.ps1 -Force
 ```
 
 To inspect resident memory usage and overlay occupancy:
@@ -239,17 +232,19 @@ make memory-usage
 
 ## Running on an Emulator
 
-`assets/iimperialism.dsk` is a ProDOS disk image. Load it in an Apple IIe emulator.
+`assets/iimperialism.dsk` is the shipped bootable disk image. Load it in an
+Apple IIe-compatible emulator.
 
 Autoboot path:
 
-- ProDOS starts `IIMP.SYSTEM`
-- `IIMP.SYSTEM` loads and jumps to `IIMPERIALISM`
+- qboot loads the stage-2 continuation
+- the continuation initializes resident ProRWTS and loads `IIMP`
+- `IIMP` starts the game and later uses resident ProRWTS for overlays and saves
 
 If you need to launch manually from a ProDOS BASIC prompt:
 
 ```text
-BRUN IIMPERIALISM
+BRUN IIMP
 ```
 
 ### Recommended Emulators
@@ -281,10 +276,10 @@ their original authors and maintainers.
   linker, Apple II runtime, and TGI support. The project was founded by John R.
   Dunning and Ullrich von Bassewitz and is maintained by the cc65 contributors.
   Repo: <https://github.com/cc65/cc65>
-- **ProRWTS**: the ProDOS filesystem RWTS used by the experimental RWTS boot and
-  runtime loader path. Written by Peter Ferrie.
+- **ProRWTS**: the ProDOS filesystem RWTS used by the shipped boot, overlay,
+  and save/load path. Written by Peter Ferrie.
   Repo: <https://github.com/peterferrie/prorwts>
-- **QBoot**: the track/sector bootstrap used by the experimental RWTS boot path.
+- **QBoot**: the track/sector bootstrap used by the shipped boot path.
   Written by Peter Ferrie.
   Repo: <https://github.com/peterferrie/qboot>
 - **ACME Cross Assembler**: used to assemble the vendored `qboot` and `prorwts`
@@ -295,22 +290,17 @@ their original authors and maintainers.
   Project: <https://applecommander.github.io/>
   GitHub: <https://github.com/applecommander/applecommander>
 
-The repository also vendors and adapts some cc65-derived Apple II loader/linker
-material under `asm/loader/` for the ProDOS bootable build. See the upstream
-cc65 project for the original sources and licensing.
-
 ## TODO
 
 Core Features
+- Random events (positive and negative) at turn's end
 - Balance game for all stages (beginning, mid, and end)
 
 Performance/Maintanability Improvements
-- Attempt to replace ProDOS by RWTS
 - Update OPTIMIZE_REFACTOR.md
+- Check memory size, if >64K, copy overlays from disk into memory at load time
 
 Discarded ideas (difficult to squeeze in without requiring extra floppies):
-- Check memory size, if >64K, copy overlays from disk into memory at load time
-- Random events (positive and negative) at turn's end
 - Map screen
 - Land battles
 

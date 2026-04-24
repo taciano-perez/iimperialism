@@ -15,8 +15,8 @@ $4000-...    CODE/RODATA/DATA   (main resident code + data)
 ...          BSS/ONCE/heap
 $8800-$8FFF  OVERLAY_SLOT       (2KB execution window in main RAM)
 $8E00-$95FF  C stack            (2KB, downward from HIMEM=$9600)
-$9600-$BEFF  ProDOS system area
-$BF00-$BFFF  ProDOS MLI
+$9600-$BBFF  C stack / high-memory workspace
+$BC00-$BFFF  Resident ProRWTS runtime
 $D400-$DD79  LC                 (`src/ui.c` UI code in Language Card RAM)
 ```
 
@@ -44,7 +44,8 @@ Separately, the linker can place selected code into the Apple II Language Card:
 - the current build map places `ui.o` `LC` code at `$D400-$DD79`
 
 As string literals grow, `RODATA/DATA/INIT` move upward. When image size and memory
-pressure cross a threshold, BRUN can fail silently back to ProDOS.
+pressure cross a threshold, the shipping boot/runtime path can lose the headroom
+it needs for overlays, stack, and resident ProRWTS.
 
 ## Overlay Architecture
 
@@ -81,30 +82,29 @@ loading even if the older, broader high-memory totals still appeared to fit.
 
 Runtime flow (`run_overlay(id)`):
 
-1. Map overlay ID to ProDOS filename.
+1. Map overlay ID to on-disk filename.
 2. Call the resident disk loader helper for the active backend.
-3. Use ProDOS MLI `OPEN` / `READ` / `CLOSE` to load exactly 2048 bytes into
-   main RAM `OVERLAY_SLOT` (`$8800`).
+3. Use resident ProRWTS file reads to load exactly 2048 bytes into main RAM
+   `OVERLAY_SLOT` (`$8800`).
 4. Execute overlay entry at `$8800` (no arguments; overlays access `state`
    directly via the `_state` symbol exported in the generated overlay linker
    config).
 
-The runtime overlay path intentionally avoids `fopen()` / `fread()`. Direct
-MLI calls are more robust under the game's current resident memory pressure
-than the Apple II `stdio` path.
+The runtime overlay path intentionally avoids `fopen()` / `fread()`. The
+resident ProRWTS path is more robust under the game's current resident memory
+pressure than the Apple II `stdio` path.
 
 Game-state persistence now lives entirely in the game menu overlay.
-`save_game()` / `load_game()` and the disk helper use direct file I/O calls for
-`GAME.DATA` instead of linking the heavier `stdio` path into resident code.
-Current backends:
+`save_game()` / `load_game()` and the disk helper use resident ProRWTS access
+to `GAME.DATA` instead of linking the heavier `stdio` path into resident code.
+Current disk helpers:
 
-- `asm/disk_overlay_load_prodos.s` / `asm/disk_gamestate_io_prodos.s`
-- `asm/disk_overlay_load_rwts.s` / `asm/disk_gamestate_io_rwts.s`
+- `asm/disk_overlay_load.s`
+- `asm/disk_gamestate_io.s`
 
-The default backend still uses ProDOS MLI `CREATE` / `OPEN` / `READ` /
-`WRITE` / `CLOSE`. The RWTS backend now uses resident ProRWTS for overlay
-loading and fixed-size `GAME.DATA` save/load after the experimental qboot boot
-path has initialized it.
+The boot path leaves a write-capable ProRWTS runtime resident at `$BC00`, and
+both overlay loading and the fixed-size `GAME.DATA` save container use that
+runtime directly.
 
 Current save-container details:
 
@@ -223,7 +223,7 @@ Example: diplomacy overlay as ID `6`, file `DSCR`.
 
 3. Extend the active disk backend's overlay-name table.
 
-Current default backend:
+Current disk backend:
 
 ```asm
 OVL_NAME_DIPLOMACY:
