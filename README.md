@@ -266,6 +266,33 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
 the generated `build/apple2-ovl.cfg` picks up the current `_state` address before
 overlays are relinked.
 
+## Credits
+
+This project builds on several external tools and libraries. Credit belongs to
+their original authors and maintainers.
+
+- **cc65**: the 6502 cross-development suite used for the C compiler, assembler,
+  linker, Apple II runtime, and TGI support. The project was founded by John R.
+  Dunning and Ullrich von Bassewitz and is maintained by the cc65 contributors.
+  Repo: <https://github.com/cc65/cc65>
+- **ProRWTS**: the ProDOS filesystem RWTS used by the experimental RWTS boot and
+  runtime loader path. Written by Peter Ferrie.
+  Repo: <https://github.com/peterferrie/prorwts>
+- **QBoot**: the track/sector bootstrap used by the experimental RWTS boot path.
+  Written by Peter Ferrie.
+  Repo: <https://github.com/peterferrie/qboot>
+- **ACME Cross Assembler**: used to assemble the vendored `qboot` and `prorwts`
+  sources for the RWTS build. Written by Marco Baye.
+  Project: <https://sourceforge.net/p/acme-crossass/code-0/HEAD/tree/trunk/>
+- **AppleCommander**: used to inspect and update Apple II disk images during the
+  build. AppleCommander is maintained by Robert Greene.
+  Project: <https://applecommander.github.io/>
+  GitHub: <https://github.com/applecommander/applecommander>
+
+The repository also vendors and adapts some cc65-derived Apple II loader/linker
+material under `asm/loader/` for the ProDOS bootable build. See the upstream
+cc65 project for the original sources and licensing.
+
 ## TODO
 
 Core Features
