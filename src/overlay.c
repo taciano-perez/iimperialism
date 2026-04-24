@@ -1,8 +1,15 @@
+#include <apple2.h>
+#include <em.h>
 #include "game.h"
 #include "disk.h"
 #include "overlay.h"
 
 #pragma code-name (push, "LOWCODE")
+
+#define OVERLAY_CACHE_PAGES   (OVL_COUNT * OVERLAY_PAGES)
+
+static unsigned char overlay_cache_enabled;
+static struct em_copy overlay_copy_params;
 
 static const char* overlay_label(unsigned char id) {
     switch (id) {
@@ -53,7 +60,48 @@ static void load_overlay_file(unsigned char id) {
     }
 }
 
+static unsigned overlay_cache_page(unsigned char id) {
+    return (unsigned)id * OVERLAY_PAGES;
+}
+
+static void cache_overlay_from_slot(unsigned char id) {
+    overlay_copy_params.buf = (void*)OVERLAY_SLOT;
+    overlay_copy_params.offs = 0U;
+    overlay_copy_params.page = overlay_cache_page(id);
+    overlay_copy_params.count = OVERLAY_SIZE;
+    overlay_copy_params.unused = 0U;
+    em_copyto(&overlay_copy_params);
+}
+
+static void load_overlay_from_cache(unsigned char id) {
+    overlay_copy_params.buf = (void*)OVERLAY_SLOT;
+    overlay_copy_params.offs = 0U;
+    overlay_copy_params.page = overlay_cache_page(id);
+    overlay_copy_params.count = OVERLAY_SIZE;
+    overlay_copy_params.unused = 0U;
+    em_copyfrom(&overlay_copy_params);
+}
+
 void init_overlays(void) {
+    unsigned char id;
+
+    overlay_cache_enabled = 0U;
+
+    if (em_install(a2_auxmem_emd) != EM_ERR_OK) {
+        return;
+    }
+
+    if (em_pagecount() < OVERLAY_CACHE_PAGES) {
+        em_uninstall();
+        return;
+    }
+
+    for (id = 0U; id < OVL_COUNT; ++id) {
+        load_overlay_file(id);
+        cache_overlay_from_slot(id);
+    }
+
+    overlay_cache_enabled = 1U;
 }
 
 /* Load overlay <id> into OVERLAY_SLOT ($8800 in MAIN) and execute it. */
@@ -62,7 +110,11 @@ void run_overlay(unsigned char id) {
         overlay_load_failed(0, 0, 0);
     }
 
-    load_overlay_file(id);
+    if (overlay_cache_enabled) {
+        load_overlay_from_cache(id);
+    } else {
+        load_overlay_file(id);
+    }
 
     /* Execute the overlay. Overlays access game state directly via _state. */
     ((void(*)(void))OVERLAY_SLOT)();

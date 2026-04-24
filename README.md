@@ -17,6 +17,9 @@ within the Apple II's constraints:
 
 - Most screen renderers are compiled as standalone 2KB overlays (`ISCR`, `PSCR`,
   `TSCR`, `ASCR`, `DSCR`, `TXAC`, `BSCR`, `SSCR`, `MENU`, `CNSL`) loaded on demand.
+- On machines with auxiliary / extended memory (>64K), `init_overlays()` now
+  preloads all overlays into extended RAM at startup and later overlay switches
+  reuse that cache instead of hitting the disk each time.
 - The trade expedition market screen is resident code; only the buy/sell action
   flow remains in the `TXAC` overlay.
 - The industry, transport, and production overlays now own their own input loops.
@@ -298,7 +301,6 @@ Core Features
 
 Performance/Maintanability Improvements
 - Update OPTIMIZE_REFACTOR.md
-- Check memory size, if >64K, copy overlays from disk into memory at load time
 
 Discarded ideas (difficult to squeeze in without requiring extra floppies):
 - Map screen

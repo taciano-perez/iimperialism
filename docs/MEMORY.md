@@ -83,9 +83,10 @@ loading even if the older, broader high-memory totals still appeared to fit.
 Runtime flow (`run_overlay(id)`):
 
 1. Map overlay ID to on-disk filename.
-2. Call the resident disk loader helper for the active backend.
-3. Use resident ProRWTS file reads to load exactly 2048 bytes into main RAM
-   `OVERLAY_SLOT` (`$8800`).
+2. If the machine has auxiliary / extended memory, copy the cached overlay from
+   extended memory into `OVERLAY_SLOT`.
+3. Otherwise, call the resident disk loader helper and use resident ProRWTS file
+   reads to load exactly 2048 bytes into main RAM `OVERLAY_SLOT` (`$8800`).
 4. Execute overlay entry at `$8800` (no arguments; overlays access `state`
    directly via the `_state` symbol exported in the generated overlay linker
    config).
@@ -93,6 +94,11 @@ Runtime flow (`run_overlay(id)`):
 The runtime overlay path intentionally avoids `fopen()` / `fread()`. The
 resident ProRWTS path is more robust under the game's current resident memory
 pressure than the Apple II `stdio` path.
+
+`init_overlays()` now attempts to install cc65's Apple II auxiliary-memory EMD
+driver. If enough extended-memory pages are available for all ten overlays
+(`80` pages total), it preloads them once at startup and later overlay changes
+become extended-memory copies instead of floppy reads.
 
 Game-state persistence now lives entirely in the game menu overlay.
 `save_game()` / `load_game()` and the disk helper use resident ProRWTS access

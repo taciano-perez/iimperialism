@@ -251,6 +251,8 @@ void render_main_screen(void) {
 }
 
 int main(void) {
+    clrscr();
+    cputsxy(16, 11, "LOADING");
     init_overlays();
     ui_init();
 
