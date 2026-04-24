@@ -259,7 +259,7 @@ int main(void) {
     print_bold(1, 1, "I I M P E R I A L I S M !");
     print(1, 2, "-------------------------");
     print(0, 3, "A game based on the European");
-    print(2, 4, "expansion of the 1900's");
+    print(2, 4, "expansion of the 1800's");
     draw_picture_at(SHIP_SPLASH, 1, 10);
     print(28, 6, "Created By:");
     print(29, 8, "Taciano D.");
