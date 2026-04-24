@@ -2,18 +2,16 @@
 
 ## Overview
 
-`assets/iimperialism.dsk` is a ProDOS 8 boot disk for the game.
+`assets/iimperialism.dsk` is the shipped boot disk for the game.
 
-It uses a ProDOS `SYS` loader (`IIMP.SYSTEM`) to auto-start the game binary
-(`IIMPERIALISM`) without `BASIC.SYSTEM` or `STARTUP` BASIC.
+It uses a custom qboot + ProRWTS path to auto-start the main game binary
+(`IIMP`) without `PRODOS`, `IIMP.SYSTEM`, `BASIC.SYSTEM`, or `STARTUP` BASIC.
 
 ## Current Disk Contents
 
 Current catalog (from `ac -l`) includes:
 
-- `PRODOS` (`SYS`) - ProDOS 8 operating system (required to boot).
-- `IIMP.SYSTEM` (`SYS`) - boot loader executed by ProDOS at startup.
-- `IIMPERIALISM` (`BIN`, `A=$0803`) - main game binary.
+- `IIMP` (`BIN`, `A=$0803`) - main game binary.
 - `ISCR` (`BIN`, `A=$8800`) - industry overlay.
 - `PSCR` (`BIN`, `A=$9000`) - production overlay.
 - `TSCR` (`BIN`, `A=$9800`) - transport overlay.
@@ -24,57 +22,61 @@ Current catalog (from `ac -l`) includes:
 - `SSCR` (`BIN`, `A=$8800`) - science overlay.
 - `MENU` (`BIN`, `A=$8800`) - game menu overlay.
 - `CNSL` (`BIN`, `A=$8800`) - Council of Nations and final victory report overlay.
+- `GAME.DATA` (`BIN`) - fixed-size save container used by the RWTS save/load path.
 
 Current size-sensitive entries from the verified build:
 
-- `IIMPERIALISM` uses `68` ProDOS blocks and is `34,166` bytes long.
+- `IIMP` uses `68` ProDOS blocks and is `34,282` bytes long.
 - Each overlay is still padded to exactly `2,048` bytes and uses `5` ProDOS
   blocks.
-- The disk currently has `1,536` bytes free, exactly three ProDOS blocks. Keep at
-  least this much free after future changes.
+- The disk currently has `17,920` bytes free. Keep meaningful free space after
+  future changes so the fixed save container and boot sectors still fit cleanly.
 
 Not present on the game disk:
 
+- `PRODOS`
+- `IIMP.SYSTEM`
 - `BASIC.SYSTEM`
 - `STARTUP`
-- `GAME.DATA` (runtime save container; `make disk` removes it from the packaged
-  image so the shipped floppy keeps its three-block reserve)
 
 ## Autoboot Behavior
 
 Boot sequence:
 
-1. ProDOS boots and runs the first `*.SYSTEM` file (`IIMP.SYSTEM`).
-2. `IIMP.SYSTEM` loads `IIMPERIALISM` (BIN) and jumps to its load address.
-3. `IIMPERIALISM` initializes game state and later loads screen overlays from disk
-   with direct ProDOS MLI reads. The trade expedition market screen is resident
-   code; only its action flow is loaded from `TXAC`.
-4. The game menu overlay saves/loads `GAME.DATA` with direct ProDOS MLI calls.
+1. qboot runs from the raw boot sectors and loads the stage-2 continuation.
+2. The continuation initializes resident ProRWTS and loads `IIMP` to `$0803`.
+3. `IIMP` initializes game state and later loads screen overlays from disk with
+   resident ProRWTS reads. The trade expedition market screen is resident code;
+   only its action flow is loaded from `TXAC`.
+4. The game menu overlay saves/loads `GAME.DATA` through resident ProRWTS
+   fixed-size read/write calls.
 
-## Loader Implementation
+## Boot Implementation
 
-Loader sources are vendored in this repo:
+Boot sources live in:
 
-- `asm/loader/loader.s`
-- `asm/loader/loader.cfg`
+- `asm/rwts/continue.s`
+- `tools/build_rwts_boot.py`
+- `tools/rebuild_third_party.ps1`
+- vendored upstream sources in `third_party/qboot/` and `third_party/prorwts/`
 
-The loader is based on `LOADER.SYSTEM` from the cc65 project, originally written by
-Oliver Schmidt, and is patched to load the fixed target file `IIMPERIALISM`.
+`build_rwts_boot.py` assembles qboot and ProRWTS, generates a live symbol include
+from the current linker map, and patches the raw boot sectors plus stage-2
+payload into the disk image.
 
-Reference: https://cc65.github.io/doc/apple2.html#s5
-
-Reason: ProDOS filenames are limited to 15 characters, so
-`IIMPERIALISM.SYSTEM` is too long. Using short `IIMP.SYSTEM` avoids that limit
-while still loading the long game binary name.
+If `third_party/` is missing, `tools/rebuild_third_party.ps1` reclones `acme`,
+`qboot`, and `prorwts`, then rebuilds `third_party/acme/src/acme.exe` so the
+boot patcher can run again.
 
 ## Build and Disk Update
 
 `Makefile` builds and writes the floppy image:
 
 - Builds game binary and overlays.
-- Builds loader system file as `build/loader.system`.
-- Removes legacy boot files (`STARTUP`, `BASIC.SYSTEM`) from disk image.
-- Writes `IIMP.SYSTEM` (`SYS`) and all current game binaries.
+- Regenerates the fixed `GAME.DATA` image.
+- Removes legacy boot files (`PRODOS`, `IIMP.SYSTEM`, `STARTUP`, `BASIC.SYSTEM`)
+  from the disk image.
+- Writes all current game binaries and patches the qboot/ProRWTS boot sectors.
 
 The final victory report uses the existing `CNSL` overlay and resident helper
 functions. It does not add a separate overlay file or any new picture asset.
@@ -101,12 +103,13 @@ java -jar tools/ac.jar -l assets/iimperialism.dsk
 
 Expected boot-critical entries:
 
-- `PRODOS`
-- `IIMP.SYSTEM`
-- `IIMPERIALISM`
+- `IIMP`
+- `GAME.DATA`
 
-The final catalog should report at least:
+The final catalog should report:
 
 ```text
-ProDOS format; 1.536 bytes free
+ProDOS format; 17.920 bytes free
 ```
+
+`PRODOS` and `IIMP.SYSTEM` should be absent from the catalog.

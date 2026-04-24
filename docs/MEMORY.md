@@ -15,8 +15,8 @@ $4000-...    CODE/RODATA/DATA   (main resident code + data)
 ...          BSS/ONCE/heap
 $8800-$8FFF  OVERLAY_SLOT       (2KB execution window in main RAM)
 $8E00-$95FF  C stack            (2KB, downward from HIMEM=$9600)
-$9600-$BEFF  ProDOS system area
-$BF00-$BFFF  ProDOS MLI
+$9600-$BBFF  C stack / high-memory workspace
+$BC00-$BFFF  Resident ProRWTS runtime
 $D400-$DD79  LC                 (`src/ui.c` UI code in Language Card RAM)
 ```
 
@@ -44,7 +44,8 @@ Separately, the linker can place selected code into the Apple II Language Card:
 - the current build map places `ui.o` `LC` code at `$D400-$DD79`
 
 As string literals grow, `RODATA/DATA/INIT` move upward. When image size and memory
-pressure cross a threshold, BRUN can fail silently back to ProDOS.
+pressure cross a threshold, the shipping boot/runtime path can lose the headroom
+it needs for overlays, stack, and resident ProRWTS.
 
 ## Overlay Architecture
 
@@ -81,23 +82,35 @@ loading even if the older, broader high-memory totals still appeared to fit.
 
 Runtime flow (`run_overlay(id)`):
 
-1. Map overlay ID to ProDOS filename.
-2. Call the resident ProDOS loader helper in `asm/prodos_overlay_load.s`.
-3. Use ProDOS MLI `OPEN` / `READ` / `CLOSE` to load exactly 2048 bytes into
-   main RAM `OVERLAY_SLOT` (`$8800`).
+1. Map overlay ID to on-disk filename.
+2. If the machine has auxiliary / extended memory, copy the cached overlay from
+   extended memory into `OVERLAY_SLOT`.
+3. Otherwise, call the resident disk loader helper and use resident ProRWTS file
+   reads to load exactly 2048 bytes into main RAM `OVERLAY_SLOT` (`$8800`).
 4. Execute overlay entry at `$8800` (no arguments; overlays access `state`
    directly via the `_state` symbol exported in the generated overlay linker
    config).
 
-The runtime overlay path intentionally avoids `fopen()` / `fread()`. Direct
-MLI calls are more robust under the game's current resident memory pressure
-than the Apple II `stdio` path.
+The runtime overlay path intentionally avoids `fopen()` / `fread()`. The
+resident ProRWTS path is more robust under the game's current resident memory
+pressure than the Apple II `stdio` path.
+
+`init_overlays()` now attempts to install cc65's Apple II auxiliary-memory EMD
+driver. If enough extended-memory pages are available for all ten overlays
+(`80` pages total), it preloads them once at startup and later overlay changes
+become extended-memory copies instead of floppy reads.
 
 Game-state persistence now lives entirely in the game menu overlay.
-`save_game()` / `load_game()` and the ProDOS helper in `asm/prodos_gamestate_io.s`
-use direct MLI `CREATE` / `OPEN` / `READ` / `WRITE` / `CLOSE` calls for
-`GAME.DATA` instead of linking the heavier `stdio` file I/O path into resident
-code.
+`save_game()` / `load_game()` and the disk helper use resident ProRWTS access
+to `GAME.DATA` instead of linking the heavier `stdio` path into resident code.
+Current disk helpers:
+
+- `asm/disk_overlay_load.s`
+- `asm/disk_gamestate_io.s`
+
+The boot path leaves a write-capable ProRWTS runtime resident at `$BC00`, and
+both overlay loading and the fixed-size `GAME.DATA` save container use that
+runtime directly.
 
 Current save-container details:
 
@@ -214,16 +227,20 @@ Example: diplomacy overlay as ID `6`, file `DSCR`.
 #define OVL_FILE_DIPLOMACY "DSCR"
 ```
 
-3. Extend `overlay_filename()` in `src/overlay.c`:
+3. Extend the active disk backend's overlay-name table.
 
-```c
-case OVL_DIPLOMACY: return OVL_FILE_DIPLOMACY;
+Current disk backend:
+
+```asm
+OVL_NAME_DIPLOMACY:
+    .byte .strlen("DSCR")
+    .byte "DSCR"
 ```
 
 4. Add object and binary rules in `Makefile`.
 
-The resident overlay loader does not need changes unless the new overlay file
-name requires a different filename mapping.
+The resident overlay loader entry point does not need changes unless the active
+backend requires different overlay metadata.
 
 If the overlay contains multiple functions, add an assembly entry stub and link it
 first so the correct entry symbol lands at `$8800`:

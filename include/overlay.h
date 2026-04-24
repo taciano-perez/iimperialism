@@ -18,6 +18,7 @@
 #define OVL_SCIENCE 7
 #define OVL_GAME_MENU 8
 #define OVL_COUNCIL_NATIONS 9
+#define OVL_COUNT 10U
 
 /* Disk file names for the overlay binaries (ProDOS, uppercase, no extension) */
 #define OVL_FILE_INDUSTRY   "ISCR"

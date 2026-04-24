@@ -1,31 +1,20 @@
 #include <conio.h>
 #include "game.h"
+#include "disk.h"
 
-#define SAVE_SLOT_COUNT 5
 #define NO_SLOT 255U
-
-typedef struct {
-    unsigned char valid;
-    unsigned int turn_number;
-    char nation_name[20];
-} SaveSlotInfo;
-
-/* Low-level ProDOS helper linked into this overlay. */
-extern unsigned char __fastcall__ prodos_save_game(const GameState* state);
-extern unsigned char __fastcall__ prodos_load_game(GameState* state);
-extern unsigned char __fastcall__ prodos_read_save_slot_info(SaveSlotInfo* info);
 
 const unsigned int game_state_size = sizeof(GameState);
 unsigned char save_slot = 0;
 
 static unsigned char save_game(const GameState* game_state, unsigned char slot) {
     save_slot = slot;
-    return prodos_save_game(game_state);
+    return disk_save_game(game_state);
 }
 
 static unsigned char load_game(GameState* game_state, unsigned char slot) {
     save_slot = slot;
-    return prodos_load_game(game_state);
+    return disk_load_game(game_state);
 }
 
 static void show_io_error(unsigned char error_code) {
@@ -37,7 +26,7 @@ static void show_io_error(unsigned char error_code) {
 }
 
 static unsigned char choose_save_slot(char is_load) {
-    SaveSlotInfo info;
+    DiskSaveSlotInfo info;
     unsigned char i;
     unsigned char error_code;
     char key;
@@ -46,10 +35,10 @@ static unsigned char choose_save_slot(char is_load) {
         clear_screen();
         print_bold(13, 3, is_load ? "Load Game" : "Save Game");
 
-        for (i = 0; i < SAVE_SLOT_COUNT; ++i) {
+        for (i = 0; i < DISK_SAVE_SLOT_COUNT; ++i) {
             save_slot = i;
             info.valid = 0;
-            error_code = prodos_read_save_slot_info(&info);
+            error_code = disk_read_save_slot_info(&info);
             if (error_code != 0) {
                 show_io_error(error_code);
                 return NO_SLOT;

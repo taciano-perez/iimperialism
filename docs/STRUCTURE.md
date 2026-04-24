@@ -8,12 +8,12 @@ artifacts separated.
 - `src/` - C sources for the resident game code, final-score helpers, and overlays.
 - `include/` - project headers.
 - `asm/` - 6502 assembly sources.
-- `asm/loader/` - vendored cc65 loader sources used to build `IIMP.SYSTEM`.
 - `config/` - cc65 linker configs.
 - `assets/` - disk images and other game assets.
 - `docs/` - design and technical documentation.
 - `tools/` - build and support tools, including AppleCommander and font extraction scripts.
-- `build/` - build output (objects, binaries, maps, loader).
+- `third_party/` - vendored upstream sources and ACME binary used by the RWTS boot build.
+- `build/` - build output (objects, binaries, maps, RWTS boot staging).
 
 ## Build Outputs
 
@@ -22,8 +22,8 @@ The `Makefile` writes outputs to `build/`:
 - `build/iimperialism` main binary
 - `build/*.o` object files
 - `build/*.bin` overlay binaries
-- `build/loader.system` loader system file
 - `build/iimperialism.map` linker map
+- `build/rwts_boot/*` generated qboot/ProRWTS boot artifacts
 
 The linker map is the authoritative source for segment placement. In the current
 build it shows:
@@ -39,8 +39,8 @@ The trade expedition market renderer is resident code in `src/trade_expedition.c
 The separate `TEXP` overlay was removed so the floppy no longer pays a fixed
 5-block file cost for that small screen.
 
-The menu overlay now owns its save/load flow internally, including its ProDOS
-MLI helper and fixed overlay entry stub.
+The menu overlay now owns its save/load flow internally, including its ProRWTS
+save/load helper and fixed overlay entry stub.
 
 The Council overlay (`cnsl.bin`) owns both the Council of Nations vote table and
 the final victory report. Resident code in `src/logic.c` owns the score

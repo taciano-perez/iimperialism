@@ -1,0 +1,78 @@
+; Disk overlay loader.
+;
+; The shipped build uses the resident ProRWTS runtime initialized by the
+; qboot/ProRWTS bootstrap. Overlays are loaded directly into the fixed overlay
+; slot without relying on ProDOS MLI.
+
+    .include "disk.inc"
+    .include "disk_overlay_table.inc"
+
+    .export _disk_get_capabilities
+    .export _disk_load_overlay
+    .export _disk_overlay_bytes_read
+
+    .segment "DATA"
+
+_disk_overlay_bytes_read:
+    .word   $0000
+
+    .segment "LOWCODE"
+
+PRORWTS_STATUS  := $F3
+PRORWTS_REQCMD  := $F8
+PRORWTS_LDRLO   := $F9
+PRORWTS_LDRHI   := $FA
+PRORWTS_NAMLO   := $FB
+PRORWTS_NAMHI   := $FC
+PRORWTS_OPENDIR := $BC00
+PRORWTS_CMDREAD := $01
+OVERLAY_SLOT    := $8800
+OVERLAY_SIZE    := $0800
+
+_disk_get_capabilities:
+    lda     #DISK_CAP_SAVE_LOAD
+    ldx     #$00
+    rts
+
+_disk_load_overlay:
+    tax
+
+    lda     #$00
+    sta     _disk_overlay_bytes_read
+    sta     _disk_overlay_bytes_read+1
+
+    cpx     #DISK_OVERLAY_COUNT
+    bcc     @valid_overlay
+    lda     #DISK_ERR_INVALID_OVERLAY
+    ldx     #$00
+    rts
+
+@valid_overlay:
+    lda     #PRORWTS_CMDREAD
+    sta     PRORWTS_REQCMD
+    lda     #<OVERLAY_SLOT
+    sta     PRORWTS_LDRLO
+    lda     #>OVERLAY_SLOT
+    sta     PRORWTS_LDRHI
+
+    lda     OVL_NAME_LO,x
+    sta     PRORWTS_NAMLO
+    lda     OVL_NAME_HI,x
+    sta     PRORWTS_NAMHI
+
+    jsr     PRORWTS_OPENDIR
+    lda     PRORWTS_STATUS
+    bne     @error
+
+    lda     #<OVERLAY_SIZE
+    sta     _disk_overlay_bytes_read
+    lda     #>OVERLAY_SIZE
+    sta     _disk_overlay_bytes_read+1
+
+    lda     #$00
+    ldx     #$00
+    rts
+
+@error:
+    ldx     #$00
+    rts
