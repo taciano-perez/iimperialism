@@ -115,7 +115,7 @@ nation's exports cheaper to buy and its imports more profitable to sell into.
 
 Documentation: `docs/FLOPPY.md`, `docs/MEMORY.md`, `docs/DESIGN.md`,
 `docs/FONT.md`, `docs/PICTURES.md`, `docs/STRUCTURE.md`,
-`docs/OPTIMIZE_CODE.md`, `docs/OPTIMIZE_REFACTOR.md`
+`docs/OPTIMIZE_CODE.md`, `docs/OPTIMIZATION.md`, `docs/RWTS.md`
 
 ## Prerequisites
 
@@ -298,9 +298,6 @@ their original authors and maintainers.
 Core Features
 - Random events (positive and negative) at turn's end
 - Balance game for all stages (beginning, mid, and end)
-
-Performance/Maintanability Improvements
-- Update OPTIMIZE_REFACTOR.md
 
 Discarded ideas (difficult to squeeze in without requiring extra floppies):
 - Map screen
