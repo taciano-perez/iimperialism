@@ -1,13 +1,20 @@
-; ProDOS overlay loader using direct MLI OPEN/READ/CLOSE calls.
+; Disk overlay loader, ProDOS backend.
+;
+; Current backend: ProDOS MLI OPEN/READ/CLOSE. Keep the public symbol names
+; backend-neutral so the higher-level game code does not depend on ProDOS.
 ;
 ; Exports:
-;   _prodos_load_overlay  - __fastcall__ unsigned char(const char* filename)
-;   _overlay_bytes_read   - transfer count from the last READ call
+;   _disk_get_capabilities   - __fastcall__ unsigned char(void)
+;   _disk_load_overlay       - __fastcall__ unsigned char(unsigned char id)
+;   _disk_overlay_bytes_read - transfer count from the last READ call
 
     .include "zeropage.inc"
+    .include "disk.inc"
+    .include "disk_overlay_table.inc"
 
-    .export _prodos_load_overlay
-    .export _overlay_bytes_read
+    .export _disk_get_capabilities
+    .export _disk_load_overlay
+    .export _disk_overlay_bytes_read
 
 MLI                 := $BF00
 OPEN_CALL           := $C8
@@ -21,7 +28,8 @@ PRODOS_IO_BUFFER    := MLI - 1024
 
 OPEN_PARAM:
     .byte   $03
-    .addr   PATHNAME
+OPEN_PATH:
+    .addr   $0000
     .addr   PRODOS_IO_BUFFER
 OPEN_REF:
     .byte   $00
@@ -40,36 +48,34 @@ CLOSE_PARAM:
 CLOSE_REF:
     .byte   $00
 
-_overlay_bytes_read:
+_disk_overlay_bytes_read:
     .word   $0000
-
-PATHNAME:
-    .res    66
 
     .segment "LOWCODE"
 
-_prodos_load_overlay:
-    sta     ptr1
-    stx     ptr1+1
+_disk_get_capabilities:
+    lda     #DISK_CAP_SAVE_LOAD
+    ldx     #$00
+    rts
+
+_disk_load_overlay:
+    tax
 
     lda     #$00
-    sta     _overlay_bytes_read
-    sta     _overlay_bytes_read+1
+    sta     _disk_overlay_bytes_read
+    sta     _disk_overlay_bytes_read+1
 
-    ldy     #$00
-@copy_filename:
-    lda     (ptr1),y
-    beq     @filename_done
-    sta     PATHNAME+1,y
-    iny
-    cpy     #64
-    bcc     @copy_filename
+    cpx     #DISK_OVERLAY_COUNT
+    bcc     @valid_overlay
+    lda     #DISK_ERR_INVALID_OVERLAY
+    ldx     #$00
+    rts
 
-@filename_done:
-    tya
-    sta     PATHNAME
-    lda     #$00
-    sta     PATHNAME+1,y
+@valid_overlay:
+    lda     OVL_NAME_LO,x
+    sta     OPEN_PATH
+    lda     OVL_NAME_HI,x
+    sta     OPEN_PATH+1
 
     jsr     MLI
     .byte   OPEN_CALL
@@ -88,9 +94,9 @@ _prodos_load_overlay:
     .word   READ_PARAM
 
     lda     READ_TRANS
-    sta     _overlay_bytes_read
+    sta     _disk_overlay_bytes_read
     lda     READ_TRANS+1
-    sta     _overlay_bytes_read+1
+    sta     _disk_overlay_bytes_read+1
 
     bcc     @read_ok
     pha

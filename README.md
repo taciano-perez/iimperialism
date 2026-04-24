@@ -85,8 +85,10 @@ nation's exports cheaper to buy and its imports more profitable to sell into.
 | `src/ovl_science.c` | Science screen overlay (`sscr.bin`) |
 | `src/ovl_game_menu.c` | Game menu overlay and save/load flow (`menu.bin`) |
 | `src/ovl_council_nations.c` | Council of Nations overlay and Taipan-inspired final report (`cnsl.bin`) |
-| `asm/prodos_overlay_load.s` | Resident ProDOS MLI overlay loader (`OPEN` / `READ` / `CLOSE`) |
-| `asm/prodos_gamestate_io.s` | Menu-overlay ProDOS MLI save/load helper for `GAME.DATA` |
+| `asm/disk_overlay_load_prodos.s` | Resident disk overlay loader, ProDOS backend |
+| `asm/disk_overlay_load_rwts.s` | Resident disk overlay loader, experimental ProRWTS read-only backend |
+| `asm/disk_gamestate_io_prodos.s` | Menu-overlay disk save/load helper for `GAME.DATA`, ProDOS backend |
+| `asm/disk_gamestate_io_rwts.s` | Menu-overlay disk save/load helper, RWTS experimental stub backend |
 | `asm/ovl_industry_entry.s` | Fixed entry stub for industry overlay |
 | `asm/ovl_diplomacy_entry.s` | Fixed entry stub for diplomacy overlay |
 | `asm/ovl_production_entry.s` | Fixed entry stub for production overlay |
@@ -122,7 +124,7 @@ Documentation: `docs/FLOPPY.md`, `docs/MEMORY.md`, `docs/DESIGN.md`,
 
 ## Runtime Requirements
 
-The current build targets a **64 KB Apple II family machine with ProDOS support**.
+The default build targets a **64 KB Apple II family machine with ProDOS support**.
 
 Supported in principle:
 
@@ -139,7 +141,7 @@ Not supported:
 Why:
 
 - the game uses the main 64 KB Apple II memory map
-- it relies on ProDOS 8 boot/loading and direct ProDOS MLI calls
+- the default disk relies on ProDOS 8 boot/loading and direct ProDOS MLI calls
 - it uses HGR graphics mode and loads 2 KB overlays into main RAM at runtime
 
 ### Windows
@@ -180,6 +182,21 @@ To build without updating the disk image:
 ```bash
 make
 ```
+
+Experimental RWTS staging build:
+
+```bash
+make SHELL=cmd disk-rwts
+```
+
+This produces `assets/iimperialism-rwts.dsk` from a separate `build-rwts`
+directory, compiles the game with `RWTS_EXPERIMENTAL=1`, and links the
+experimental `rwts` disk backend. It now has a custom qboot/ProRWTS boot path:
+
+- save/load are disabled in the menu
+- boot no longer depends on `PRODOS` or `IIMP.SYSTEM`
+- overlay reads go through resident ProRWTS instead of ProDOS MLI
+- the runtime path is still read-only; `GAME.DATA` save/load is not implemented
 
 To clean artifacts:
 

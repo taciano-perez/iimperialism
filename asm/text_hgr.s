@@ -78,6 +78,29 @@ _draw_text_hgr_opaque:
     adc     #$00                        ; fold in carry from low-byte add
     sta     base_addr+1                 ; store resulting destination high byte
 
+    ; RWTS boot debug: drop one visible byte at the computed destination
+    ; before any glyph decoding, so we can verify the blitter is targeting
+    ; the visible HGR page at all.
+    lda     base_addr
+    sta     ptr1
+    lda     base_addr+1
+    sta     ptr1+1
+    ldy     #$00
+    lda     #$7F
+    sta     (ptr1),y
+
+    ; RWTS boot debug: also write a fixed visible column near the top-left
+    ; of page 1. If this appears but the computed-destination probe does not,
+    ; the blitter is being called but its destination calculation is wrong.
+    sta     $2081
+    sta     $2481
+    sta     $2881
+    sta     $2C81
+    sta     $3081
+    sta     $3481
+    sta     $3881
+    sta     $3C81
+
     lda     #$00                        ; start at glyph row 0
     sta     row_index                   ; initialize row loop counter
 

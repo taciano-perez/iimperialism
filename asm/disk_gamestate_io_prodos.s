@@ -1,4 +1,7 @@
-; ProDOS fixed-slot game-state persistence using direct MLI calls.
+; Disk fixed-slot game-state persistence, ProDOS backend.
+;
+; Current backend: ProDOS MLI file operations. Keep the public symbol names
+; backend-neutral so higher-level menu code can switch storage backends later.
 ;
 ; GAME.DATA is a compact 5-slot container:
 ;   4 bytes container header ("IS", version, slot count)
@@ -13,9 +16,9 @@
 
     .include "zeropage.inc"
 
-    .export _prodos_save_game
-    .export _prodos_load_game
-    .export _prodos_read_save_slot_info
+    .export _disk_save_game
+    .export _disk_load_game
+    .export _disk_read_save_slot_info
 
     .import _game_state_size
     .import _save_slot
@@ -170,7 +173,7 @@ INFO_PTR:
 
     .segment "CODE"
 
-_prodos_save_game:
+_disk_save_game:
     ; __fastcall__ passes the GameState pointer in A/X.
     sta     STATE_PTR
     stx     STATE_PTR+1
@@ -250,7 +253,7 @@ save_failed:
     ldx     #$00
     rts
 
-_prodos_load_game:
+_disk_load_game:
     ; __fastcall__ passes the GameState destination pointer in A/X.
     sta     STATE_PTR
     stx     STATE_PTR+1
@@ -295,7 +298,7 @@ load_failed:
     ldx     #$00
     rts
 
-_prodos_read_save_slot_info:
+_disk_read_save_slot_info:
     ; __fastcall__ passes the SaveSlotInfo pointer in A/X.
     sta     INFO_PTR
     stx     INFO_PTR+1

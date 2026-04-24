@@ -2,10 +2,14 @@
 
 ## Overview
 
-`assets/iimperialism.dsk` is a ProDOS 8 boot disk for the game.
+`assets/iimperialism.dsk` is the default ProDOS 8 boot disk for the game.
 
 It uses a ProDOS `SYS` loader (`IIMP.SYSTEM`) to auto-start the game binary
 (`IIMPERIALISM`) without `BASIC.SYSTEM` or `STARTUP` BASIC.
+
+The separate experimental image, `assets/iimperialism-rwts.dsk`, now uses a
+custom qboot/ProRWTS boot path instead. This document describes the default
+ProDOS image unless noted otherwise.
 
 ## Current Disk Contents
 
@@ -91,6 +95,12 @@ On Windows environments where shell redirection differs, use:
 make SHELL=cmd disk
 ```
 
+Experimental custom-boot image:
+
+```bash
+make SHELL=cmd disk-rwts
+```
+
 ## Verification
 
 To inspect disk contents:
@@ -110,3 +120,6 @@ The final catalog should report at least:
 ```text
 ProDOS format; 1.536 bytes free
 ```
+
+For the experimental RWTS image, `PRODOS` and `IIMP.SYSTEM` are intentionally
+absent from the catalog.

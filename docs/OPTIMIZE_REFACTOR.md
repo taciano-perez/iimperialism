@@ -162,7 +162,7 @@ OVL: file = %O, start = $8800, size = $0800, fillval = $00, fill = yes;
 
 The loader also expects exactly `2048` bytes:
 
-- `asm/prodos_overlay_load.s` reads up to `OVERLAY_SIZE`
+- the active disk overlay backend reads up to `OVERLAY_SIZE`
 - `src/overlay.c` treats any read count other than `OVERLAY_SIZE` as failure
 
 That is simple and safe, but it means a small overlay still consumes the same
@@ -182,7 +182,7 @@ Required implementation shape:
 - stop padding overlay files in the overlay linker config
 - clear the full `$8800-$8FFF` overlay slot before each read, or otherwise zero
   the unread tail after a short read
-- remove or relax the exact `overlay_bytes_read == OVERLAY_SIZE` check
+- remove or relax the exact `disk_overlay_bytes_read == OVERLAY_SIZE` check
 - preserve the maximum read count of `2048` bytes
 - test every overlay path, because stale bytes in the overlay slot would be a
   serious failure mode

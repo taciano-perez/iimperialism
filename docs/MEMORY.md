@@ -82,7 +82,7 @@ loading even if the older, broader high-memory totals still appeared to fit.
 Runtime flow (`run_overlay(id)`):
 
 1. Map overlay ID to ProDOS filename.
-2. Call the resident ProDOS loader helper in `asm/prodos_overlay_load.s`.
+2. Call the resident disk loader helper for the active backend.
 3. Use ProDOS MLI `OPEN` / `READ` / `CLOSE` to load exactly 2048 bytes into
    main RAM `OVERLAY_SLOT` (`$8800`).
 4. Execute overlay entry at `$8800` (no arguments; overlays access `state`
@@ -94,10 +94,17 @@ MLI calls are more robust under the game's current resident memory pressure
 than the Apple II `stdio` path.
 
 Game-state persistence now lives entirely in the game menu overlay.
-`save_game()` / `load_game()` and the ProDOS helper in `asm/prodos_gamestate_io.s`
-use direct MLI `CREATE` / `OPEN` / `READ` / `WRITE` / `CLOSE` calls for
-`GAME.DATA` instead of linking the heavier `stdio` file I/O path into resident
-code.
+`save_game()` / `load_game()` and the disk helper use direct file I/O calls for
+`GAME.DATA` instead of linking the heavier `stdio` path into resident code.
+Current backends:
+
+- `asm/disk_overlay_load_prodos.s` / `asm/disk_gamestate_io_prodos.s`
+- `asm/disk_overlay_load_rwts.s` / `asm/disk_gamestate_io_rwts.s`
+
+The default backend still uses ProDOS MLI `CREATE` / `OPEN` / `READ` /
+`WRITE` / `CLOSE`. The RWTS backend now uses resident ProRWTS for read-only
+overlay loading after the experimental qboot boot path has initialized it.
+Save/load remains stubbed in the RWTS build.
 
 Current save-container details:
 
@@ -214,16 +221,20 @@ Example: diplomacy overlay as ID `6`, file `DSCR`.
 #define OVL_FILE_DIPLOMACY "DSCR"
 ```
 
-3. Extend `overlay_filename()` in `src/overlay.c`:
+3. Extend the active disk backend's overlay-name table.
 
-```c
-case OVL_DIPLOMACY: return OVL_FILE_DIPLOMACY;
+Current default backend:
+
+```asm
+OVL_NAME_DIPLOMACY:
+    .byte .strlen("DSCR")
+    .byte "DSCR"
 ```
 
 4. Add object and binary rules in `Makefile`.
 
-The resident overlay loader does not need changes unless the new overlay file
-name requires a different filename mapping.
+The resident overlay loader entry point does not need changes unless the active
+backend requires different overlay metadata.
 
 If the overlay contains multiple functions, add an assembly entry stub and link it
 first so the correct entry symbol lands at `$8800`:
