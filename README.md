@@ -298,6 +298,8 @@ their original authors and maintainers.
 Core Features
 - Random events (positive and negative) at turn's end
 - Balance game for all stages (beginning, mid, and end)
+- Handle overlay loading on Apple IIgs
+- Handle absence of disk
 
 Discarded ideas (difficult to squeeze in without requiring extra floppies):
 - Map screen
