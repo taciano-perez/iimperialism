@@ -22,8 +22,8 @@ void render_transport_screen(void) {
         render_turn_funds_header();
         render_warehouse_box();
 
-    box(BOX_X1, BOX_Y1, BOX_X2, BOX_Y2);
-    print((BOX_X1+1), BOX_Y1, "Transport Orders");
+    box(BOX_X1, BOX_Y1+1, BOX_X2, BOX_Y2);
+    print_inverted(BOX_X1, BOX_Y1, "Transport Orders");
     print((BOX_X1+1), (BOX_Y1+1), "Timber: ");
     print_int_right_aligned((BOX_X1+11), (BOX_Y1+1), state.transport_timber);
     print((BOX_X1+13), (BOX_Y1+1), "/");
@@ -48,12 +48,12 @@ void render_transport_screen(void) {
         draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
         print(5, 20, "What are your orders, sir?");
         print(5, 21, "Change Transport per turn,");
-        print(5, 22, "Build wagons or Quit?");
+        print(5, 22, "build Wagons or Quit?");
 
         key = cgetc_at(26, 22);
         switch (key) {
-            case 'b':
-            case 'B':
+            case 'w':
+            case 'W':
                 clear_input_area();
                 max_transport = MIN(state.resources[RESOURCE_LUMBER], state.resources[RESOURCE_STEEL]);
                 max_transport = MIN(max_transport, MAX_UCHAR - state.available_wagons);

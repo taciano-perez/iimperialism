@@ -9,12 +9,16 @@ static const char STR_TRADER_LOSS[] = "The buggers sunk a trader!";
 static const char STR_FIGHT[] = "Aye, we'll fight!";
 static const char STR_BOUNTY[] = "We captured a booty of $";
 
+static unsigned char get_battle_firepower(unsigned char is_enemy, unsigned char ship_count) {
+    return ship_count * (is_enemy ? GUNS_PER_WARSHIP_BASE : state.guns_per_warship);
+}
+
 static void render_firepower(unsigned char is_enemy, unsigned char ship_count) {
     unsigned char clear_x;
 
     clear_x = is_enemy ? 35 : 12;
     clear_area(clear_x, 1, 4, 1);
-    print_int_right_aligned(clear_x + 3, 1, ship_count * state.guns_per_warship);
+    print_int_right_aligned(clear_x + 3, 1, get_battle_firepower(is_enemy, ship_count));
 }
 
 static void get_ship_position(unsigned char is_enemy,
@@ -43,15 +47,15 @@ static void get_ship_position(unsigned char is_enemy,
 
 static void handle_ship_hit(unsigned char is_enemy,
                             unsigned char* ship_count,
-                            unsigned char attacker_ship_count) {
+                            unsigned char attacker_firepower) {
     unsigned char ship_index;
     unsigned char last_index;
     unsigned char x_offset;
     unsigned char y_offset;
     unsigned char last_x_offset;
     unsigned char last_y_offset;
+    unsigned char defender_firepower;
     unsigned char picture;
-    unsigned char total_ship_count;
     unsigned char i;
 
     if (*ship_count == 0) {
@@ -67,8 +71,8 @@ static void handle_ship_hit(unsigned char is_enemy,
         draw_picture_at(picture, x_offset, y_offset);
     }
 
-    total_ship_count = attacker_ship_count + *ship_count;
-    if (rand_range(0, total_ship_count - 1) < attacker_ship_count) {
+    defender_firepower = get_battle_firepower(is_enemy, *ship_count);
+    if (rand_range(0, (unsigned char)(attacker_firepower + defender_firepower - 1U)) < attacker_firepower) {
         last_index = *ship_count - 1;
         clear_area(x_offset, y_offset, 4, 4);
         --(*ship_count);
@@ -103,6 +107,8 @@ void render_battle_screen(void) {
     unsigned char visible_friendly_ships;
     unsigned char visible_enemy_ships;
     unsigned char picture;
+    unsigned char x_offset;
+    unsigned char y_offset;
     
     base_ships = 1U + ((state.turn_number - 1U) / 10U);
     min_ships = (base_ships + 1U) / 2U;
@@ -118,9 +124,6 @@ void render_battle_screen(void) {
     render_firepower(0, visible_friendly_ships);
     print_int_right_aligned(15, 2, state.traders);
     for (i = 0; i < visible_friendly_ships; ++i) {
-        unsigned char x_offset;
-        unsigned char y_offset;
-
         get_ship_position(0, (unsigned char)i, &x_offset, &y_offset);
         draw_picture_at(SHIP, x_offset, y_offset);
     }
@@ -130,9 +133,6 @@ void render_battle_screen(void) {
     render_firepower(1, visible_enemy_ships);
     picture = state.attacker_index == INDEX_PIRATES ? SHIP_PIRATE : SHIP_FOREIGN;
     for (i = 0; i < visible_enemy_ships; ++i) {
-        unsigned char x_offset;
-        unsigned char y_offset;
-
         get_ship_position(1, (unsigned char)i, &x_offset, &y_offset);
         draw_picture_at(picture, x_offset, y_offset);
     }
@@ -142,55 +142,51 @@ void render_battle_screen(void) {
         unsigned char previous_friendly_ships;
         clear_area(5, 21, 22, 2);
         print(5, 21, "Fight or Run?");
-        key = cgetc_at(18, 21);
-        switch (key) {
-            case 'F':
-            case 'f':
-                print(5, 22, STR_FIGHT);
-                for (i = 0; i < visible_friendly_ships; ++i) {
-                    handle_ship_hit(1, &visible_enemy_ships, visible_friendly_ships);
-                    if (visible_enemy_ships == 0) {
-                        modifier_percent = rand_range(100U - BATTLE_BOUNTY_VARIANCE_PERCENT,
-                                                      100U + BATTLE_BOUNTY_VARIANCE_PERCENT);
-                        bounty = ((unsigned int)enemy_ships * 10U * modifier_percent) / 100U;
-                        state.money += bounty;
-                        state.turn_booty += bounty;
-                        clear_input_area();
-                        print(5, 20, "Victory!");
-                        print(5, 21, STR_BOUNTY);
-                        print_int(29, 21, bounty);
-                        state.current_screen = SCREEN_TRADE_EXPEDITION;
-                        play_sound_alert();
-                        wait_three_seconds_or_keypress();
-                        return;
-                    }
-                    previous_friendly_ships = visible_friendly_ships;
-                    handle_ship_hit(0, &visible_friendly_ships, visible_enemy_ships);
-                    if (state.traders != 0U && rand_range(1U, 100U) <= BATTLE_TRADER_HIT_CHANCE_PERCENT) {
-                        trader_lost();
-                        clear_area(5, 22, 31, 1);
-                        print(5, 22, STR_FIGHT);
-                    }
-                    if (visible_friendly_ships != previous_friendly_ships) {
-                        --state.warships;
-                    }
-                    if (visible_friendly_ships == 0) {
-                        clear_input_area();
-                        print(5, 20, "Defeat!");
-                        state.current_screen = SCREEN_DIPLOMACY;
-                        play_sound_alert();
-                        wait_three_seconds_or_keypress();
-                        return;
-                    }
+        key = (unsigned char)(cgetc_at(18, 21) & 0xDF);
+        if (key == 'F') {
+            print(5, 22, STR_FIGHT);
+            for (i = 0; i < visible_friendly_ships; ++i) {
+                handle_ship_hit(1, &visible_enemy_ships, visible_friendly_ships * state.guns_per_warship);
+                if (visible_enemy_ships == 0) {
+                    modifier_percent = rand_range(100U - BATTLE_BOUNTY_VARIANCE_PERCENT,
+                                                  100U + BATTLE_BOUNTY_VARIANCE_PERCENT);
+                    bounty = ((unsigned int)enemy_ships * 10U * modifier_percent) / 100U;
+                    state.money += bounty;
+                    state.turn_booty += bounty;
+                    clear_input_area();
+                    print(5, 20, "Victory!");
+                    print(5, 21, STR_BOUNTY);
+                    print_int(29, 21, bounty);
+                    state.current_screen = SCREEN_TRADE_EXPEDITION;
+                    play_sound_alert();
+                    wait_three_seconds_or_keypress();
+                    return;
                 }
-                break;
-            case 'R':
-            case 'r':
-                if (state.traders != 0U && rand_range(1U, 100U) <= BATTLE_RUN_TRADER_HIT_CHANCE_PERCENT) {
+                previous_friendly_ships = visible_friendly_ships;
+                handle_ship_hit(0, &visible_friendly_ships, visible_enemy_ships * GUNS_PER_WARSHIP_BASE);
+                if (state.traders != 0U && rand_range(1U, 100U) <= BATTLE_TRADER_HIT_CHANCE_PERCENT) {
                     trader_lost();
+                    clear_area(5, 22, 31, 1);
+                    print(5, 22, STR_FIGHT);
                 }
-                state.current_screen = SCREEN_DIPLOMACY;
-                return;
+                if (visible_friendly_ships != previous_friendly_ships) {
+                    --state.warships;
+                }
+                if (visible_friendly_ships == 0) {
+                    clear_input_area();
+                    print(5, 20, "Defeat!");
+                    state.current_screen = SCREEN_DIPLOMACY;
+                    play_sound_alert();
+                    wait_three_seconds_or_keypress();
+                    return;
+                }
+            }
+        } else if (key == 'R') {
+            if (state.traders != 0U && rand_range(1U, 100U) <= BATTLE_RUN_TRADER_HIT_CHANCE_PERCENT) {
+                trader_lost();
+            }
+            state.current_screen = SCREEN_DIPLOMACY;
+            return;
         }
     }
 

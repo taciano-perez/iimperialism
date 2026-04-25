@@ -89,7 +89,7 @@ static void trade_commodities(unsigned char nation_index, unsigned char mode) {
                     print(5, 22, get_diplomacy_string(DSTR_HOW_MANY));
                     print_int_right_aligned(28, 22, max_quantity);
                     quantity = scan_uint(31, 22, 3);
-                    if (quantity <= max_quantity) {
+                    if (quantity <= max_quantity && quantity > 0) {
                         state.remaining_turn_capacity -= quantity;
                         if (mode == TRADE_MODE_BUY) {
                             state.resources[resource] += quantity;

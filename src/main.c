@@ -216,8 +216,8 @@ void render_main_screen(void) {
     draw_picture_at(CHANCELLOR_PORTRAIT, 20, 13);
     print_rating_row(24, 13, 38, "Diplomacy:", get_diplomacy_rating_tier());
 
-    print(0, 20, "Visit Ministry of Industry, Patent");
-    print(0, 21, "Office, Admiralty, Foreign Office,");
+    print(0, 20, "Visit Ministry of Industry, Foreign");
+    print(0, 21, "Office, Admiralty, Science Academy,");
     print(0, 22, "or End turn?");
 
     while (1) {
@@ -227,8 +227,8 @@ void render_main_screen(void) {
             case 'I':
                 state.current_screen = SCREEN_INDUSTRY;
                 return;
-            case 'p':
-            case 'P':
+            case 's':
+            case 'S':
                 state.current_screen = SCREEN_SCIENCE;
                 return;
             case 'a':

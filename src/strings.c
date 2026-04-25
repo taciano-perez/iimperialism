@@ -16,7 +16,7 @@ static const char* const STR_DIPLOMACY[] = {
     "Launch Trade expedition, offer",
     "Colony status, Alliance or Quit?",
     "We must build warships first!",
-    "A diplomatic mission costs $1000.",
+    "A diplomatic mission costs $500.",
     "Nation to offer",
     "an alliance:",
     "colony status:",

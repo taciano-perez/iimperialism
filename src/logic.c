@@ -271,7 +271,7 @@ static void assign_foreign_nation_names(void) {
     static const char great_power_name_pool[][8] = {
         "Deneb",
         "Haxaco",
-        "Patagon",
+        "Atagon",
         "Zimm",
         "Kem",
         "Ordune",

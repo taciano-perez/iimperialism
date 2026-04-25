@@ -45,7 +45,7 @@ void render_science_screen(void) {
         unsigned int next_cost;
 
         clear_screen();
-        print(0, 0, "Patent Office");
+        print(0, 0, "Science Academy");
         render_turn_funds_header();
         
         print_inverted(0, 2, "Research");

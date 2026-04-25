@@ -41,8 +41,8 @@ void render_production_screen(void) {
 
         render_warehouse_box();
 
-        box(BOX_X1, BOX_Y1, BOX_X2, BOX_Y2);
-        print((BOX_X1+1), BOX_Y1, "Production per turn");
+        box(BOX_X1, BOX_Y1+1, BOX_X2, BOX_Y2);
+        print_inverted(BOX_X1, BOX_Y1, "Production per turn");
         print((BOX_X1+1), (BOX_Y1+1), "Lumber: ");
         print_int_right_aligned((BOX_X1+11), (BOX_Y1+1), state.production_lumber);
         print((BOX_X1+1), (BOX_Y1+2), "Fabric: ");
@@ -72,8 +72,8 @@ void render_production_screen(void) {
 
         draw_picture_at(INDUSTRY_PORTRAIT, 0, 20);
         print(5, 20, "What are your orders, sir?");
-        print(5, 21, "Change Production per turn, Train");
-        print(5, 22, "new workers or Quit?");
+        print(5, 21, "Change Production per turn, train");
+        print(5, 22, "new Workers or Quit?");
 
         key = cgetc_at(25, 22);
         switch (key) {
@@ -81,8 +81,8 @@ void render_production_screen(void) {
             case 'P':
                 production_orders();
                 break;
-            case 't':
-            case 'T':
+            case 'w':
+            case 'W':
                 train_new_workers();
                 break;
             case 'q':
