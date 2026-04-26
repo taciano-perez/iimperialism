@@ -10,7 +10,7 @@ const char STR_RELATION_COLONY[] = "Colony";
 static const char* const STR_DIPLOMACY[] = {
     "Foreign Office",
     "Nation",
-    "Status",
+    "Relations",
     "Exports",
     "Imports",
     "Launch Trade expedition, offer",
@@ -22,7 +22,7 @@ static const char* const STR_DIPLOMACY[] = {
     "colony status:",
     "Offer accepted!",
     "Offer rejected. Investment lost.",
-    "You need Status = Great",
+    "You need Relations = Great",
     "and $1000 to offer",
     "an alliance to a great power.",
     "colony status to a minor nation.",
