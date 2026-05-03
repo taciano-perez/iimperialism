@@ -12,6 +12,8 @@ with new shipbuilding costs scaling to match those stronger vessels.
 
 **Play it online:** [Apple//jse](https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/assets/iimperialism.dsk)
 
+Created by Taciano Dreckmann Perez, if redistributing please acknowledge the author.
+
 ## Runtime Requirements
 
 The shipped build targets a **64 KB Apple II family machine with HGR and a
@@ -415,5 +417,4 @@ Discarded ideas (difficult to squeeze in without requiring extra floppies):
 - Land battles
 
 Packaging goodies
-- Manual
 - Floppy Sticker
