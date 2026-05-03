@@ -2,651 +2,478 @@
 
 ## Purpose
 
-This document summarizes how the current rules are likely to play, which
-constants in `include/game.h` are the strongest balance levers, and how to
-model simulated playthroughs before changing gameplay code.
+This document describes how the current implementation actually plays, which
+systems are the main balance levers, and which behaviors are balance-critical
+enough that they should be treated as mechanics rather than incidental code
+details.
 
-The goal is not just "make the game harder" or "make it easier". The goal is:
+The goal is to keep three phases healthy:
 
-- early game: the player should feel constrained, but not doomed
-- mid game: the player should be making meaningful tradeoffs between economy,
-  science, navy, and diplomacy
-- late game: the player should still face pressure, but should have enough
-  agency to close out a winning diplomatic campaign
+- early game: tight but recoverable
+- mid game: real choices between growth, research, warships, and diplomacy
+- late game: strong player agency without an automatic snowball
 
-## What The Current Rule Set Encourages
+## Current Baseline
 
-### 1. The opening economy is fragile
+The current values in `include/game.h` are:
 
-The player starts with:
-
-- `$250`
-- `6` available workers
-- `2` traders
-- `2` warships
-
-With the current upkeep constants:
-
+- `CAPACITY_PER_TRADER_BASE = 2`
+- `GUNS_PER_WARSHIP_BASE = 2`
+- `TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT = 50`
+- `TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT = 50`
+- `TRADE_RELATIONS_MULTIPLIER = 2`
+- `BATTLE_TRADER_HIT_CHANCE_PERCENT = 5`
+- `BATTLE_RUN_TRADER_HIT_CHANCE_PERCENT = 60`
+- `DIPLOMATIC_OVERTURE_CHANCE_PERCENT = 50`
+- `DIPLOMATIC_OFFER_COST = 500`
+- `RELATIONS_LOSS_PER_TURN = 3`
+- `SCIENCE_RESEARCH_COST_MULTIPLIER = 500`
 - `UPKEEP_COST_PER_WORKER = 2`
 - `UPKEEP_COST_PER_TRADER = 5`
 - `UPKEEP_COST_PER_WARSHIP = 5`
 
-the opening upkeep is:
+The starting state in `src/logic.c` is:
 
-- `6 * 2 + 2 * 5 + 2 * 5 = $32 per turn`
+- `$250`
+- `4` provinces
+- `2` traders
+- `2` warships
+- `6` idle workers
+- `5` idle wagons
+- transport orders: `5/5/1/1`
+- production orders: `2 lumber`, `2 fabric`, `1 steel`, `1 furniture`,
+  `1 clothes`
+- `Fair` relations (`100`) with all foreign nations
 
-That means the starting treasury lasts about `7-8` turns without successful
-trade. This is a good signal that the player must engage with trade quickly, but
-it also means the opening is very punishing if battles, unlucky prices, or poor
-first decisions interrupt early profits.
+## What The Current Build Actually Encourages
 
-### 2. Diplomatic progression is currently slow relative to council timing
+### 1. The opening treasury is fragile, but the opening industry is not
 
-A nation starts at `RELATION_FAIR = 100`. To reach `RELATION_GREAT = 200`,
-the player needs `+100` relation.
+Opening upkeep is:
 
-Current relation movement:
+- workers: `6 * 2 = 12`
+- traders: `2 * 5 = 10`
+- warships: `2 * 5 = 10`
+- total: `$32` per turn
 
-- gain from trade: `quantity * TRADE_RELATIONS_MULTIPLIER`
-- current multiplier: `2`
-- end-turn decay: `RELATIONS_LOSS_PER_TURN = 3`
+So the treasury alone lasts about `7` full turns.
 
-At the start of the game, the player has only `4` trade capacity per turn
-(`2` traders * `2` capacity). If all `4` capacity is used on one nation, the
-gross gain is `+8`, and the end-turn decay makes the net gain only `+5`.
+That sounds harsher than the real opening because idle workers are the only
+workers that pay upkeep. Assigned workers are removed from `available_workers`,
+and upkeep is charged only on `available_workers` in `next_turn()`.
 
-That implies roughly `20` focused turns to move a nation from `Fair` to
-`Great`, before even attempting an alliance or colony offer.
+That matters because the starting production orders already use `7` workers
+while the state also starts with `6` idle workers. In effect, the nation starts
+with a larger total labor force than the upkeep math suggests, and can reduce
+future labor upkeep by assigning more workers into production or shipbuilding.
 
-Since the council meets every `10` turns and victory needs at least:
+This means the opening cash pressure is real, but labor pressure is currently
+discounted by implementation.
 
-- `1` allied great power and `2` colonies, or
-- `2` allied great powers
+### 2. The default economy converts stockpiled iron and coal into worker growth
 
-the current diplomatic pacing is likely too slow for a satisfying mid game.
-The player will often feel that the game is asking for diplomacy, while the
-numbers mostly permit only a long grind.
+The starting transport and production orders do not form a steady-state loop.
 
-### 3. Trade is the main engine, but early trade throughput is small
+Per turn, before research:
 
-Current early trade throughput is constrained by:
+- transport adds `+5 timber`, `+5 wool`, `+1 iron`, `+1 coal`
+- production consumes `4 timber`, `4 wool`, `2 iron`, `2 coal`
+- net raw change is:
+  - timber `+1`
+  - wool `+1`
+  - iron `-1`
+  - coal `-1`
+- finished-goods output is:
+  - `+1 furniture`
+  - `+1 clothes`
+  - `+1 steel`
 
-- `CAPACITY_PER_TRADER_BASE = 2`
-- only `2` starting traders
-- `50%` pirate battle chance per expedition
-- extra foreign attack checks from bad-relation nations
+Because furniture and clothes train workers at `1 + 1` each, the opening
+economy is set up to turn starting iron and coal reserves into labor growth.
+That is a coherent opening pattern, but it also means the initial industrial
+setup is more forgiving than the upkeep numbers alone imply.
 
-The price system itself is directionally sound:
+### 3. Trade margins are reasonable; expedition frequency is the real pressure
 
-- great powers import raw materials and export finished goods
-- minor nations export raw materials and import finished goods
-- better relations improve both buy and sell terms
+At `Fair` relations, `get_relation_tier()` returns tier `2`.
 
-This creates a useful trade triangle. The issue is not the concept. The issue is
-that early expedition volume is low while expedition risk is high, so the player
-can be forced into a thin-margin economy.
+That makes current prices:
 
-### 4. Science is powerful, and now arrives much earlier
+- export prices: `85% + 0..15% - 6%` => `79%..94%` of base price
+- import prices: `110% + 0..20% + 8%` => `118%..138%` of base price
 
-Current research cost is:
+So trade is not priced to fail. The basic triangle works:
 
-- `level * SCIENCE_RESEARCH_COST_MULTIPLIER`
-- multiplier is `500`
+- minor nations export raw materials cheaply
+- great powers import raw materials at a premium
+- great powers export advanced goods
+- minor nations import advanced goods
 
-So the ladder costs:
+The real limiter is throughput and voyage risk:
 
-- `500, 1000, 1500, ... 4000`
+- only `2` traders at start
+- only `2` capacity per trader
+- only `4` cargo per turn before science
+- each expedition has a flat `50%` pirate interception check
 
-The upgrades are strong, especially:
+The price model supports profit. The player is pressured because each trading
+turn has low volume and many chances to get interrupted.
 
-- raw yield doublings
-- trader capacity doublings
-- warship gun multipliers
+### 4. Relation growth is workable in theory, but brittle in practice
 
-This is no longer a late-game-only system. A competent player can plausibly buy
-early research in the opening or early mid game. That improves the game's tempo,
-but it also increases snowball risk: if a player gets even a modestly profitable
-trade start, science can now accelerate the economy much sooner than before.
+Each unit traded gives:
 
-### 5. Battles create pressure, but the pressure is front-loaded
+- `+2` relations from `TRADE_RELATIONS_MULTIPLIER`
 
-Current expedition danger:
+Each end turn removes:
 
-- `TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT = 50`
-- `TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT = 50`
+- `-3` relations from every non-permanent nation
 
-This means early trade, which the player urgently needs, is already exposed to a
-coin-flip pirate encounter. If any nation has fallen to `Bad`, that adds more
-attack pressure on top.
+Going from `Fair` (`100`) to `Great` (`200`) nominally needs `+100`.
 
-That kind of pressure is useful in the late game, but it is probably too high
-for the opening and too binary for the middle.
+If the player spends the full opening capacity of `4` on one nation in a turn,
+that is `+8` immediate relation gain, then `-3` at end turn, for `+5` net.
+That implies about `20` focused turns to reach `Great` if the player can only
+feed one nation with the starting fleet and never misses a turn of trade.
 
-### 6. Formal diplomacy is cheaper, but relation growth is still the bottleneck
+That is already slow. Two additional mechanics make it swingier:
 
-Current formal diplomacy values:
+- if treasury reaches `0`, every non-permanent nation is reset immediately to
+  `Bad`
+- after an offer succeeds, the relation becomes permanent at
+  `RELATION_ALLY_COLONY` and never decays
 
-- `DIPLOMATIC_OFFER_COST = 500`
-- `DIPLOMATIC_OVERTURE_CHANCE_PERCENT = 50`
+So the system is not a smooth diplomacy grind. It is a long ramp with a harsh
+bankruptcy cliff.
 
-Halving the offer cost is a strong improvement. It means the player is no longer
-punished as severely for converting a `Great` relation into an ally or colony.
-This reduces one of the game's sharpest mid-game treasury taxes.
+### 5. The council is paced around permanent conversions, not goodwill alone
 
-However, the player still needs to reach `Great` first, and that pacing is still
-controlled mostly by:
+Votes come from provinces:
 
-- `TRADE_RELATIONS_MULTIPLIER = 2`
-- `RELATIONS_LOSS_PER_TURN = 3`
-- low starting trade capacity
-- high trade-expedition battle pressure
+- player nation: `8`
+- each foreign great power: `8`
+- each foreign minor nation: `4`
+- victory target: `24`
 
-So diplomacy is less expensive now, but not yet necessarily faster.
+Non-allied major powers vote for themselves. Non-allied minor nations abstain.
+Temporary goodwill does not directly convert into council votes.
 
-### 7. Naval gun science now directly affects combat outcomes
+That means the player must secure permanent partners:
 
-The battle model has been refactored so hit odds are now weighted by firepower,
-not just by ship count.
+- `2` allied great powers, or
+- `1` allied great power plus `2` colonies
 
-Current battle model:
+This victory structure is sound. The pressure point is still the time needed to
+reach `Great` and then survive a `50%` overture roll.
+
+### 6. Sea danger is high per voyage, but fighting is much safer than running
+
+Every trade expedition first checks for pirates:
+
+- `50%` chance
+
+If pirates do not appear, every `Bad` nation rolls separately for interception:
+
+- `50%` chance per `Bad` nation
+
+That creates a nonlinear danger curve. Total expedition battle chance becomes:
+
+- `50%` if no nation is `Bad`
+- `75%` if `1` nation is `Bad`
+- `87.5%` if `2` nations are `Bad`
+- `98.4%` if all `5` nations are `Bad`
+
+That is one of the most important current balance facts. Once relations start
+collapsing, trade almost stops being optional risk and starts becoming nearly
+guaranteed combat.
+
+Inside combat, the pressure is less punishing than the expedition checks imply:
+
+- early enemy fleets are only `1` ship on turns `1-9`
+- trader loss while fighting is only `5%` per enemy response
+- trader loss while running is `60%`
+
+So the current system strongly rewards standing and fighting rather than trying
+to disengage.
+
+### 7. Naval science is now a direct combat stat, not just flavor
+
+Combat resolution uses firepower:
 
 - player firepower = `visible_friendly_ships * state.guns_per_warship`
 - enemy firepower = `visible_enemy_ships * GUNS_PER_WARSHIP_BASE`
-- chance to sink a ship = `attacker_firepower / (attacker_firepower + defender_firepower)`
+- hit chance is weighted by attacker firepower over total firepower
 
-This is a meaningful change for balance:
+That means:
 
-- `Carronade` and `Shell Guns` are now real combat upgrades
-- a smaller player fleet with better guns can now fight evenly or even
-  advantageously against a larger enemy fleet
-- naval science is now a stronger strategic branch than before
+- `Carronade` doubles player guns per warship from `2` to `4`
+- `Shell Guns` raises them again from `4` to `8`
+- equal fleets become materially easier fights after gun tech
 
-This improves coherence, because the displayed `Firepower:` value now matches the
-actual battle odds. It also increases the risk that gun science becomes one of
-the strongest snowball mechanics in the game, especially now that research is
-cheaper.
+This makes the science tree much more strategically meaningful than before.
+It also means science timing and battle balance can no longer be tuned
+independently.
 
-### 8. Several balance outcomes are currently dominated by implementation details
+### 8. Research is cheap enough to matter early, but not cheap enough to skip trade
 
-One current behavior still matters more than any constant tuning:
+Research costs are linear:
 
-1. Upkeep is charged only on `available_workers`, not on the total labor force.
-   Assigning workers into production reduces labor upkeep pressure.
+- level 1: `$500`
+- level 2: `$1000`
+- level 3: `$1500`
+- ...
+- level 8: `$4000`
 
-If this is not intentional, then purely tuning `game.h` constants will not fully
-solve balance.
+Total cost for the full tree is `$18,000`.
 
-## Stage-By-Stage Balance Targets
+That is accessible enough for mid-game planning, but not so cheap that the
+player can ignore trade. The bigger issue is branch timing:
 
-These are useful target outcomes for tuning.
+- early raw-yield techs strengthen worker growth and production stability
+- level 3 gun tech improves naval outcomes before trader-capacity tech arrives
+- level 5 doubles trader capacity and also doubles the material cost of newly
+  built traders
 
-### Early Game: turns 1-8
+This is a healthier science model than the older "science is too expensive to
+matter" state, but it increases snowball risk for profitable starts.
 
-Desired feeling:
+## Balance-Critical Implementation Details
 
-- cash is tight
-- mistakes matter
-- the player can still recover from one unlucky battle or one bad trade choice
+These are not small edge cases. They currently shape strategy.
 
-Suggested target outcomes:
+### 1. Labor upkeep only charges idle workers
 
-- bankruptcy should be uncommon before turn `8`
-- first meaningful profitable trade loop should be possible by turns `2-4`
-- first research purchase should feel reachable by turns `3-6`
-- the player should not lose merchant capacity too often before they have room to
-  rebuild
+`next_turn()` charges worker upkeep from `state.available_workers`, not from
+total workers. Assigning workers into production or shipbuilding reduces labor
+upkeep pressure.
 
-### Mid Game: turns 9-20
+If this is intentional, it should be documented as a rule. If it is not
+intentional, balance conclusions based on worker cost need to be treated with
+caution.
 
-Desired feeling:
+### 2. Relation-based prices lag by one turn
 
-- the player starts specializing
-- diplomacy becomes a deliberate strategy, not a background grind
-- the first council should often show progress, the second should feel
-  winnable for strong play
+`next_turn()` refreshes market prices first and then decays relations.
 
-Suggested target outcomes:
+That means the relation shown to the player after ending the turn is lower than
+the relation tier used to generate that turn's market prices. Better relations
+also do not improve prices immediately during the same turn they are earned.
 
-- first `Great` relation should usually happen around turns `8-12`
-- first alliance/colony should usually happen around turns `9-14`
-- the player should be choosing between:
-  - more traders
-  - more warships
-  - science investment
-  - training workers
-- the second council should often be competitive, not merely informational
+This slightly softens decay in practice, but it is opaque.
 
-### Late Game: turns 21+
+### 3. Trader losses reset remaining capacity incorrectly
 
-Desired feeling:
+When a trader is lost in battle, `trader_lost()` sets:
 
-- the empire is larger and more efficient
-- upkeep and battle losses still matter
-- victory should require closing decisions, not just waiting for an inevitable win
-- gun science should feel strong, but should not make a small elite fleet too
-  dominant for the rest of the campaign
+- `state.remaining_turn_capacity = state.traders * CAPACITY_PER_TRADER_BASE`
 
-Suggested target outcomes:
+It does not use `state.capacity_per_trader`, and it does not preserve already
+spent capacity for the current turn.
 
-- winning by the third council should be realistic for strong play
-- winning by the fourth council should still be possible for weaker or unlucky runs
-- trade should remain relevant even after key science upgrades
-- diplomacy should still require maintenance unless the player has already locked
-  nations into ally/colony status
+This causes two balance distortions:
 
-## The Most Important `game.h` Levers
+- post-science capacity drops to base capacity after a loss
+- a mid-turn trader loss can restore cargo capacity that has already been spent
+
+This is significant enough to affect any serious trade-balance conclusions.
+
+### 4. The first diplomatic offer after a long setup is still a pure coin flip
+
+After the player reaches `Great`, the formal alliance or colony attempt is still
+just:
+
+- pay `$500`
+- succeed on `50%`
+
+Because relation gain is gradual but the conversion is binary, diplomacy can
+still feel more swingy than strategic even after the cheaper offer cost.
+
+## Stage-By-Stage Balance Picture
+
+### Early Game: turns 1-9
+
+The current build creates:
+
+- real treasury pressure
+- a forgiving industrial base
+- profitable but low-volume trade
+- frequent voyage interruptions
+- a strong incentive to fight rather than run
+
+The opening is not mostly about production starvation. It is mostly about
+whether early trade can happen often enough to cover upkeep and start relation
+progress.
+
+### Mid Game: turns 10-19
+
+This is where the current balance is most at risk.
+
+By now the player is supposed to:
+
+- have a larger fleet or more traders
+- begin buying science
+- approach `Great` with at least one nation
+- think about council math
+
+But the current numbers still make diplomacy slow, and a single bankruptcy
+incident can erase all that progress by sending every non-permanent relation to
+`Bad`.
+
+### Late Game: turn 20 onward
+
+Late game depends heavily on whether the player reached one of two states:
+
+- stable trade loop plus permanent diplomatic partners
+- early collapse into repeated interceptions and relation failure
+
+Once the player gets permanent allies or colonies, council progress becomes much
+more deterministic. The main late-game balance question is whether gun science
+and capacity science let a good start snowball too cleanly.
+
+## Highest-Value Balance Levers
 
 ### 1. Diplomacy pacing
 
-Highest-value constants:
+Most important constants:
 
 - `TRADE_RELATIONS_MULTIPLIER`
 - `RELATIONS_LOSS_PER_TURN`
 - `DIPLOMATIC_OVERTURE_CHANCE_PERCENT`
-- `DIPLOMATIC_OFFER_COST`
-
-Recommended direction:
-
-- increase `TRADE_RELATIONS_MULTIPLIER`
-- reduce `RELATIONS_LOSS_PER_TURN`
-- make the final ally/colony conversion somewhat more reliable
 
 Why:
 
-- this is the main bottleneck for reaching the council victory condition
-- it directly determines whether the game peaks in the mid game or stalls there
+- these determine whether the player can reach permanent council support before
+  the game stalls
 
-Practical first-pass tuning candidates:
+Current reading:
 
-- `TRADE_RELATIONS_MULTIPLIER`: try `3` first, then `4` if still too slow
-- `RELATIONS_LOSS_PER_TURN`: try `2` first
-- `DIPLOMATIC_OVERTURE_CHANCE_PERCENT`: try `60-70`
-- `DIPLOMATIC_OFFER_COST`: current `500` is already in a reasonable range
-
-Interpretation:
-
-- raising trade relation gain rewards active play
-- lowering decay reduces the feeling that diplomacy is a treadmill
-- raising offer success reduces frustration from coin-flip failures after a long
-  setup
 - offer cost is no longer the main diplomatic problem
+- relation accumulation and final conversion reliability are the problem
 
-### 2. Early trade viability
+### 2. Expedition danger
 
-Highest-value constants:
-
-- `CAPACITY_PER_TRADER_BASE`
-- `UPKEEP_COST_PER_TRADER`
-- `FOREIGN_EXPORT_PRICE_BASE_PERCENT`
-- `FOREIGN_EXPORT_PRICE_VARIANCE_PERCENT`
-- `FOREIGN_IMPORT_PRICE_BASE_PERCENT`
-- `FOREIGN_IMPORT_PRICE_VARIANCE_PERCENT`
-- `FOREIGN_EXPORT_PRICE_RELATION_STEP_PERCENT`
-- `FOREIGN_IMPORT_PRICE_RELATION_STEP_PERCENT`
-
-Recommended direction:
-
-- either increase early throughput or reduce early fixed fleet pressure
-- preserve the relation-based price advantage because it is one of the game's
-  best systems
-- since science is now cheaper, be careful about over-buffing both early trade
-  and research at the same time
-
-Practical first-pass tuning candidates:
-
-- `CAPACITY_PER_TRADER_BASE`: test `3`
-- `UPKEEP_COST_PER_TRADER`: test `4`
-- `FOREIGN_EXPORT_PRICE_BASE_PERCENT`: keep near `80-85`
-- `FOREIGN_IMPORT_PRICE_BASE_PERCENT`: keep near `115-120`
-- relation step percents can be nudged slightly upward if diplomacy still does
-  not feel economically meaningful
-
-Interpretation:
-
-- if trade margins are acceptable but total volume is too small, raise capacity
-- if volume is fine but treasury still collapses, reduce upkeep
-- if both are weak, modestly widen buy/sell spreads
-
-### 3. Battle pressure
-
-Highest-value constants:
+Most important constants:
 
 - `TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT`
 - `TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT`
-- `BATTLE_TRADER_HIT_CHANCE_PERCENT`
 - `BATTLE_RUN_TRADER_HIT_CHANCE_PERCENT`
-- `BATTLE_BOUNTY_VARIANCE_PERCENT`
 
-Recommended direction:
+Why:
 
-- reduce early forced battles
-- keep the "bad relations are dangerous" idea, but avoid making trade impossible
-  once one nation collapses to `Bad`
+- expedition frequency is the engine behind both money and diplomacy
+- `Bad`-nation interception stacks very aggressively
 
-Practical first-pass tuning candidates:
+Current reading:
 
-- `TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT`: test `30-35`
-- `TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT`: test `25-35`
-- `BATTLE_RUN_TRADER_HIT_CHANCE_PERCENT`: test `35-45`
-- `BATTLE_BOUNTY_VARIANCE_PERCENT`: consider `25-35` for less swing
+- the dangerous part is not only pirate chance
+- the compounding attack checks after relations sour are the sharper balance
+  lever
 
-Interpretation:
+### 3. Early trade throughput
 
-- players should fear the sea, but not feel that trade is a coin-flip tax
-- late-game danger can come from larger fleets and accumulated geopolitical
-  hostility rather than constant early interception
-- battle pressure is now a more important pacing lever because cheaper science
-  and cheaper overtures have reduced two other forms of economic friction
-- because gun science now affects hit odds directly, battle balance must be
-  evaluated together with science timing, not in isolation
+Most important constants:
 
-### 4. Research timing
+- `CAPACITY_PER_TRADER_BASE`
+- `UPKEEP_COST_PER_TRADER`
+- foreign price base and relation-step percents
 
-Highest-value constants:
+Why:
+
+- if trade volume is too low, even good margins do not support diplomacy fast
+  enough
+
+Current reading:
+
+- margins are acceptable
+- capacity is tight
+- upkeep is meaningful but not obviously the first problem
+
+### 4. Science timing
+
+Most important constant:
 
 - `SCIENCE_RESEARCH_COST_MULTIPLIER`
 
-Recommended direction:
+Why:
 
-- the multiplier is no longer obviously too high
-- avoid lowering it further until diplomacy and trade pacing are re-tested
+- research now changes both economic scaling and combat odds
 
-Practical first-pass tuning candidates:
+Current reading:
 
-- current `500` may already be close to the floor for a healthy campaign pace
-- if science snowball becomes dominant, consider moving back upward slightly
-  rather than lowering it further
+- `500` is already low enough to make science relevant
+- lowering it further before other retesting would likely blur the real causes
+  of improvement
 
-Interpretation:
+## Recommended Tuning Order
 
-- this is a coarse lever because it affects the whole tree equally
-- if early science feels good but late science arrives too quickly, the eventual
-  solution may need per-tech costs rather than one global multiplier
-- this matters even more now because the gun-science branch directly improves
-  battle odds instead of only improving displayed firepower and build costs
+Do not tune every system at once.
 
-### 5. Fixed upkeep pressure
-
-Highest-value constants:
-
-- `UPKEEP_COST_PER_WORKER`
-- `UPKEEP_COST_PER_TRADER`
-- `UPKEEP_COST_PER_WARSHIP`
-
-Recommended direction:
-
-- treat these carefully until the labor-upkeep behavior is confirmed as
-  intentional
-
-Practical first-pass tuning candidates:
-
-- `UPKEEP_COST_PER_WARSHIP`: test `4`
-- `UPKEEP_COST_PER_TRADER`: test `4`
-- leave `UPKEEP_COST_PER_WORKER` alone until the worker-upkeep rule is settled
-
-Interpretation:
-
-- warship and trader upkeep shape whether the player can afford expansion
-- worker upkeep is currently distorted by how assigned workers are stored
-
-## Constants That Matter Less For Core Balance
-
-These are secondary levers, not primary ones:
-
-- `COUNCIL_VICTORY_VOTES`
-- score-related constants
-- `FOREIGN_NATION_COUNT`
-- `FOREIGN_TRADE_ENTRY_COUNT`
-
-The council target of `24` out of `32` is structurally good. It creates a clear
-need for meaningful diplomacy. The bigger issue is not the target itself. The
-bigger issue is whether the player can realistically get there in time.
-
-## Revised Balance Picture
-
-With the current constants:
-
-- `SCIENCE_RESEARCH_COST_MULTIPLIER = 500`
-- `DIPLOMATIC_OFFER_COST = 500`
-- `TRADE_RELATIONS_MULTIPLIER = 2`
-- `RELATIONS_LOSS_PER_TURN = 3`
-- `DIPLOMATIC_OVERTURE_CHANCE_PERCENT = 50`
-- `TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT = 50`
-
-the game no longer looks primarily blocked by expensive science or expensive
-formal diplomacy. Those two systems are now much more accessible.
-
-The main remaining risk is that campaigns become swingy rather than simply slow:
-
-- strong starts may snowball earlier through cheap science
-- relation growth may still feel grindy because trade gains are modest and decay
-  is constant
-- the final ally/colony conversion is still a coin flip
-- sea risk may still suppress the very trade activity that diplomacy depends on
-- a player who reaches gun science early may gain a disproportionate naval edge
-  against baseline enemy fleets
-
-In other words:
-
-- science is now more likely to be an accelerator than a bottleneck
-- diplomatic offer cost is now more likely to be fair than punitive
-- relation pacing and expedition reliability remain the main balance concerns
-- naval science is now a first-class balance concern rather than a secondary one
-
-## Recommended Balance Strategy
-
-Do not tune everything at once. Use a staged approach.
-
-### Pass 1: make the mid game reachable
+### Pass 1: make diplomacy reachable
 
 Change only:
 
-- diplomacy pacing
-- expedition danger
-- maybe trader capacity or trader upkeep
-- do not reduce science cost further in this pass
+- `TRADE_RELATIONS_MULTIPLIER`
+- or `RELATIONS_LOSS_PER_TURN`
+- or `DIPLOMATIC_OVERTURE_CHANCE_PERCENT`
 
-Goal:
+Best first candidates:
 
-- a strong player should be threatening a win by the second or third council
+- `TRADE_RELATIONS_MULTIPLIER`: `2 -> 3`
+- `RELATIONS_LOSS_PER_TURN`: `3 -> 2`
+- `DIPLOMATIC_OVERTURE_CHANCE_PERCENT`: `50 -> 60`
 
-### Pass 2: make science timing matter
+### Pass 2: reduce compounding voyage lockout
 
-After mid-game diplomacy works, re-evaluate:
+Change only:
+
+- `TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT`
+- `TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT`
+
+Best first candidates:
+
+- pirate chance: `50 -> 35`
+- foreign interception chance: `50 -> 25` or `30`
+
+The goal is not to remove danger. The goal is to stop bad relations from making
+trade almost guaranteed combat.
+
+### Pass 3: re-evaluate science and fleet snowball
+
+Only after diplomacy and expedition flow feel better, re-check:
 
 - `SCIENCE_RESEARCH_COST_MULTIPLIER`
-- price spread constants if needed
+- trader build scaling after capacity tech
+- gun-tech combat dominance
 
-Goal:
+## Recommended Non-Constant Fixes Before Deep Rebalance
 
-- science should accelerate or specialize a winning economy, but should not
-  dominate all other strategic choices
+These are worth resolving before treating simulation results as authoritative:
 
-### Pass 3: smooth late-game pressure
+1. Decide whether worker upkeep should charge total workers or only idle
+   workers.
+2. Fix `trader_lost()` so remaining capacity uses `state.capacity_per_trader`
+   and preserves already-spent cargo for the turn.
+3. Decide whether relation-based prices should use pre-decay or post-decay
+   status, and document the intended rule.
+4. Re-test whether bankruptcy should really collapse every non-permanent nation
+   immediately to `Bad`.
 
-After the first two passes, tune:
+## Practical Conclusion
 
-- upkeep values
-- battle-loss values
-- bounty variance
+The current build is no longer mainly blocked by science cost or diplomatic
+offer cost. Those are both in a playable range.
 
-Goal:
+The main balance problems now are:
 
-- late game should remain tense without collapsing into random punishment
+- relation growth is still slow relative to council demands
+- bankruptcy is too punishing to diplomatic progress
+- expedition danger compounds too sharply once relations go bad
+- naval science has become powerful enough that it must be tested as a primary
+  balance system
+- at least one implementation quirk (`trader_lost()`) currently distorts trade
+  balance materially
 
-## How To Model Balance Before More Code Changes
-
-The game is a good candidate for Monte Carlo and heuristic simulation.
-
-### Why simulation is worth doing
-
-Manual playtesting will find obvious pain points, but not distribution-level
-problems such as:
-
-- how often the player goes bankrupt before turn `10`
-- how often the first alliance appears before turn `15`
-- whether one strategy dominates all others
-- whether victory timing is too random
-
-### What to simulate
-
-A simulator does not need the full UI. It only needs:
-
-- inventory state
-- treasury
-- workers, wagons, traders, warships
-- science level
-- relation values for each foreign nation
-- market prices and battle events
-- council outcomes every `10` turns
-
-### Strategies to model
-
-At minimum, simulate several policy archetypes:
-
-- balanced: expands transport, production, traders, and diplomacy evenly
-- trade-first: prioritizes traders and relation building
-- science-first: buys research as early as possible
-- navy-first: prioritizes warships for safer expeditions
-- industrial-first: prioritizes workers and domestic production before diplomacy
-
-If one policy beats the others almost every time, the game is not balanced yet.
-
-### Metrics to track
-
-For each run, record:
-
-- turn of bankruptcy, if any
-- turn of first `Great` relation
-- turn of first ally/colony
-- council vote totals at turns `10`, `20`, `30`, `40`
-- turn of victory
-- final treasury
-- number of battles fought
-- traders lost
-- warships lost
-- research levels achieved
-
-Then review distributions, not just averages:
-
-- win rate by turn band
-- median and 90th percentile bankruptcy turn
-- median alliance timing
-- variance in final treasury
-
-### Success criteria for the simulator
-
-A promising balance state would look something like:
-
-- low early bankruptcy rate for competent policies
-- clear difference between strong and weak strategies
-- no single dominant strategy with overwhelming win rate
-- most wins clustering around council `2` or `3`
-- late victories still possible, but not mandatory
-
-## Recommended Next Step
-
-Before changing any mechanics beyond constants, the most useful next step is:
-
-1. decide whether the current worker-upkeep and naval-science behaviors are
-   intentional
-2. test the current build with the new cheaper science and overture costs before
-   changing more constants
-3. if diplomacy still feels slow, change `TRADE_RELATIONS_MULTIPLIER` or
-   `RELATIONS_LOSS_PER_TURN` next, not `DIPLOMATIC_OFFER_COST`
-4. if trade still feels too risky to support diplomacy, reduce expedition battle
-   pressure next
-5. specifically test whether early gun science makes small fleets too efficient
-   in battle
-6. build a simple off-engine simulator that mirrors the turn rules and runs
-   large batches of games
-
-If only one area is changed first, it should still be diplomacy pacing,
-specifically the rate at which trade translates into lasting relation progress.
-That is now the clearest remaining system-level limiter on satisfying mid- and
-late-game play.
-
-## Practical Next Steps
-
-The next steps should be empirical, not speculative.
-
-### 1. Playtest the new baseline
-
-Run several games with the current values:
-
-- `SCIENCE_RESEARCH_COST_MULTIPLIER = 500`
-- `DIPLOMATIC_OFFER_COST = 500`
-
-Track:
-
-- turn of first research purchase
-- turn of first `Great` relation
-- turn of first ally/colony
-- council votes at turns `10`, `20`, `30`
-- whether losses at sea are stopping profitable trade loops
-- whether gun-tech fleets are consistently beating larger baseline fleets
-
-Goal:
-
-- confirm whether the game now feels faster in a good way, or merely swingier
-
-### 2. If diplomacy is still too slow, change only one pacing lever
-
-Prefer this order:
-
-1. `TRADE_RELATIONS_MULTIPLIER` from `2` to `3`
-2. `RELATIONS_LOSS_PER_TURN` from `3` to `2`
-3. `DIPLOMATIC_OVERTURE_CHANCE_PERCENT` from `50` to `60`
-
-This keeps cause and effect clear during testing.
-
-### 3. If trade is still too volatile, reduce expedition danger
-
-Try one of:
-
-- `TRADE_EXPEDITION_BATTLE_CHANCE_PERCENT` from `50` to `35`
-- `TRADE_EXPEDITION_ATTACK_FOREIGN_NATION_CHANCE_PERCENT` from `50` to `30`
-
-Goal:
-
-- trade should remain risky, but should not be so unreliable that the diplomacy
-  game cannot get moving
-
-### 4. Specifically test naval science power
-
-Because gun science now changes battle odds directly, test a few concrete cases:
-
-- equal fleets with and without gun tech
-- smaller player fleet with gun tech vs larger enemy fleet
-- late-game battles after `Shell Guns`
-
-Goal:
-
-- science should create a meaningful combat edge
-- it should not make ship count mostly irrelevant
-
-If naval science proves too strong, the next solutions are likely to be:
-
-- slowing research timing slightly
-- increasing enemy fleet size scaling
-- giving enemies improved gun baselines later in the game
-
-### 5. Do not lower science cost further yet
-
-At `500`, science is already much more available. Lowering it again before
-re-testing diplomacy and trade would make it harder to tell whether future
-improvements came from better pacing or from pure economic acceleration.
-
-### 6. Build a simple simulator after the next tuning pass
-
-Once one more round of diplomacy/trade tuning is done, build a lightweight
-simulation harness and measure:
-
-- bankruptcy rate before turn `10`
-- alliance/colony timing
-- win timing by council number
-- win rate by strategic archetype
-- battle outcomes by fleet-size and gun-tech combination
-
-That will show whether the game is actually becoming better balanced or just
-more generous.
+If only one balance area is changed first, it should be diplomacy pacing,
+followed immediately by expedition danger. Those are the two systems that most
+directly determine whether a campaign becomes strategically tense or merely
+swingy.
