@@ -296,7 +296,12 @@ python tools/export_web_fonts.py --ttf --woff2
 
 ## Manual Build
 
-To build the manual as styled HTML with the game fonts used for headings:
+The manual source lives in:
+
+- `docs/manual/iimperialism-manual.md`
+
+To build the manual as styled HTML with the game fonts used for headings and
+Garamond body text:
 
 ```bash
 python tools/build_manual_html.py
@@ -306,8 +311,7 @@ This writes:
 
 - `docs/manual/iimperialism-manual.html`
 
-On Windows, if Microsoft Edge or Google Chrome is installed, you can also build
-the PDF automatically through a headless browser print pass:
+To build the PDF on Windows:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools/build_manual_pdf.ps1
@@ -317,9 +321,56 @@ This writes:
 
 - `build/manual/iimperialism-manual.pdf`
 
-The PDF pipeline first regenerates the HTML output, then prints that HTML with
-the local browser engine. If no supported browser is found, build the HTML and
-print it to PDF manually from the browser.
+The PDF pipeline first regenerates the HTML output, then renders that HTML with
+Playwright using a locally installed Edge or Chrome executable.
+
+Current layout behavior:
+
+- page 1 is the cover
+- page 2 is the table of contents
+- page 3 starts `INTRODUCTION`
+
+If PDF generation is unavailable on your machine, you can still build:
+
+- `docs/manual/iimperialism-manual.html`
+
+and print that HTML manually from a browser.
+
+## Release Build
+
+Versioned release artifacts live under:
+
+- `releases/<version>/`
+
+The default version source is:
+
+- `RELEASE_VERSION.txt`
+
+To build a versioned release from the repository root on Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/build_release.ps1
+```
+
+This script:
+
+1. resolves the release version from `-Version`, `RELEASE_VERSION.txt`, or a prompt
+2. updates the manual version in `docs/manual/iimperialism-manual.md`
+3. builds the disk image
+4. builds the manual PDF
+5. copies both artifacts into `releases/<version>/`
+
+Useful variants:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/build_release.ps1 -Version 0.2.0
+powershell -ExecutionPolicy Bypass -File tools/build_release.ps1 -PromptForVersion
+powershell -ExecutionPolicy Bypass -File tools/build_release.ps1 -Force
+```
+
+See also:
+
+- `docs/releases.md`
 
 ## Credits
 

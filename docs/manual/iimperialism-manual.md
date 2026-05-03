@@ -489,3 +489,4 @@ The final report shows `Your score is ...` in inverted text, then compares your 
 IImperialism! is a love letter to the classic games <b>Taipan!</b> (Apple II) and <b>Imperialism</b> (PC and Mac). Some of its visual and textual elements are borrowed from these great games.
 
 IImperialism! has been created by Taciano Dreckmann Perez in 2026. All rights reserved.
+
