@@ -10,7 +10,54 @@ that shift with each nation's current relations.
 Science research unlocks higher trader capacity and warship firepower over time,
 with new shipbuilding costs scaling to match those stronger vessels.
 
-## Overview
+**Play it online:** [Apple//jse](https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/assets/iimperialism.dsk)
+
+## Runtime Requirements
+
+The shipped build targets a **64 KB Apple II family machine with HGR and a
+compatible 5.25-inch floppy controller path**.
+
+Supported in principle:
+
+- Apple IIe
+- Apple IIc
+- Apple IIgs running Apple II compatible 6502 software
+- Apple II / Apple II Plus class machines only if they have enough RAM and compatible Disk II-style boot/runtime support
+
+Not supported:
+
+- 48 KB Apple II configurations
+- Apple II / Apple II Plus / Europlus machines without the RAM expansion needed to reach 64 KB
+
+Why:
+
+- the game uses the main 64 KB Apple II memory map
+- the shipped disk uses a custom qboot + ProRWTS boot/runtime path
+- it uses HGR graphics mode and loads 2 KB overlays into main RAM at runtime
+
+## Running on an Emulator
+
+`assets/iimperialism.dsk` is the shipped bootable disk image. Load it in an
+Apple IIe-compatible emulator.
+
+Autoboot path:
+
+- qboot loads the stage-2 continuation
+- the continuation initializes resident ProRWTS and loads `IIMP`
+- `IIMP` starts the game and later uses resident ProRWTS for overlays and saves
+
+If you need to launch manually from a ProDOS BASIC prompt:
+
+```text
+BRUN IIMP
+```
+
+### Recommended Emulators
+
+- **Online:** [Apple//jse](https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/assets/iimperialism.dsk)
+- **Cross-platform:** [MicroM8](https://microm8.com/)
+
+## Technical Overview
 
 The game runs within the Apple II's main 64KB memory map. It uses a custom memory layout to fit
 within the Apple II's constraints:
@@ -117,35 +164,12 @@ Documentation: `docs/FLOPPY.md`, `docs/MEMORY.md`, `docs/DESIGN.md`,
 `docs/FONT.md`, `docs/PICTURES.md`, `docs/STRUCTURE.md`,
 `docs/OPTIMIZE_CODE.md`, `docs/OPTIMIZATION.md`, `docs/RWTS.md`
 
-## Prerequisites
+## Build Prerequisites
 
 - **cc65** cross-development package
 - **Java** (for AppleCommander)
 - **Git** and a MinGW-compatible `make` (`mingw32-make` or `make`) if you need
   to recreate `third_party/` from scratch
-
-## Runtime Requirements
-
-The shipped build targets a **64 KB Apple II family machine with HGR and a
-compatible 5.25-inch floppy controller path**.
-
-Supported in principle:
-
-- Apple IIe
-- Apple IIc
-- Apple IIgs running Apple II compatible 6502 software
-- Apple II / Apple II Plus class machines only if they have enough RAM and compatible Disk II-style boot/runtime support
-
-Not supported:
-
-- 48 KB Apple II configurations
-- Apple II / Apple II Plus / Europlus machines without the RAM expansion needed to reach 64 KB
-
-Why:
-
-- the game uses the main 64 KB Apple II memory map
-- the shipped disk uses a custom qboot + ProRWTS boot/runtime path
-- it uses HGR graphics mode and loads 2 KB overlays into main RAM at runtime
 
 ### Windows
 
@@ -233,30 +257,6 @@ In your setup (Git Bash on Windows), use:
 make memory-usage
 ```
 
-## Running on an Emulator
-
-`assets/iimperialism.dsk` is the shipped bootable disk image. Load it in an
-Apple IIe-compatible emulator.
-
-Autoboot path:
-
-- qboot loads the stage-2 continuation
-- the continuation initializes resident ProRWTS and loads `IIMP`
-- `IIMP` starts the game and later uses resident ProRWTS for overlays and saves
-
-If you need to launch manually from a ProDOS BASIC prompt:
-
-```text
-BRUN IIMP
-```
-
-### Recommended Emulators
-
-- **Cross-platform:** [MicroM8](https://microm8.com/)
-- **Windows:** [AppleWin](https://github.com/AppleWin/AppleWin)
-- **macOS:** [Virtual II](https://www.virtualii.com/)
-- **Linux:** [LinApple](https://github.com/linappleii/linapple)
-
 ## Development Workflow
 
 ```bash
@@ -293,13 +293,16 @@ their original authors and maintainers.
   Project: <https://applecommander.github.io/>
   GitHub: <https://github.com/applecommander/applecommander>
 
+LLMs were used in the in the development of this game, specifically OpenAI Codex (gpt-5.4 medium) and Claude Code (Sonnet 4.6).
+
 ## TODO
 
 Core Features
+- Add remaining trade capacity to Diplomacy screen
+- Show available workers and wagons in industry screen
 - Random events (positive and negative) at turn's end
 - Balance game for all stages (beginning, mid, and end)
-- Handle overlay loading on Apple IIgs
-- Handle absence of disk
+- Display I/O error messages
 
 Discarded ideas (difficult to squeeze in without requiring extra floppies):
 - Map screen
@@ -308,3 +311,4 @@ Discarded ideas (difficult to squeeze in without requiring extra floppies):
 Packaging goodies
 - Manual
 - Floppy Sticker
+- Website
