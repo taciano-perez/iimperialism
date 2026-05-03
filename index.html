@@ -11,13 +11,13 @@
     <link rel="icon" type="image/png" href="assets/img/web/ship-favicon.png">
     <link rel="apple-touch-icon" href="assets/img/web/ship.png">
     <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DYC3GRG2Q1"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() { dataLayer.push(arguments); }
 
       const GA_TRACKING_ID = "G-DYC3GRG2Q1";
       const CONSENT_KEY = "iimperialism-analytics-consent";
-      let gaLoaded = false;
 
       gtag("consent", "default", {
         ad_storage: "denied",
@@ -26,21 +26,8 @@
         analytics_storage: "denied"
       });
 
-      function loadGoogleAnalytics() {
-        if (gaLoaded) {
-          return;
-        }
-
-        gaLoaded = true;
-
-        const script = document.createElement("script");
-        script.async = true;
-        script.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_TRACKING_ID;
-        document.head.appendChild(script);
-
-        gtag("js", new Date());
-        gtag("config", GA_TRACKING_ID);
-      }
+      gtag("js", new Date());
+      gtag("config", GA_TRACKING_ID);
 
       function setAnalyticsConsent(granted) {
         gtag("consent", "update", {
@@ -51,10 +38,6 @@
         });
 
         window.localStorage.setItem(CONSENT_KEY, granted ? "granted" : "denied");
-
-        if (granted) {
-          loadGoogleAnalytics();
-        }
       }
 
       if (window.localStorage.getItem(CONSENT_KEY) === "granted") {
@@ -376,9 +359,16 @@
 
       .footer-settings {
         margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
       }
 
       .privacy-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         border: 1px solid rgba(239, 215, 140, 0.35);
         border-radius: 999px;
         padding: 8px 14px;
@@ -697,6 +687,7 @@
       <footer class="site-footer">
         Copyright &copy; Taciano Dreckmann Perez 2026
         <div class="footer-settings">
+          <a class="privacy-button" href="privacy.html">Privacy notice</a>
           <button class="privacy-button" type="button" data-open-consent>
             Privacy settings
           </button>
@@ -713,7 +704,8 @@
     >
       <h2 class="consent-title" id="consent-title">Analytics consent</h2>
       <p class="consent-copy" id="consent-copy">
-        This site uses Google Analytics to measure visits and key actions. Analytics stays off until you accept.
+        This site uses Google Analytics to measure visits and key actions. Analytics storage stays denied until you
+        accept. Read the <a href="privacy.html">privacy notice</a> for details.
       </p>
       <div class="consent-actions">
         <button class="consent-button consent-accept" type="button" data-consent-action="accept">

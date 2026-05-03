@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Privacy Notice | IImperialism!</title>
+    <meta
+      name="description"
+      content="Privacy notice for the IImperialism! website, including analytics, cookies, legal bases, retention, and contact details."
+    >
+    <link rel="icon" type="image/png" href="assets/img/web/ship-favicon.png">
+    <link rel="apple-touch-icon" href="assets/img/web/ship.png">
+    <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <style>
+      :root {
+        --bg-top: #08151d;
+        --bg-bottom: #132b32;
+        --panel: rgba(10, 24, 31, 0.84);
+        --panel-border: rgba(239, 215, 140, 0.32);
+        --text: #f4ebce;
+        --muted: #d2c8a0;
+        --gold: #efd78c;
+        --sea: #71c7c8;
+        --ink: #091116;
+        --shadow: rgba(0, 0, 0, 0.36);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top, rgba(113, 199, 200, 0.12), transparent 32%),
+          radial-gradient(circle at 20% 20%, rgba(239, 215, 140, 0.1), transparent 24%),
+          linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+        font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.025)) 0 0 / 100% 3px,
+          linear-gradient(90deg, rgba(255, 255, 255, 0.016), rgba(255, 255, 255, 0.016)) 0 0 / 3px 100%;
+        opacity: 0.22;
+      }
+
+      .page {
+        width: min(920px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 36px 0 48px;
+      }
+
+      .panel {
+        padding: 28px;
+        border: 1px solid var(--panel-border);
+        border-radius: 24px;
+        background:
+          linear-gradient(135deg, rgba(239, 215, 140, 0.08), rgba(113, 199, 200, 0.06)),
+          var(--panel);
+        box-shadow: 0 24px 70px var(--shadow);
+      }
+
+      .eyebrow,
+      .title,
+      .section-title,
+      .nav-link,
+      th {
+        font-family: "IImperialism Taipan", monospace;
+      }
+
+      .eyebrow {
+        display: block;
+        margin-bottom: 18px;
+        color: var(--sea);
+        font-size: 15px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .title {
+        margin: 0;
+        color: var(--gold);
+        font-size: clamp(32px, 6vw, 52px);
+        line-height: 1;
+      }
+
+      .lede {
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      .meta {
+        margin-top: 22px;
+        padding: 16px 18px;
+        border: 1px solid rgba(239, 215, 140, 0.18);
+        border-radius: 16px;
+        background: rgba(6, 14, 19, 0.45);
+      }
+
+      .meta p,
+      .section p,
+      .section li {
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.65;
+      }
+
+      .section {
+        margin-top: 22px;
+        padding: 24px;
+        border: 1px solid rgba(239, 215, 140, 0.16);
+        border-radius: 20px;
+        background: rgba(9, 18, 24, 0.76);
+      }
+
+      .section-title {
+        margin: 0 0 14px;
+        color: var(--gold);
+        font-size: 22px;
+        text-transform: uppercase;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      li + li {
+        margin-top: 8px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+      }
+
+      th,
+      td {
+        padding: 12px 10px;
+        border-bottom: 1px solid rgba(239, 215, 140, 0.14);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--gold);
+        font-size: 14px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      td {
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      a {
+        color: var(--sea);
+      }
+
+      .nav-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      .nav-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 180px;
+        padding: 12px 16px;
+        border: 1px solid rgba(239, 215, 140, 0.35);
+        border-radius: 999px;
+        color: var(--gold);
+        background: rgba(9, 17, 22, 0.42);
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .site-footer {
+        margin-top: 22px;
+        text-align: center;
+        color: rgba(244, 235, 206, 0.64);
+        font-size: 14px;
+      }
+
+      @media (max-width: 860px) {
+        .page {
+          width: min(100% - 20px, 920px);
+          padding-top: 18px;
+        }
+
+        .panel,
+        .section {
+          padding: 20px;
+          border-radius: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="panel">
+        <span class="eyebrow">Website Privacy</span>
+        <h1 class="title">Privacy Notice</h1>
+        <p class="lede">
+          This notice explains how the IImperialism! website handles personal data when you visit the site, use links on
+          the site, and choose whether to allow analytics cookies.
+        </p>
+        <div class="meta">
+          <p><strong>Last updated:</strong> May 3, 2026</p>
+          <p><strong>Controller:</strong> Taciano Dreckmann Perez</p>
+          <p><strong>Contact:</strong> <a href="mailto:taciano.perez@gmail.com">taciano.perez@gmail.com</a></p>
+        </div>
+
+        <section class="section">
+          <h2 class="section-title">Scope</h2>
+          <p>
+            This notice applies to the public website for IImperialism!, including the landing page, download links,
+            documentation links, and the privacy controls presented on this website.
+          </p>
+          <p>
+            The site is intended to provide information about the game and let visitors launch the browser-based emulator,
+            download the disk image, download the manual, and visit the public source repository.
+          </p>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Data We Process</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Source</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Server and delivery logs</td>
+                  <td>Your browser, network, and hosting infrastructure</td>
+                  <td>Deliver the website, maintain security, and troubleshoot technical issues.</td>
+                </tr>
+                <tr>
+                  <td>Analytics events</td>
+                  <td>Your browser, only after you accept analytics</td>
+                  <td>Measure visits and key actions such as emulator launches, downloads, and repository clicks.</td>
+                </tr>
+                <tr>
+                  <td>Consent preference</td>
+                  <td>Your browser local storage</td>
+                  <td>Remember whether you accepted or declined analytics cookies.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Cookies And Similar Technologies</h2>
+          <p>
+            The website uses a consent choice stored in your browser under the key
+            <code>iimperialism-analytics-consent</code>. This preference is used to remember whether analytics may run on
+            your device.
+          </p>
+          <p>
+            If you accept analytics, Google Analytics may set measurement cookies or similar identifiers. If you decline,
+            analytics storage remains denied and Google Analytics should not use analytics cookies for measurement.
+          </p>
+          <p>
+            You can change your choice at any time from the <strong>Privacy settings</strong> button in the website footer.
+          </p>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Legal Bases</h2>
+          <ul>
+            <li>Website delivery, security, and basic operation are processed to provide the site you requested.</li>
+            <li>Analytics cookies and analytics measurement run only on the basis of your consent.</li>
+            <li>You may withdraw analytics consent at any time through the site's privacy controls.</li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Google Analytics</h2>
+          <p>
+            If you accept analytics, this website uses Google Analytics 4 to understand general traffic patterns and
+            measure important actions on the site. The tracked actions currently include launching the browser emulator,
+            downloading the disk image, downloading the manual, and opening the source repository.
+          </p>
+          <p>
+            The analytics implementation uses denied-by-default consent settings. The Google tag loads on page view so
+            consent status can be communicated correctly, but analytics storage remains denied unless you actively opt in.
+          </p>
+          <p>
+            Google acts as a separate recipient of analytics data. Google's own privacy information is available at
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>.
+          </p>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Recipients And International Transfers</h2>
+          <p>
+            Personal data may be processed by the website host, CDN, and related infrastructure providers that are needed
+            to deliver the site securely. If you accept analytics, data is also shared with Google Analytics.
+          </p>
+          <p>
+            Some of these providers may process data outside your country, including outside the European Economic Area or
+            the United Kingdom. Where international transfers occur, they are intended to rely on the transfer mechanisms
+            offered by the relevant provider, such as adequacy decisions or standard contractual safeguards where required.
+          </p>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Retention</h2>
+          <ul>
+            <li>Consent choice data remains in your browser until you clear site data or change the setting.</li>
+            <li>Operational logs are retained only for as long as reasonably needed for security, delivery, and troubleshooting.</li>
+            <li>Analytics data is intended to be retained for no longer than 14 months in Google Analytics, unless a shorter period is configured.</li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Your Rights</h2>
+          <p>
+            Depending on the law that applies to you, you may have rights to request access to personal data, correction,
+            deletion, restriction, objection, portability, and withdrawal of consent for analytics processing.
+          </p>
+          <p>
+            To exercise privacy rights for this website, contact
+            <a href="mailto:taciano.perez@gmail.com">taciano.perez@gmail.com</a>. You may also complain to the data
+            protection authority in the place where you live, work, or believe a data protection issue occurred.
+          </p>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Changes To This Notice</h2>
+          <p>
+            This notice may be updated when the website, analytics setup, or legal requirements change. The version on this
+            page is the current version for the website.
+          </p>
+        </section>
+
+        <div class="nav-row">
+          <a class="nav-link" href="index.html">Back To Home</a>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        Copyright &copy; Taciano Dreckmann Perez 2026
+      </footer>
+    </main>
+  </body>
+</html>
