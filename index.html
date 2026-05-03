@@ -1,14 +1,509 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>IImperialism!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IImperialism! | Apple II Strategy Game</title>
+    <meta
+      name="description"
+      content="Rule an industrial empire on the Apple II. Download the disk image or play IImperialism! online in your browser."
+    >
+    <link rel="icon" type="image/png" href="assets/img/web/ship-favicon.png">
+    <link rel="apple-touch-icon" href="assets/img/web/ship.png">
+    <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <style>
+      :root {
+        --bg-top: #08151d;
+        --bg-bottom: #132b32;
+        --panel: rgba(10, 24, 31, 0.82);
+        --panel-border: rgba(239, 215, 140, 0.32);
+        --text: #f4ebce;
+        --muted: #d2c8a0;
+        --gold: #efd78c;
+        --gold-deep: #b88d36;
+        --sea: #71c7c8;
+        --ink: #091116;
+        --shadow: rgba(0, 0, 0, 0.36);
+        --hero-ship-native-size: 28px;
+        --hero-ship-display-scale: 4;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top, rgba(113, 199, 200, 0.12), transparent 32%),
+          radial-gradient(circle at 20% 20%, rgba(239, 215, 140, 0.1), transparent 24%),
+          linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+        font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.025)) 0 0 / 100% 3px,
+          linear-gradient(90deg, rgba(255, 255, 255, 0.016), rgba(255, 255, 255, 0.016)) 0 0 / 3px 100%;
+        opacity: 0.22;
+      }
+
+      .page {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 36px 0 48px;
+      }
+
+      .hero {
+        position: relative;
+        padding: 28px;
+        border: 1px solid var(--panel-border);
+        border-radius: 24px;
+        background:
+          linear-gradient(135deg, rgba(239, 215, 140, 0.08), rgba(113, 199, 200, 0.06)),
+          var(--panel);
+        box-shadow: 0 24px 70px var(--shadow);
+      }
+
+      .hero-copy {
+        position: relative;
+        z-index: 1;
+        width: min(760px, 100%);
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -10% -28% 40%;
+        height: 220px;
+        background: radial-gradient(circle, rgba(239, 215, 140, 0.18), transparent 60%);
+        transform: rotate(-8deg);
+        pointer-events: none;
+      }
+
+      .eyebrow,
+      .title,
+      .cta-link,
+      .stat-label,
+      .section-title {
+        font-family: "IImperialism Taipan", monospace;
+      }
+
+      .eyebrow {
+        display: block;
+        margin-bottom: 18px;
+        color: var(--sea);
+        font-size: 15px;
+        letter-spacing: 1px;
+        text-align: center;
+      }
+
+      .title {
+        margin: 0;
+        max-width: none;
+        font-size: clamp(34px, 5.8vw, 62px);
+        line-height: 1.02;
+        letter-spacing: -0.5px;
+        color: var(--gold);
+        text-shadow: 0 0 18px rgba(239, 215, 140, 0.18);
+        text-align: center;
+      }
+
+      .subtitle {
+        width: min(760px, 100%);
+        margin: 22px auto 0;
+        display: grid;
+        grid-template-columns:
+          calc(var(--hero-ship-native-size) * var(--hero-ship-display-scale))
+          minmax(0, 1fr)
+          calc(var(--hero-ship-native-size) * var(--hero-ship-display-scale));
+        gap: 18px;
+        align-items: center;
+        font-size: clamp(18px, 2.5vw, 24px);
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .subtitle-text {
+        text-align: center;
+      }
+
+      .hero-ship {
+        display: block;
+        width: calc(var(--hero-ship-native-size) * var(--hero-ship-display-scale));
+        height: calc(var(--hero-ship-native-size) * var(--hero-ship-display-scale));
+        object-fit: contain;
+        image-rendering: pixelated;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 28px;
+        justify-content: center;
+      }
+
+      .cta-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 220px;
+        padding: 14px 18px;
+        border: 2px solid transparent;
+        border-radius: 14px;
+        text-decoration: none;
+        font-size: 16px;
+        line-height: 1.2;
+        text-transform: uppercase;
+        transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+      }
+
+      .cta-link:hover,
+      .cta-link:focus-visible {
+        transform: translateY(-2px);
+      }
+
+      .cta-primary {
+        color: var(--ink);
+        background: linear-gradient(180deg, #ffe8a4, #d7ab44);
+        box-shadow: 0 10px 24px rgba(215, 171, 68, 0.28);
+      }
+
+      .cta-secondary {
+        color: var(--text);
+        background: rgba(113, 199, 200, 0.08);
+        border-color: rgba(113, 199, 200, 0.42);
+        box-shadow: 0 10px 24px rgba(18, 63, 71, 0.32);
+      }
+
+      .shot-frame {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(239, 215, 140, 0.18);
+        border-radius: 12px;
+        background: #000;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+      }
+
+      .shot-frame img {
+        display: block;
+        width: 100%;
+        height: auto;
+        image-rendering: pixelated;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 28px;
+      }
+
+      .stat {
+        padding: 18px 16px;
+        border: 1px solid rgba(239, 215, 140, 0.18);
+        border-radius: 16px;
+        background: rgba(6, 14, 19, 0.48);
+      }
+
+      .stat-label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--gold);
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+
+      .stat-value {
+        margin: 0;
+        color: var(--text);
+        font-size: 18px;
+        line-height: 1.45;
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+        margin-top: 26px;
+      }
+
+      .panel {
+        padding: 24px;
+        border: 1px solid var(--panel-border);
+        border-radius: 20px;
+        background: rgba(9, 18, 24, 0.76);
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.2);
+      }
+
+      .section-title {
+        margin: 0 0 16px;
+        color: var(--gold);
+        font-size: 22px;
+        text-transform: uppercase;
+      }
+
+      .panel p {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.55;
+      }
+
+      .feature-list {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--text);
+        font-size: 17px;
+        line-height: 1.7;
+      }
+
+      .feature-list li + li {
+        margin-top: 8px;
+      }
+
+      .showcase-panel {
+        margin-top: 22px;
+      }
+
+      .screenshot-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .screenshot-card {
+        padding: 14px;
+        border: 1px solid rgba(239, 215, 140, 0.16);
+        border-radius: 16px;
+        background: rgba(6, 14, 19, 0.42);
+      }
+
+      .screenshot-title {
+        margin: 12px 0 6px;
+        color: var(--gold);
+        font-family: "IImperialism Taipan", monospace;
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+
+      .screenshot-copy {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.45;
+      }
+
+      .footer-note {
+        margin-top: 18px;
+        color: rgba(244, 235, 206, 0.76);
+        font-size: 15px;
+      }
+
+      .footer-note a {
+        color: var(--sea);
+      }
+
+      .site-footer {
+        margin-top: 22px;
+        text-align: center;
+        color: rgba(244, 235, 206, 0.64);
+        font-size: 14px;
+      }
+
+      @media (max-width: 860px) {
+        .content-grid,
+        .stats {
+          grid-template-columns: 1fr;
+        }
+
+        .page {
+          width: min(100% - 20px, 1120px);
+          padding-top: 18px;
+        }
+
+        .hero,
+        .panel {
+          padding: 20px;
+          border-radius: 18px;
+        }
+
+        .title {
+          font-size: clamp(30px, 10vw, 48px);
+        }
+
+        .subtitle {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+
+        .hero-ship {
+          margin: 0 auto;
+        }
+
+        .screenshot-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .cta-link {
+          width: 100%;
+          min-width: 0;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>IImperialism!</h1>
-    <p>Apple II disk image:</p>
-    <p><a href="assets/iimperialism.dsk">download.dsk</a></p>
-    <p>Play it online in an emulator:</p>
-    <p><a href="https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/assets/iimperialism.dsk">Apple//jse</a></p>
+    <main class="page">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">Apple II Grand Strategy</div>
+          <h1 class="title">IImperialism!</h1>
+          <p class="subtitle">
+            <img class="hero-ship" src="assets/img/web/ship.png" alt="">
+            <span class="subtitle-text">
+              Build an industrial empire, command trade across hostile seas, and
+              outmaneuver rival powers in a turn-based strategy campaign for
+              the Apple II.
+            </span>
+            <img class="hero-ship" src="assets/img/web/ship_pirate.png" alt="">
+          </p>
+          <div class="cta-row">
+            <a class="cta-link cta-primary" href="assets/iimperialism.dsk" download>
+              Download Disk Image
+            </a>
+            <a
+              class="cta-link cta-secondary"
+              href="https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/assets/iimperialism.dsk"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Play Online Now
+            </a>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-label">Platform</span>
+            <p class="stat-value">64 KB Apple II family machines with HGR support</p>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Style</span>
+            <p class="stat-value">A love letter to classic strategy games Taipan! and Imperialism</p>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Format</span>
+            <p class="stat-value">Free, open-source game available as a bootable `.dsk` image</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel showcase-panel">
+        <h2 class="section-title">From The Campaign</h2>
+        <div class="screenshot-grid">
+          <div class="screenshot-card">
+            <div class="shot-frame">
+              <img
+                src="assets/screenshots/diplomacy-screen.png"
+                alt="Foreign Office diplomacy screen"
+              >
+            </div>
+            <h3 class="screenshot-title">Diplomacy</h3>
+            <p class="screenshot-copy">
+              Track foreign relations, read import and export markets, and decide where influence will pay off.
+            </p>
+          </div>
+          <div class="screenshot-card">
+            <div class="shot-frame">
+              <img
+                src="assets/screenshots/sea-battle-screen.png"
+                alt="Sea battle screen with pirate attack"
+              >
+            </div>
+            <h3 class="screenshot-title">Sea Battles</h3>
+            <p class="screenshot-copy">
+              Trade is never safe. Protect your merchant fleet or watch a profitable expedition turn into disaster.
+            </p>
+          </div>
+          <div class="screenshot-card">
+            <div class="shot-frame">
+              <img
+                src="assets/screenshots/council-nations-screen.png"
+                alt="Council of Nations screen"
+              >
+            </div>
+            <h3 class="screenshot-title">Rule the World</h3>
+            <p class="screenshot-copy">
+              Raise industry, fund research, protect your merchant fleet, and win
+              the <strong>Council of Nations</strong> before your competitors do.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel">
+          <h2 class="section-title">Why Play</h2>
+          <p>
+            IImperialism! channels the pressure and elegance of classic strategy
+            design: tight resources, dangerous trade routes, and just enough room
+            for a clever empire to dominate the century.
+          </p>
+          <ul class="feature-list">
+            <li>Convert raw materials into manufactured commodities and build an industrial power.</li>
+            <li>Use trade expeditions to earn cash, shift relations, and shape the world market.</li>
+            <li>Invest in research to assert your dominance over lesser powers.</li>
+            <li>Secure colonies and alliances to carry the vote in the Council of Nations.</li>
+          </ul>
+        </article>
+
+        <article class="panel">
+          <h2 class="section-title">How To PLay</h2>
+          <p>
+            Want the authentic route? Download the disk image and boot it in your
+            Apple II.
+          </p>
+          <p>
+            Want immediate action? Launch the Apple //js online
+            emulator and start building your empire in the browser.
+          </p>
+          <div class="cta-row">
+            <a class="cta-link cta-primary" href="assets/iimperialism.dsk" download>
+              Get The .DSK
+            </a>
+            <a
+              class="cta-link cta-secondary"
+              href="https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/assets/iimperialism.dsk"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Play Online
+            </a>
+          </div>
+          <p>&nbsp;</p>
+          <p>
+            Source, build notes, and project documentation are available in the
+            <a href="https://github.com/taciano-perez/iimperialism">Git repository</a>.
+          </p>
+        </article>
+      </section>
+
+      <footer class="site-footer">
+        Copyright &copy; Taciano Dreckmann Perez 2026
+      </footer>
+    </main>
   </body>
 </html>
