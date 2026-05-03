@@ -11,6 +11,56 @@
     <link rel="icon" type="image/png" href="assets/img/web/ship-favicon.png">
     <link rel="apple-touch-icon" href="assets/img/web/ship.png">
     <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+
+      const GA_TRACKING_ID = "G-DYC3GRG2Q1";
+      const CONSENT_KEY = "iimperialism-analytics-consent";
+      let gaLoaded = false;
+
+      gtag("consent", "default", {
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        analytics_storage: "denied"
+      });
+
+      function loadGoogleAnalytics() {
+        if (gaLoaded) {
+          return;
+        }
+
+        gaLoaded = true;
+
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_TRACKING_ID;
+        document.head.appendChild(script);
+
+        gtag("js", new Date());
+        gtag("config", GA_TRACKING_ID);
+      }
+
+      function setAnalyticsConsent(granted) {
+        gtag("consent", "update", {
+          ad_storage: "denied",
+          ad_user_data: "denied",
+          ad_personalization: "denied",
+          analytics_storage: granted ? "granted" : "denied"
+        });
+
+        window.localStorage.setItem(CONSENT_KEY, granted ? "granted" : "denied");
+
+        if (granted) {
+          loadGoogleAnalytics();
+        }
+      }
+
+      if (window.localStorage.getItem(CONSENT_KEY) === "granted") {
+        setAnalyticsConsent(true);
+      }
+    </script>
     <style>
       :root {
         --bg-top: #08151d;
@@ -324,6 +374,88 @@
         font-size: 14px;
       }
 
+      .footer-settings {
+        margin-top: 10px;
+      }
+
+      .privacy-button {
+        border: 1px solid rgba(239, 215, 140, 0.35);
+        border-radius: 999px;
+        padding: 8px 14px;
+        color: var(--gold);
+        background: rgba(9, 17, 22, 0.42);
+        font: inherit;
+        cursor: pointer;
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      }
+
+      .privacy-button:hover,
+      .privacy-button:focus-visible {
+        border-color: rgba(239, 215, 140, 0.72);
+        background: rgba(9, 17, 22, 0.62);
+        transform: translateY(-1px);
+      }
+
+      .consent-banner {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        z-index: 20;
+        width: min(420px, calc(100% - 32px));
+        padding: 18px;
+        border: 1px solid var(--panel-border);
+        border-radius: 18px;
+        background:
+          linear-gradient(135deg, rgba(239, 215, 140, 0.12), rgba(113, 199, 200, 0.08)),
+          rgba(6, 15, 20, 0.96);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+      }
+
+      .consent-banner[hidden] {
+        display: none;
+      }
+
+      .consent-title {
+        margin: 0 0 8px;
+        color: var(--gold);
+        font-size: 1.05rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .consent-copy {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .consent-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .consent-button {
+        min-width: 128px;
+        border-radius: 999px;
+        padding: 11px 16px;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .consent-accept {
+        border: 1px solid rgba(239, 215, 140, 0.85);
+        color: var(--ink);
+        background: linear-gradient(180deg, #f5de92, #d4aa50);
+      }
+
+      .consent-decline {
+        border: 1px solid rgba(239, 215, 140, 0.35);
+        color: var(--gold);
+        background: transparent;
+      }
+
       @media (max-width: 860px) {
         .content-grid,
         .stats {
@@ -361,6 +493,12 @@
         .cta-link {
           width: 100%;
           min-width: 0;
+        }
+
+        .consent-banner {
+          left: 16px;
+          right: 16px;
+          width: auto;
         }
       }
 
@@ -400,6 +538,7 @@
               href="https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/releases/0.1.0/iimperialism-0.1.0.dsk"
               target="_blank"
               rel="noopener noreferrer"
+              data-analytics-event="play_online"
             >
               Play Online Now
             </a>
@@ -409,6 +548,7 @@
               download
               target="_blank"
               rel="noopener noreferrer"
+              data-analytics-event="download_dsk"
             >
               Download Disk Image
             </a>
@@ -418,6 +558,7 @@
               download
               target="_blank"
               rel="noopener noreferrer"
+              data-analytics-event="download_manual"
             >
               Download Manual
             </a>
@@ -515,6 +656,7 @@
               href="https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/releases/0.1.0/iimperialism-0.1.0.dsk"
               target="_blank"
               rel="noopener noreferrer"
+              data-analytics-event="play_online"
             >
               Play Online
             </a>
@@ -524,6 +666,7 @@
               download
               target="_blank"
               rel="noopener noreferrer"
+              data-analytics-event="download_dsk"
             >
               Get The .DSK
             </a>
@@ -533,6 +676,7 @@
               download
               target="_blank"
               rel="noopener noreferrer"
+              data-analytics-event="download_manual"
             >
               Get The Manual
             </a>
@@ -544,6 +688,7 @@
               href="https://github.com/taciano-perez/iimperialism"
               target="_blank"
               rel="noopener noreferrer"
+              data-analytics-event="open_repository"
             >Git repository</a>.
           </p>
         </article>
@@ -551,7 +696,81 @@
 
       <footer class="site-footer">
         Copyright &copy; Taciano Dreckmann Perez 2026
+        <div class="footer-settings">
+          <button class="privacy-button" type="button" data-open-consent>
+            Privacy settings
+          </button>
+        </div>
       </footer>
     </main>
+    <aside
+      class="consent-banner"
+      id="consent-banner"
+      role="dialog"
+      aria-labelledby="consent-title"
+      aria-describedby="consent-copy"
+      hidden
+    >
+      <h2 class="consent-title" id="consent-title">Analytics consent</h2>
+      <p class="consent-copy" id="consent-copy">
+        This site uses Google Analytics to measure visits and key actions. Analytics stays off until you accept.
+      </p>
+      <div class="consent-actions">
+        <button class="consent-button consent-accept" type="button" data-consent-action="accept">
+          Accept analytics
+        </button>
+        <button class="consent-button consent-decline" type="button" data-consent-action="decline">
+          Decline
+        </button>
+      </div>
+    </aside>
+    <script>
+      (function () {
+        const consentBanner = document.getElementById("consent-banner");
+        const consentButtons = document.querySelectorAll("[data-consent-action]");
+        const settingsButtons = document.querySelectorAll("[data-open-consent]");
+        const trackedLinks = document.querySelectorAll("[data-analytics-event]");
+
+        function hideBanner() {
+          consentBanner.hidden = true;
+        }
+
+        function showBanner() {
+          consentBanner.hidden = false;
+        }
+
+        if (window.localStorage.getItem(CONSENT_KEY) !== null) {
+          hideBanner();
+        } else {
+          showBanner();
+        }
+
+        consentButtons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            const granted = button.dataset.consentAction === "accept";
+            setAnalyticsConsent(granted);
+            hideBanner();
+          });
+        });
+
+        settingsButtons.forEach(function (button) {
+          button.addEventListener("click", showBanner);
+        });
+
+        trackedLinks.forEach(function (link) {
+          link.addEventListener("click", function () {
+            if (window.localStorage.getItem(CONSENT_KEY) !== "granted") {
+              return;
+            }
+
+            gtag("event", "select_content", {
+              content_type: "cta",
+              item_id: link.dataset.analyticsEvent,
+              link_url: link.href
+            });
+          });
+        });
+      }());
+    </script>
   </body>
 </html>
