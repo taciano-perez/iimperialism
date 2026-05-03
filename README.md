@@ -294,6 +294,33 @@ If your `fonttools` install also has WOFF2 encoder support, you can add:
 python tools/export_web_fonts.py --ttf --woff2
 ```
 
+## Manual Build
+
+To build the manual as styled HTML with the game fonts used for headings:
+
+```bash
+python tools/build_manual_html.py
+```
+
+This writes:
+
+- `docs/manual/iimperialism-manual.html`
+
+On Windows, if Microsoft Edge or Google Chrome is installed, you can also build
+the PDF automatically through a headless browser print pass:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/build_manual_pdf.ps1
+```
+
+This writes:
+
+- `build/manual/iimperialism-manual.pdf`
+
+The PDF pipeline first regenerates the HTML output, then prints that HTML with
+the local browser engine. If no supported browser is found, build the HTML and
+print it to PDF manually from the browser.
+
 ## Credits
 
 This project builds on several external tools and libraries. Credit belongs to
@@ -339,4 +366,3 @@ Discarded ideas (difficult to squeeze in without requiring extra floppies):
 Packaging goodies
 - Manual
 - Floppy Sticker
-- Website

@@ -1,5 +1,9 @@
 # IImperialism! Manual
 
+Version: 0.1.0
+
+Author: Taciano Dreckmann Perez
+
 ## INTRODUCTION
 
 In IImperialism!, you rule an industrializing empire in a nineteenth-century-inspired age of trade, diplomacy, and naval rivalry. Your task is to build a functioning economy, keep your treasury solvent, win favor abroad, and secure enough support in the Council of Nations to claim victory.
@@ -9,6 +13,10 @@ This is a turn-based game. Each turn, you review your empire, adjust standing or
 ## STARTING A GAME
 
 Boot your Apple II with the IImperialism! floppy and wait for the splash screen. Press `ESC` to continue. You will then be asked to enter the name of your nation. Type a name of up to ten characters and press `RETURN`.
+
+![Splash screen](../../assets/screenshots/splashscreen.png)
+
+![Nation naming prompt](../../assets/screenshots/what-is-your-nation.png)
 
 The game begins on the Main Screen.
 
@@ -47,6 +55,8 @@ Transport and production orders remain in effect from turn to turn until you cha
 
 The Main Screen is your central command screen. It shows your nation name, the current turn, your funds, and an advisor prompt.
 
+![Main screen](../../assets/screenshots/main-screen.png)
+
 From here, press:
 
 - `I` for the Ministry of Industry
@@ -71,6 +81,8 @@ From the Game Menu, press:
 
 The Ministry of Industry summarizes the state of your domestic economy.
 
+![Industry screen](../../assets/screenshots/industry-screen.png)
+
 The top warehouse panel shows your current stock of:
 
 - Raw materials: Timber, Wool, Iron, Coal
@@ -92,6 +104,8 @@ From this screen, press:
 ## TRANSPORT ORDERS
 
 Transport Orders determine how much raw material reaches your warehouse each turn.
+
+![Transport orders screen](../../assets/screenshots/transport-screen.png)
 
 Your provinces produce fixed amounts of:
 
@@ -124,6 +138,8 @@ If you assign more wagons to one resource, fewer remain available for the others
 ## PRODUCTION ORDERS
 
 Production Orders control your factories and workshops. Each unit of production also requires one worker assigned to that order.
+
+![Production screen](../../assets/screenshots/production-screen.png)
 
 From the Production screen, press:
 
@@ -171,6 +187,8 @@ Training raises your available labor pool, allowing larger production orders and
 
 The Ledger shows the financial result of the current turn so far.
 
+![Ledger screen](../../assets/screenshots/ledger-screen.png)
+
 It lists:
 
 - Labor force upkeep
@@ -188,6 +206,8 @@ Press any key to close the Ledger and return to the Ministry of Industry.
 ## ADMIRALTY HEADQUARTERS
 
 The Admiralty manages both your merchant fleet and your war fleet.
+
+![Admiralty screen](../../assets/screenshots/admiralty-screen.png)
 
 The screen shows:
 
@@ -223,6 +243,8 @@ Traders determine how much cargo you can carry on trade expeditions. Warships pr
 
 The Patent Office is the science screen. Here you invest money to patent new technologies.
 
+![Science screen](../../assets/screenshots/science-screen.png)
+
 From this screen, press:
 
 - `R` to invest in research
@@ -254,6 +276,8 @@ Research is expensive, but these upgrades can greatly improve your industry, tra
 ## THE FOREIGN OFFICE
 
 The Foreign Office is the diplomacy screen. It lists five foreign nations, their current status toward you, and the goods they export and import.
+
+![Foreign Office screen](../../assets/screenshots/diplomacy-screen.png)
 
 Relations are displayed as:
 
@@ -318,6 +342,8 @@ Either if no battle occurs or when you are victorious, you reach the foreign mar
 
 When a trade expedition arrives, the market screen shows:
 
+![Trade screen](../../assets/screenshots/trade-screen.png)
+
 - The foreign nation you are visiting
 - Your current warehouse
 - That nation's local market prices
@@ -355,6 +381,8 @@ Successful trade also improves relations with that nation, making future diploma
 
 Battles occur when a trade expedition is intercepted.
 
+![Sea battle screen](../../assets/screenshots/sea-battle-screen.png)
+
 The battle screen shows:
 
 - Your navy's firepower
@@ -389,6 +417,8 @@ Battles are dangerous, but victory can be profitable.
 ## THE COUNCIL OF NATIONS
 
 Every ten turns, the Council of Nations meets.
+
+![Council of Nations screen](../../assets/screenshots/council-nations-screen.png)
 
 The council shows:
 
@@ -458,4 +488,4 @@ The final report shows `Your score is ...` in inverted text, then compares your 
 
 IImperialism! is a love letter to the classic games <b>Taipan!</b> (Apple II) and <b>Imperialism</b> (PC and Mac). Some of its visual and textual elements are borrowed from these great games.
 
-IImperialism! is created by Taciano Dreckmann Perez in 2026.
+IImperialism! has been created by Taciano Dreckmann Perez in 2026. All rights reserved.

@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IImperialism! Manual</title>
+    <link rel="stylesheet" href="../../assets/fonts/fonts.css">
+    <style>
+      :root {
+        --paper-bg: #e8d9a6;
+        --paper: #f6eed0;
+        --ink: #1a241d;
+        --muted: #465448;
+        --panel: #fcf6e3;
+        --rule: #cfbd81;
+        --accent: #b78b34;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: linear-gradient(180deg, #f0e3b7, var(--paper-bg));
+        color: var(--ink);
+        font-family: Garamond, "Adobe Garamond Pro", "Palatino Linotype", serif;
+      }
+
+      .page {
+        width: min(920px, calc(100% - 32px));
+        margin: 24px auto;
+        padding: 36px 42px 44px;
+        background: var(--paper);
+        border: 1px solid rgba(183, 139, 52, 0.35);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+      }
+
+      .manual-header {
+        border-bottom: 3px solid var(--accent);
+        margin-bottom: 28px;
+        padding-bottom: 18px;
+      }
+
+      .cover-page {
+        min-height: 220mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        page-break-after: always;
+      }
+
+      .cover-title {
+        margin: 0 0 26px;
+        font-size: 44px;
+        line-height: 1.15;
+        color: #7b5a16;
+      }
+
+      .cover-meta {
+        margin: 8px 0 0;
+        font-size: 24px;
+        line-height: 1.4;
+      }
+
+      .manual-toc {
+        margin: 0 0 30px;
+        padding: 18px 20px 16px;
+        background: var(--panel);
+        border: 1px solid var(--rule);
+      }
+
+      h1, h2, figcaption {
+        font-family: "IImperialism Taipan", monospace;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 38px;
+        line-height: 1.1;
+        color: #6f4f11;
+      }
+
+      h2 {
+        margin: 0 0 16px;
+        font-size: 22px;
+        color: #8a651a;
+      }
+
+      .manual-toc h2 {
+        margin-bottom: 14px;
+      }
+
+      .manual-toc-page {
+        page-break-after: always;
+      }
+
+      .manual-section + .manual-section {
+        margin-top: 28px;
+      }
+
+      .manual-section {
+        padding-top: 8px;
+      }
+
+      p, li {
+        font-size: 17px;
+        line-height: 1.65;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      ul, ol {
+        margin: 0 0 16px 22px;
+        padding: 0;
+      }
+
+      .manual-toc ol {
+        columns: 2;
+        column-gap: 28px;
+        margin-bottom: 0;
+      }
+
+      li + li {
+        margin-top: 6px;
+      }
+
+      .manual-toc a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      code {
+        padding: 1px 5px;
+        background: rgba(183, 139, 52, 0.1);
+        border-radius: 4px;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 0.92em;
+      }
+
+      .manual-figure {
+        margin: 18px 0 20px;
+        padding: 14px;
+        background: var(--panel);
+        border: 1px solid var(--rule);
+      }
+
+      .manual-figure img {
+        display: block;
+        width: 280px;
+        max-width: 100%;
+        margin: 0 auto;
+        height: auto;
+        image-rendering: pixelated;
+        background: #000;
+      }
+
+      .manual-figure figcaption {
+        margin-top: 10px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      @page {
+        size: A4;
+        margin: 18mm 14mm 20mm;
+      }
+
+      @media print {
+        body {
+          background: var(--paper);
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .page {
+          width: auto;
+          margin: 0;
+          padding: 0;
+          border: 0;
+          box-shadow: none;
+          background: var(--paper);
+        }
+
+        .manual-figure {
+          break-inside: avoid;
+        }
+
+        h2 {
+          break-after: avoid;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .page {
+          width: min(100% - 20px, 920px);
+          padding: 24px 18px 30px;
+        }
+
+        h1 {
+          font-size: 30px;
+        }
+
+        .cover-title {
+          font-size: 34px;
+        }
+
+        .cover-meta {
+          font-size: 20px;
+        }
+
+        .manual-toc ol {
+          columns: 1;
+        }
+
+        .manual-figure img {
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+<section class="cover-page"><h1 class="cover-title">IImperialism! Manual</h1><p class="cover-meta">Version 0.1.0</p><p class="cover-meta">By Taciano Dreckmann Perez</p></section>
+<section class="manual-toc-page"><nav class="manual-toc" aria-labelledby="manual-toc-title"><h2 id="manual-toc-title">Contents</h2><ol>
+  <li><a href="#introduction">INTRODUCTION</a></li>
+  <li><a href="#starting-a-game">STARTING A GAME</a></li>
+  <li><a href="#how-the-game-works">HOW THE GAME WORKS</a></li>
+  <li><a href="#turn-sequence">TURN SEQUENCE</a></li>
+  <li><a href="#the-main-screen">THE MAIN SCREEN</a></li>
+  <li><a href="#the-game-menu">THE GAME MENU</a></li>
+  <li><a href="#the-ministry-of-industry">THE MINISTRY OF INDUSTRY</a></li>
+  <li><a href="#transport-orders">TRANSPORT ORDERS</a></li>
+  <li><a href="#production-orders">PRODUCTION ORDERS</a></li>
+  <li><a href="#training-workers">TRAINING WORKERS</a></li>
+  <li><a href="#the-ledger">THE LEDGER</a></li>
+  <li><a href="#admiralty-headquarters">ADMIRALTY HEADQUARTERS</a></li>
+  <li><a href="#the-patent-office">THE PATENT OFFICE</a></li>
+  <li><a href="#the-foreign-office">THE FOREIGN OFFICE</a></li>
+  <li><a href="#alliances-and-colonies">ALLIANCES AND COLONIES</a></li>
+  <li><a href="#trade-expeditions">TRADE EXPEDITIONS</a></li>
+  <li><a href="#the-foreign-market-screen">THE FOREIGN MARKET SCREEN</a></li>
+  <li><a href="#buying-and-selling">BUYING AND SELLING</a></li>
+  <li><a href="#battle-at-sea">BATTLE AT SEA</a></li>
+  <li><a href="#the-council-of-nations">THE COUNCIL OF NATIONS</a></li>
+  <li><a href="#strategy-guide">STRATEGY GUIDE</a></li>
+  <li><a href="#victory">VICTORY</a></li>
+  <li><a href="#inspiration-and-authorship">INSPIRATION AND AUTHORSHIP</a></li>
+</ol></nav></section>
+
+<section class="manual-section" id="introduction"><h2>INTRODUCTION</h2>
+<p>In IImperialism!, you rule an industrializing empire in a nineteenth-century-inspired age of trade, diplomacy, and naval rivalry. Your task is to build a functioning economy, keep your treasury solvent, win favor abroad, and secure enough support in the Council of Nations to claim victory.</p>
+<p>This is a turn-based game. Each turn, you review your empire, adjust standing orders, send trade expeditions, invest in research, and then end the turn so your economy can operate.</p>
+
+</section>
+<section class="manual-section" id="starting-a-game"><h2>STARTING A GAME</h2>
+<p>Boot your Apple II with the IImperialism! floppy and wait for the splash screen. Press <code>ESC</code> to continue. You will then be asked to enter the name of your nation. Type a name of up to ten characters and press <code>RETURN</code>.</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/splashscreen.png" alt="Splash screen"><figcaption>Splash screen</figcaption></figure>
+<figure class="manual-figure"><img src="../../assets/screenshots/what-is-your-nation.png" alt="Nation naming prompt"><figcaption>Nation naming prompt</figcaption></figure>
+<p>The game begins on the Main Screen.</p>
+
+</section>
+<section class="manual-section" id="how-the-game-works"><h2>HOW THE GAME WORKS</h2>
+<p>Your empire runs on four connected systems:</p>
+<ul>
+  <li>Transport brings raw materials from your provinces into the warehouse each turn.</li>
+  <li>Production converts those materials into processed and finished goods.</li>
+  <li>Trade expeditions buy and sell goods abroad for profit and improve foreign relations.</li>
+  <li>Science improves the efficiency of your provinces, fleet, and navy.</li>
+</ul>
+<p>The basic economic chain is:</p>
+<ul>
+  <li>Timber -&gt; Lumber -&gt; Furniture</li>
+  <li>Wool -&gt; Fabric -&gt; Clothes</li>
+  <li>Iron + Coal -&gt; Steel -&gt; Tools or Guns</li>
+</ul>
+<p>You start with a small stockpile, a limited labor force, a wagon network, a merchant fleet, and a navy. The game is won through diplomacy rather than conquest: every ten turns, the Council of Nations meets and votes. If your nation controls 24 votes, you win the game.</p>
+
+</section>
+<section class="manual-section" id="turn-sequence"><h2>TURN SEQUENCE</h2>
+<p>During your turn, you may visit the different ministries and screens in any order. When you press <code>E</code> on the Main Screen, the turn ends and the following happens:</p>
+<ol>
+  <li>Your transport orders move raw materials from the provinces into your warehouse.</li>
+  <li>Your production orders consume inputs and produce goods.</li>
+  <li>Market prices are refreshed in foreign nations and are influenced by your current relations with them.</li>
+  <li>Upkeep is deducted from your treasury.</li>
+  <li>Relations with non-allied nations slowly decline.</li>
+  <li>The turn number advances.</li>
+  <li>Every tenth turn, the Council of Nations convenes.</li>
+</ol>
+<p>Transport and production orders remain in effect from turn to turn until you change them.</p>
+
+</section>
+<section class="manual-section" id="the-main-screen"><h2>THE MAIN SCREEN</h2>
+<p>The Main Screen is your central command screen. It shows your nation name, the current turn, your funds, and an advisor prompt.</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/main-screen.png" alt="Main screen"><figcaption>Main screen</figcaption></figure>
+<p>From here, press:</p>
+<ul>
+  <li><code>I</code> for the Ministry of Industry</li>
+  <li><code>P</code> for the Patent Office</li>
+  <li><code>A</code> for Admiralty Headquarters</li>
+  <li><code>F</code> for the Foreign Office</li>
+  <li><code>E</code> to end the turn</li>
+  <li><code>ESC</code> to open the Game Menu</li>
+</ul>
+
+</section>
+<section class="manual-section" id="the-game-menu"><h2>THE GAME MENU</h2>
+<p>Press <code>ESC</code> from the Main Screen to open the Game Menu.</p>
+<p>From the Game Menu, press:</p>
+<ul>
+  <li><code>N</code> to start a New Game</li>
+  <li><code>L</code> to Load Game</li>
+  <li><code>S</code> to Save Game</li>
+  <li><code>ESC</code> to resume the current game</li>
+</ul>
+
+</section>
+<section class="manual-section" id="the-ministry-of-industry"><h2>THE MINISTRY OF INDUSTRY</h2>
+<p>The Ministry of Industry summarizes the state of your domestic economy.</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/industry-screen.png" alt="Industry screen"><figcaption>Industry screen</figcaption></figure>
+<p>The top warehouse panel shows your current stock of:</p>
+<ul>
+  <li>Raw materials: Timber, Wool, Iron, Coal</li>
+  <li>Processed goods: Lumber, Fabric, Steel</li>
+  <li>Finished goods: Furniture, Clothes, Tools, Guns</li>
+</ul>
+<p>The lower panel shows:</p>
+<ul>
+  <li>Current transport orders per turn for Timber, Wool, Iron, and Coal</li>
+  <li>Current production orders per turn for all manufactured goods</li>
+</ul>
+<p>From this screen, press:</p>
+<ul>
+  <li><code>T</code> for Transport Orders</li>
+  <li><code>P</code> for Production Orders</li>
+  <li><code>L</code> to open the Ledger</li>
+  <li><code>Q</code> to return to the Main Screen</li>
+</ul>
+
+</section>
+<section class="manual-section" id="transport-orders"><h2>TRANSPORT ORDERS</h2>
+<p>Transport Orders determine how much raw material reaches your warehouse each turn.</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/transport-screen.png" alt="Transport orders screen"><figcaption>Transport orders screen</figcaption></figure>
+<p>Your provinces produce fixed amounts of:</p>
+<ul>
+  <li>Timber</li>
+  <li>Wool</li>
+  <li>Iron</li>
+  <li>Coal</li>
+</ul>
+<p>Wagons are required to move those materials. Each assigned unit of transport uses wagon capacity. Idle wagons are shown on screen.</p>
+<p>From the Transport screen, press:</p>
+<ul>
+  <li><code>T</code> to change transport orders</li>
+  <li><code>B</code> to build more wagons</li>
+  <li><code>Q</code> to return to the Ministry of Industry</li>
+</ul>
+<p>When changing orders, choose <code>T</code>imber, <code>W</code>ool, <code>I</code>ron, or <code>C</code>oal, then enter the new amount to transport each turn.</p>
+<p>When building wagons:</p>
+<ul>
+  <li>Each wagon costs 1 Lumber and 1 Steel.</li>
+</ul>
+<p>Transport is limited by:</p>
+<ul>
+  <li>The province yield of that resource</li>
+  <li>Your currently available wagons</li>
+</ul>
+<p>If you assign more wagons to one resource, fewer remain available for the others.</p>
+
+</section>
+<section class="manual-section" id="production-orders"><h2>PRODUCTION ORDERS</h2>
+<p>Production Orders control your factories and workshops. Each unit of production also requires one worker assigned to that order.</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/production-screen.png" alt="Production screen"><figcaption>Production screen</figcaption></figure>
+<p>From the Production screen, press:</p>
+<ul>
+  <li><code>P</code> to change production orders</li>
+  <li><code>T</code> to train new workers</li>
+  <li><code>Q</code> to return to the Ministry of Industry</li>
+</ul>
+<p>Production recipes are:</p>
+<ul>
+  <li>1 Lumber requires 2 Timber</li>
+  <li>1 Fabric requires 2 Wool</li>
+  <li>1 Steel requires 2 Iron and 2 Coal</li>
+  <li>1 Furniture requires 2 Lumber</li>
+  <li>1 Clothes requires 2 Fabric</li>
+  <li>1 Tools requires 2 Steel</li>
+  <li>1 Guns requires 2 Steel</li>
+</ul>
+<p>To change production orders, choose:</p>
+<ul>
+  <li><code>L</code> for Lumber</li>
+  <li><code>F</code> for Fabric</li>
+  <li><code>S</code> for Steel</li>
+  <li><code>U</code> for fUrniture</li>
+  <li><code>C</code> for Clothes</li>
+  <li><code>T</code> for Tools</li>
+  <li><code>G</code> for Guns</li>
+  <li><code>Q</code> to quit the order-entry prompt</li>
+</ul>
+<p>Enter the new number of units to produce each turn. The game will limit you by available inputs and available workers.</p>
+
+</section>
+<section class="manual-section" id="training-workers"><h2>TRAINING WORKERS</h2>
+<p>Workers are required for both production and shipbuilding.</p>
+<p>From the Production screen, press <code>T</code> to train workers.</p>
+<p>Each new worker costs:</p>
+<ul>
+  <li>1 Furniture</li>
+  <li>1 Clothes</li>
+</ul>
+<p>Training raises your available labor pool, allowing larger production orders and more shipbuilding.</p>
+
+</section>
+<section class="manual-section" id="the-ledger"><h2>THE LEDGER</h2>
+<p>The Ledger shows the financial result of the current turn so far.</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/ledger-screen.png" alt="Ledger screen"><figcaption>Ledger screen</figcaption></figure>
+<p>It lists:</p>
+<ul>
+  <li>Labor force upkeep</li>
+  <li>Merchant marine upkeep</li>
+  <li>Navy upkeep</li>
+  <li>Trade expenses</li>
+  <li>Trade revenue</li>
+  <li>War booty</li>
+  <li>Bottom-line balance</li>
+</ul>
+<p>Use this screen to judge whether your empire can afford its current military, labor force, and trading activity.</p>
+<p>Press any key to close the Ledger and return to the Ministry of Industry.</p>
+
+</section>
+<section class="manual-section" id="admiralty-headquarters"><h2>ADMIRALTY HEADQUARTERS</h2>
+<p>The Admiralty manages both your merchant fleet and your war fleet.</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/admiralty-screen.png" alt="Admiralty screen"><figcaption>Admiralty screen</figcaption></figure>
+<p>The screen shows:</p>
+<ul>
+  <li>Number of Traders</li>
+  <li>Cargo capacity per trader</li>
+  <li>Total merchant capacity</li>
+  <li>Number of Warships</li>
+  <li>Guns per warship</li>
+  <li>Total naval firepower</li>
+  <li>Available workers</li>
+</ul>
+<p>From this screen, press:</p>
+<ul>
+  <li><code>T</code> to build Trading vessels</li>
+  <li><code>W</code> to build Warships</li>
+  <li><code>Q</code> to return to the Main Screen</li>
+</ul>
+<p>Base costs are:</p>
+<ul>
+  <li>Trader: 1 Lumber, 1 Fabric, and 1 Worker</li>
+  <li>Warship: 1 Lumber, 1 Fabric, 1 Gun, and 1 Worker</li>
+</ul>
+<p>Science upgrades can raise these costs for newly built ships:</p>
+<ul>
+  <li>At 2x trader capacity, a new Trader costs 2 Lumber, 2 Fabric, and 1 Worker.</li>
+  <li>At 4x trader capacity, a new Trader costs 4 Lumber, 4 Fabric, and 1 Worker.</li>
+  <li>At 2x guns per warship, a new Warship costs 1 Lumber, 1 Fabric, 2 Guns, and 1 Worker.</li>
+  <li>At 4x guns per warship, a new Warship costs 1 Lumber, 1 Fabric, 4 Guns, and 1 Worker.</li>
+</ul>
+<p>Traders determine how much cargo you can carry on trade expeditions. Warships protect those expeditions and provide strength in battle.</p>
+
+</section>
+<section class="manual-section" id="the-patent-office"><h2>THE PATENT OFFICE</h2>
+<p>The Patent Office is the science screen. Here you invest money to patent new technologies.</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/science-screen.png" alt="Science screen"><figcaption>Science screen</figcaption></figure>
+<p>From this screen, press:</p>
+<ul>
+  <li><code>R</code> to invest in research</li>
+  <li><code>Q</code> to return to the Main Screen</li>
+</ul>
+<p>Only the next technology in sequence may be researched. The cost is:</p>
+<ul>
+  <li>Technology level x $1000</li>
+</ul>
+<p>The current research ladder is:</p>
+<ol>
+  <li>Forestry: 2x Timber output</li>
+  <li>Sheep Breeding: 2x Wool output</li>
+  <li>Carronade: 2x guns per warship</li>
+  <li>Shaft Mining: 2x Iron output</li>
+  <li>Clipper Ships: 2x trader capacity</li>
+  <li>Coal Pumps: 2x Coal output</li>
+  <li>Shell Guns: 4x guns per warship</li>
+  <li>Steel Hulls: 4x trader capacity</li>
+</ol>
+<p>The direct gameplay upgrades are:</p>
+<ul>
+  <li>Forestry, Sheep Breeding, Shaft Mining, and Coal Pumps increase raw-material output from provinces</li>
+  <li>Carronade and Shell guns increase guns per warship and proportionally increase the Gun cost of new warships</li>
+  <li>Clipper Ships and Steel Hulls increase trader capacity and proportionally increase the Lumber and Fabric cost of new traders</li>
+</ul>
+<p>Research is expensive, but these upgrades can greatly improve your industry, trade capacity, and naval combat power.</p>
+
+</section>
+<section class="manual-section" id="the-foreign-office"><h2>THE FOREIGN OFFICE</h2>
+<p>The Foreign Office is the diplomacy screen. It lists five foreign nations, their current status toward you, and the goods they export and import.</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/diplomacy-screen.png" alt="Foreign Office screen"><figcaption>Foreign Office screen</figcaption></figure>
+<p>Relations are displayed as:</p>
+<ul>
+  <li>Bad</li>
+  <li>Poor</li>
+  <li>Fair</li>
+  <li>Good</li>
+  <li>Great</li>
+  <li>Ally (Great Power) or Colony (minor nation)</li>
+</ul>
+<p>Arrows to the right of this field indicate if the relations status with a nation are trending up or down.</p>
+<p>The first two nations are the other Great Powers. The remaining three are minor nations. Great Powers import raw materials and export processed goods, whereas minor nations export raw materials and import processed goods. Great Powers can become allies, and minor nations can be turned into colonies.</p>
+<p>From this screen, press:</p>
+<ul>
+  <li><code>T</code> to launch a Trade Expedition</li>
+  <li><code>A</code> to offer an Alliance</li>
+  <li><code>C</code> to offer Colony status</li>
+  <li><code>Q</code> to return to the Main Screen</li>
+</ul>
+<p>Trade and diplomacy are the main ways to improve your standing abroad and earn Council votes later in the game.</p>
+
+</section>
+<section class="manual-section" id="alliances-and-colonies"><h2>ALLIANCES AND COLONIES</h2>
+<p>Formal diplomacy is expensive and only becomes available when relations are already strong.</p>
+<p>Each diplomatic mission costs:</p>
+<ul>
+  <li>$1000</li>
+</ul>
+<p>Rules:</p>
+<ul>
+  <li>Alliances may be offered only to Great Powers.</li>
+  <li>Colony status may be offered only to minor nations.</li>
+  <li>The target nation must have <code>Great</code> status toward you.</li>
+  <li>Acceptance is not guaranteed.</li>
+</ul>
+<p>If the offer succeeds:</p>
+<ul>
+  <li>A Great Power becomes an Ally.</li>
+  <li>A minor nation becomes a Colony.</li>
+</ul>
+<p>Once the offer is accepted, the relationship becomes permanent, not degrading over time.</p>
+<p>These special relationships are important because allied or colonial nations vote for you in the Council of Nations.</p>
+
+</section>
+<section class="manual-section" id="trade-expeditions"><h2>TRADE EXPEDITIONS</h2>
+<p>Trade expeditions are the heart of the game. They are how you turn goods into money and improve relations.</p>
+<p>From the Foreign Office, press <code>T</code>, choose a nation from <code>1</code> to <code>5</code>, and sail. You must have at least one warship to attempt a trade expedition.</p>
+<p>There is always a risk of battle at sea:</p>
+<ul>
+  <li>Pirates may attack.</li>
+  <li>A hostile foreign power may also attack, provided that its relations with you are bad.</li>
+</ul>
+<p>Either if no battle occurs or when you are victorious, you reach the foreign market. If you are defeated, you return to your home port.</p>
+
+</section>
+<section class="manual-section" id="the-foreign-market-screen"><h2>THE FOREIGN MARKET SCREEN</h2>
+<p>When a trade expedition arrives, the market screen shows:</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/trade-screen.png" alt="Trade screen"><figcaption>Trade screen</figcaption></figure>
+<ul>
+  <li>The foreign nation you are visiting</li>
+  <li>Your current warehouse</li>
+  <li>That nation&#x27;s local market prices</li>
+  <li>Goods they will import from you</li>
+  <li>Goods they will export to you</li>
+  <li>Your remaining fleet capacity for the turn</li>
+</ul>
+<p>Those market prices depend in part on relations: nations that like you offer better terms than nations that do not.</p>
+<p>Each expedition uses your merchant fleet&#x27;s carrying capacity. That capacity is shared across all trading you do in the same turn.</p>
+
+</section>
+<section class="manual-section" id="buying-and-selling"><h2>BUYING AND SELLING</h2>
+<p>At the market, press:</p>
+<ul>
+  <li><code>B</code> to Buy</li>
+  <li><code>S</code> to Sell</li>
+  <li><code>Q</code> to leave and return to the Foreign Office</li>
+</ul>
+<p>When buying:</p>
+<ul>
+  <li>You buy from the nation&#x27;s exports.</li>
+  <li>The maximum you can buy is limited by your money and remaining cargo capacity.</li>
+</ul>
+<p>When selling:</p>
+<ul>
+  <li>You sell goods the nation imports.</li>
+  <li>The maximum you can sell is limited by your warehouse stock and remaining cargo capacity.</li>
+</ul>
+<p>Each unit traded uses one point of cargo capacity.</p>
+<p>Successful trade also improves relations with that nation, making future diplomacy easier and helping secure Council votes.</p>
+
+</section>
+<section class="manual-section" id="battle-at-sea"><h2>BATTLE AT SEA</h2>
+<p>Battles occur when a trade expedition is intercepted.</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/sea-battle-screen.png" alt="Sea battle screen"><figcaption>Sea battle screen</figcaption></figure>
+<p>The battle screen shows:</p>
+<ul>
+  <li>Your navy&#x27;s firepower</li>
+  <li>Enemy fleet firepower</li>
+  <li>Your remaining traders</li>
+</ul>
+<p>During battle, press:</p>
+<ul>
+  <li><code>F</code> to Fight</li>
+  <li><code>R</code> to Run</li>
+</ul>
+<p>If you fight and win:</p>
+<ul>
+  <li>You receive war booty in cash.</li>
+  <li>The expedition continues to the trade screen.</li>
+</ul>
+<p>If you lose warships in battle:</p>
+<ul>
+  <li>Your warship total falls.</li>
+</ul>
+<p>If traders are hit:</p>
+<ul>
+  <li>Your trader total falls as well.</li>
+</ul>
+<p>If you run:</p>
+<ul>
+  <li>You may still lose a trader.</li>
+  <li>The expedition ends and you return to your home port.</li>
+</ul>
+<p>Battles are dangerous, but victory can be profitable.</p>
+
+</section>
+<section class="manual-section" id="the-council-of-nations"><h2>THE COUNCIL OF NATIONS</h2>
+<p>Every ten turns, the Council of Nations meets.</p>
+<figure class="manual-figure"><img src="../../assets/screenshots/council-nations-screen.png" alt="Council of Nations screen"><figcaption>Council of Nations screen</figcaption></figure>
+<p>The council shows:</p>
+<ul>
+  <li>Each nation&#x27;s province total</li>
+  <li>Who that nation voted for</li>
+  <li>Your current vote total</li>
+  <li>The victory target</li>
+</ul>
+<p>Vote strength is based on provinces:</p>
+<ul>
+  <li>The three major nations have 8 votes each</li>
+  <li>The three minor nations have 4 votes each</li>
+</ul>
+<p>To win the game, your nation must reach:</p>
+<ul>
+  <li>24 votes</li>
+</ul>
+<p>Your own nation always votes for itself. Allied Great Powers and colonial minor nations will also vote for you. If you have not yet secured enough support, the game continues after the council session.</p>
+<p>If you do secure enough support, the Council first confirms the victory and then shows the final report to the crown.</p>
+
+</section>
+<section class="manual-section" id="strategy-guide"><h2>STRATEGY GUIDE</h2>
+<p>A reliable opening plan is:</p>
+<ol>
+  <li>Stabilize transport so you are bringing in enough Timber, Wool, Iron, and Coal every turn.</li>
+  <li>Expand production of Lumber, Fabric, and Steel before pushing too hard into finished goods.</li>
+  <li>Train workers when your factories or shipyards are constrained by labor.</li>
+  <li>Build traders so you can move more cargo, and maintain warships so expeditions are possible.</li>
+  <li>Trade actively with the same nations to improve relations and improve future market prices.</li>
+  <li>Spend diplomatic missions on nations that have already reached <code>Great</code> status.</li>
+</ol>
+<p>General advice:</p>
+<ul>
+  <li>Do not ignore upkeep. A large fleet and workforce can bankrupt you.</li>
+  <li>Tools and Guns are advanced goods, but you must first sustain Steel production.</li>
+  <li>Trade capacity is precious. Buy and sell only what gives useful profits or supports your production chain.</li>
+  <li>Advanced traders and warships are stronger, but their shipyard costs rise with their science bonuses.</li>
+  <li>Research that improves raw-material output, trader capacity, and naval guns has a large long-term payoff.</li>
+  <li>A colony or alliance is often worth more than a short-term trade gain because it helps secure Council votes.</li>
+</ul>
+
+</section>
+<section class="manual-section" id="victory"><h2>VICTORY</h2>
+<p>IImperialism! is won in diplomacy, backed by industry and trade.</p>
+<p>Build a strong economy, keep the sea lanes open, turn commerce into influence, and enter the Council of Nations with enough allies and colonies to command 24 votes.</p>
+<p>After victory, the game presents a final score and historical rating. The score rewards three things:</p>
+<ul>
+  <li>diplomacy beyond the bare 24-vote victory</li>
+  <li>speed of victory</li>
+  <li>treasury</li>
+</ul>
+<p>The final report may still list your fleet, firepower, and merchant capacity as part of the campaign summary, but those values no longer add directly to the final score.</p>
+<p>The final report shows <code>Your score is ...</code> in inverted text, then compares your campaign to a rank ladder of nineteenth-century European heads of state:</p>
+<ul>
+  <li>Queen Victoria: <code>50,000 and over</code></li>
+  <li>Otto von Bismarck: <code>35,000 to 49,999</code></li>
+  <li>Napoleon III: <code>20,000 to 34,999</code></li>
+  <li>Charles X: <code>8,000 to 19,999</code></li>
+  <li>Ferdinand VII: <code>less than 8,000</code></li>
+</ul>
+
+</section>
+<section class="manual-section" id="inspiration-and-authorship"><h2>INSPIRATION AND AUTHORSHIP</h2>
+<p>IImperialism! is a love letter to the classic games <b>Taipan!</b> (Apple II) and <b>Imperialism</b> (PC and Mac). Some of its visual and textual elements are borrowed from these great games.</p>
+<p>IImperialism! has been created by Taciano Dreckmann Perez in 2026. All rights reserved.</p>
+</section>
+    </main>
+  </body>
+</html>
