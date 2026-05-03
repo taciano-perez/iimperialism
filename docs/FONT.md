@@ -147,14 +147,17 @@ becomes:
 1001101b = 0x4D
 ```
 
-## Extraction Scripts
+## Conversion And Export Scripts
 
-The font extraction scripts produce the glyph tables that get copied into
-`include/font.h`.
+The font-related scripts in this repo now cover two separate jobs:
+
+1. extracting runtime glyph tables from source PNG sheets
+2. exporting the checked-in runtime glyph tables as website assets
 
 Current in-tree script:
 
 - `tools/extract_font_bold.py`
+- `tools/export_web_fonts.py`
 
 Typical usage:
 
@@ -174,6 +177,69 @@ It does not generate the runtime renderer.
 There is currently no checked-in extraction script for the regular font, even
 though the regular font data in `include/font.h` follows the same packed
 runtime format.
+
+### Web Font Export
+
+The web-font export script works from the checked-in `include/font.h` glyph
+tables instead of re-extracting from the PNG sources.
+
+Default usage:
+
+```bash
+python tools/export_web_fonts.py
+```
+
+This writes output into `build/webfonts/` by default.
+
+To write the website assets into the checked-in website path:
+
+```bash
+python tools/export_web_fonts.py --output-dir assets/fonts --ttf --woff2
+```
+
+The exporter can emit:
+
+- BDF bitmap fonts for both faces
+- PNG sprite sheets for inspection or sprite-based website fallbacks
+- `fonts.css` with `@font-face` rules and a helper class
+- `specimen.html` for visual inspection
+- optional TTF files when `fonttools` is installed locally
+- optional WOFF2 files when `fonttools` is installed locally and the Python
+  `brotli` package is available
+
+The generated `TTF` and `WOFF2` files keep the bitmap look by converting each
+lit source pixel into a filled square in the glyph outline.
+
+### Current Generated Website Assets
+
+The repository currently ships these exported web-font assets in `assets/fonts/`:
+
+- `iimperialism-taipan-regular.ttf`
+- `iimperialism-taipan-regular.woff2`
+- `iimperialism-taipan-bold.ttf`
+- `iimperialism-taipan-bold.woff2`
+- `fonts.css`
+- `specimen.html`
+
+The same export run also writes BDF and PNG versions of each face:
+
+- `iimperialism-taipan-regular.bdf`
+- `iimperialism-taipan-regular.png`
+- `iimperialism-taipan-bold.bdf`
+- `iimperialism-taipan-bold.png`
+
+### Exporter Inputs And Limits
+
+The exporter assumes:
+
+- glyph coverage remains ASCII `32..127`
+- glyph bitmaps remain `7x8`
+- advance width remains one fixed 8-pixel cell
+- the glyph tables in `include/font.h` remain the canonical source for website
+  export
+
+It does not derive kerning, extended Unicode coverage, or smooth outline curves.
+The resulting web fonts are intentionally pixel-styled.
 
 ## Runtime Rendering
 
@@ -288,7 +354,9 @@ row.
 
 - `assets/img/taipan-font.png` - regular source image
 - `assets/img/taipan-font-bold.png` - bold source image
+- `assets/fonts/` - exported website font assets and specimen files
 - `tools/extract_font_bold.py` - bold conversion script
+- `tools/export_web_fonts.py` - website font exporter from `include/font.h`
 - `include/font.h` - generated glyph tables and font constants
 - `asm/text_hgr.s` - runtime HGR text blitters
 - `src/ui.c` - UI helpers in the `LC` segment that call the blitters

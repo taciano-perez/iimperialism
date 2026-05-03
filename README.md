@@ -159,6 +159,7 @@ nation's exports cheaper to buy and its imports more profitable to sell into.
 | `Makefile` | Build rules for the main binary, overlays, RWTS boot path, and disk image |
 | `build-run.sh` | Build + disk update + emulator launch helper |
 | `tools/ac.jar` | AppleCommander utility |
+| `tools/export_web_fonts.py` | Exports the in-game regular and bold bitmap fonts as BDF/PNG assets plus optional TTF/WOFF2 web fonts |
 
 Documentation: `docs/FLOPPY.md`, `docs/MEMORY.md`, `docs/DESIGN.md`,
 `docs/FONT.md`, `docs/PICTURES.md`, `docs/STRUCTURE.md`,
@@ -270,6 +271,29 @@ When adding a new screen as an overlay, see `docs/MEMORY.md` under
 the generated `build/apple2-ovl.cfg` picks up the current `_state` address before
 overlays are relinked.
 
+## Website Font Export
+
+To export the in-game bitmap fonts for website use:
+
+```bash
+python tools/export_web_fonts.py
+```
+
+This writes regular and bold BDF bitmap fonts, PNG sprite sheets, a CSS stub,
+and an HTML specimen into `build/webfonts/`.
+
+If you also have `fonttools` installed locally, you can generate `TTF` files:
+
+```bash
+python tools/export_web_fonts.py --ttf
+```
+
+If your `fonttools` install also has WOFF2 encoder support, you can add:
+
+```bash
+python tools/export_web_fonts.py --ttf --woff2
+```
+
 ## Credits
 
 This project builds on several external tools and libraries. Credit belongs to
@@ -292,6 +316,10 @@ their original authors and maintainers.
   build. AppleCommander is maintained by Robert Greene.
   Project: <https://applecommander.github.io/>
   GitHub: <https://github.com/applecommander/applecommander>
+- **Taipan!**: the bitmap fonts used by the game are derived from `Taipan!`
+  by Art Canfil.
+- **Imperialism**: several nation names used by the game are taken from
+  `Imperialism` by Frog City.
 
 LLMs were used in the in the development of this game, specifically OpenAI Codex (gpt-5.4 medium) and Claude Code (Sonnet 4.6).
 
