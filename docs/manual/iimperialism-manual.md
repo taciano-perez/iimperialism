@@ -70,6 +70,8 @@ From here, press:
 
 Press `ESC` from the Main Screen to open the Game Menu.
 
+![Game Menu](../../assets/screenshots/menu-screen.png)
+
 From the Game Menu, press:
 
 - `N` to start a New Game

@@ -363,6 +363,19 @@
           min-width: 0;
         }
       }
+
+      @media (max-width: 520px) {
+        .hero,
+        .panel {
+          padding: 16px;
+        }
+
+        .title {
+          font-size: clamp(19px, 8vw, 30px);
+          line-height: 0.94;
+          letter-spacing: 0;
+        }
+      }
     </style>
   </head>
   <body>
@@ -381,16 +394,31 @@
             <img class="hero-ship" src="assets/img/web/ship_pirate.png" alt="">
           </p>
           <div class="cta-row">
-            <a class="cta-link cta-primary" href="assets/iimperialism.dsk" download>
+            <a
+              class="cta-link cta-primary"
+              href="releases/0.1.0/iimperialism-0.1.0.dsk"
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Download Disk Image
             </a>
             <a
-              class="cta-link cta-secondary"
-              href="https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/assets/iimperialism.dsk"
+              class="cta-link cta-primary"
+              href="https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/releases/0.1.0/iimperialism-0.1.0.dsk"
               target="_blank"
               rel="noopener noreferrer"
             >
               Play Online Now
+            </a>
+            <a
+              class="cta-link cta-secondary"
+              href="releases/0.1.0/iimperialism-manual-0.1.0.pdf"
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Download Manual
             </a>
           </div>
         </div>
@@ -481,22 +509,41 @@
             emulator and start building your empire in the browser.
           </p>
           <div class="cta-row">
-            <a class="cta-link cta-primary" href="assets/iimperialism.dsk" download>
+            <a
+              class="cta-link cta-primary"
+              href="releases/0.1.0/iimperialism-0.1.0.dsk"
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Get The .DSK
             </a>
             <a
-              class="cta-link cta-secondary"
-              href="https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/assets/iimperialism.dsk"
+              class="cta-link cta-primary"
+              href="https://www.scullinsteel.com/apple//e?disk=https://taciano-perez.github.io/iimperialism/releases/0.1.0/iimperialism-0.1.0.dsk"
               target="_blank"
               rel="noopener noreferrer"
             >
               Play Online
             </a>
+            <a
+              class="cta-link cta-secondary"
+              href="releases/0.1.0/iimperialism-manual-0.1.0.pdf"
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Get The Manual
+            </a>
           </div>
           <p>&nbsp;</p>
           <p>
             Source, build notes, and project documentation are available in the
-            <a href="https://github.com/taciano-perez/iimperialism">Git repository</a>.
+            <a
+              href="https://github.com/taciano-perez/iimperialism"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Git repository</a>.
           </p>
         </article>
       </section>
